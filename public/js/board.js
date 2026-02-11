@@ -49,34 +49,18 @@ function rebuildBoard() {
 
     const rows = getBoardRows();
     const slotH = CONFIG.SLOT_HEIGHT;
-    const padTop = boardHeight * CONFIG.BOARD_PADDING_TOP;
+    const padTop = boardHeight * 0.1; // More space at top for initial drop
     const padBot = slotH + 10;
-    const padSide = boardWidth * CONFIG.BOARD_PADDING_SIDE;
     const usableH = boardHeight - padTop - padBot;
-    const usableW = boardWidth - padSide * 2;
 
     // ── Create walls ──
     const wallOpts = { isStatic: true, restitution: 0.3, friction: 0.1, render: { visible: false } };
-
-    // Left wall
-    walls.push(Matter.Bodies.rectangle(
-        -CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight, wallOpts
-    ));
-    // Right wall
-    walls.push(Matter.Bodies.rectangle(
-        boardWidth + CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight, wallOpts
-    ));
-    // Bottom floor
-    walls.push(Matter.Bodies.rectangle(
-        boardWidth / 2, boardHeight + CONFIG.WALL_THICKNESS / 2,
-        boardWidth, CONFIG.WALL_THICKNESS, wallOpts
-    ));
-
+    walls.push(Matter.Bodies.rectangle(-CONFIG.WALL_THICKNESS / 2, boardHeight / 2, CONFIG.WALL_THICKNESS, boardHeight, wallOpts));
+    walls.push(Matter.Bodies.rectangle(boardWidth + CONFIG.WALL_THICKNESS / 2, boardHeight / 2, CONFIG.WALL_THICKNESS, boardHeight, wallOpts));
+    walls.push(Matter.Bodies.rectangle(boardWidth / 2, boardHeight + CONFIG.WALL_THICKNESS / 2, boardWidth, CONFIG.WALL_THICKNESS, wallOpts));
     Matter.World.add(world, walls);
 
-    // ── Create pegs ──
+    // ── Create pegs in a Classic Pyramid (Galton Board) ──
     const pegOpts = {
         isStatic: true,
         restitution: CONFIG.BALL_RESTITUTION,
@@ -85,15 +69,23 @@ function rebuildBoard() {
         label: 'peg',
     };
 
+    // To form a bell curve distribution, we start with 1 peg and add one per row
+    // Staggered layout: Row 0 has 1 peg, Row 1 has 2 pegs, etc.
+    const rowSpacing = usableH / (rows - 1 || 1);
+    const maxCols = rows;
+    // We want the bottom row to fit within the board width
+    const horizontalSpacing = Math.min(60, (boardWidth * 0.85) / maxCols);
+
     for (let r = 0; r < rows; r++) {
-        const cols = 3 + r; // Start with 3 pegs, add one per row
-        const rowY = padTop + (r / (rows - 1 || 1)) * usableH;
+        const cols = r + 1; // 1, 2, 3...
+        const rowY = padTop + r * rowSpacing;
+
+        // Center the row
+        const rowWidth = (cols - 1) * horizontalSpacing;
+        const rowStartX = (boardWidth - rowWidth) / 2;
 
         for (let c = 0; c < cols; c++) {
-            const spacing = usableW / cols;
-            const rowOffset = (usableW - (cols - 1) * spacing) / 2;
-            const pegX = padSide + rowOffset + c * spacing;
-
+            const pegX = rowStartX + c * horizontalSpacing;
             const peg = Matter.Bodies.circle(pegX, rowY, CONFIG.PEG_RADIUS, pegOpts);
             peg.pegIndex = pegPositions.length;
             pegs.push(peg);
@@ -103,29 +95,52 @@ function rebuildBoard() {
 
     Matter.World.add(world, pegs);
 
-    // ── Create slot dividers and sensors ──
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
-    const numSlots = multipliers.length;
-    const slotWidth = boardWidth / numSlots;
+    // ── Create slots aligned with the bottom row of pegs ──
+    const lastRowCols = rows;
+    const lastRowWidth = (lastRowCols - 1) * horizontalSpacing;
+    const lastRowStartX = (boardWidth - lastRowWidth) / 2;
+
+    const numSlots = lastRowCols + 1;
+    const slotXOffsets = [];
+    for (let i = 0; i < numSlots; i++) {
+        slotXOffsets.push(lastRowStartX - horizontalSpacing / 2 + i * horizontalSpacing);
+    }
+
+    // Adapt multipliers to the number of slots
+    // We want a "Bell Curve" payout: Small on edges, BIG in the middle (Real Plinko)
+    const baseMults = [1, 5, 20, 50, 250, 50, 20, 5, 1];
+    const multipliers = [];
+    for (let i = 0; i < numSlots; i++) {
+        // Map current index to the base pattern
+        const ratio = i / (numSlots - 1);
+        const patternIdx = Math.floor(ratio * (baseMults.length - 1));
+        multipliers.push(baseMults[patternIdx]);
+    }
+
+    // Store multipliers for rendering
+    runtimeState.currentMultipliers = multipliers;
 
     // Slot dividers
     const dividerOpts = { isStatic: true, restitution: 0.2, friction: 0.3, render: { visible: false } };
     for (let i = 0; i <= numSlots; i++) {
-        const divX = i * slotWidth;
+        const divX = lastRowStartX - horizontalSpacing / 2 + (i - 0.5) * horizontalSpacing + horizontalSpacing / 2;
+        // Wait, simpler: dividers are between slots
+        const dividerX = lastRowStartX - horizontalSpacing + i * horizontalSpacing + horizontalSpacing / 2;
+
         const divider = Matter.Bodies.rectangle(
-            divX, boardHeight - slotH / 2 - 2,
+            dividerX, boardHeight - slotH / 2 - 2,
             2, slotH - 4,
             dividerOpts
         );
         Matter.World.add(world, [divider]);
     }
 
-    // Slot sensors (invisible triggers at bottom)
+    // Slot sensors
     for (let i = 0; i < numSlots; i++) {
-        const sensorX = slotWidth / 2 + i * slotWidth;
+        const sensorX = lastRowStartX - horizontalSpacing / 2 + i * horizontalSpacing;
         const sensor = Matter.Bodies.rectangle(
             sensorX, boardHeight - slotH + 8,
-            slotWidth - 4, 12,
+            horizontalSpacing - 4, 12,
             { isStatic: true, isSensor: true, label: 'slot_' + i }
         );
         sensor.slotIndex = i;
@@ -133,14 +148,12 @@ function rebuildBoard() {
     }
     Matter.World.add(world, slotSensorBodies);
 
-    // ── Pick jackpot slot ──
-    runtimeState.jackpotSlot = Math.floor(Math.random() * numSlots);
+    // Jackpots
+    runtimeState.jackpotSlot = Math.floor(numSlots / 2); // Always middle for "Real Plinko" feel
 
-    // Render slot tray HTML
     renderSlotTray(rows);
 
-    // ── Collision events ──
-    Matter.Events.off(engine); // Clear old events
+    Matter.Events.off(engine);
     Matter.Events.on(engine, 'collisionStart', handleCollisions);
 }
 
@@ -211,12 +224,14 @@ function handleCollisions(event) {
 // ── Handle Ball Landing in Slot ──
 function handleSlotHit(slotIndex, ballBody) {
     const rows = getBoardRows();
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
+    const multipliers = runtimeState.currentMultipliers || CONFIG.SLOT_MULTIPLIERS[rows] || [1];
     let mult = multipliers[slotIndex] || 1;
 
     // Is it the jackpot slot?
     const isJackpot = slotIndex === runtimeState.jackpotSlot;
-    if (isJackpot) mult *= 500;
+    // In Real Plinko center slots pay more, so we don't necessarily need an extra mult here
+    // But we'll keep a small bonus if it's the specific jackpot slot
+    if (isJackpot) mult *= 2;
 
     // Lucky ball bonus
     const isLucky = ballBody.isLucky;

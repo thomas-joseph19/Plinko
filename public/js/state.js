@@ -14,26 +14,13 @@ function getDefaultState() {
         totalCoinsAllTime: 0,
 
         // Board
-        boardRows: 4,
+        boardRows: 5,
 
         // Upgrades (levels)
         upgrades: {
-            dropSpeed: 0,
-            ballCount: 0,
-            ballWeight: 0,
-            luckyBalls: 0,
-            multiBall: 0,
-            multiDropper: 0,
-            dropAim: 0,
-            pegDensity: 0,
-            slotBoost: 0,
-            magneticPegs: 0,
-            bumpers: 0,
-            offlineEarn: 0,
-            coinMagnet: 0,
-            critChance: 0,
-            comboMeter: 0,
-            boardExpand: 0,
+            multiDrop: 0,
+            pegLayer: 0,
+            offlineEarnings: 0
         },
 
         // Prestige
@@ -99,23 +86,20 @@ function resetGame() {
 
 // ── Computed Getters ──
 function getDropInterval() {
-    const base = CONFIG.BASE_DROP_INTERVAL;
-    const speedLevel = gameState.upgrades.dropSpeed;
-    // Each level reduces interval by 12%
-    const interval = base * Math.pow(0.88, speedLevel);
-    return Math.max(CONFIG.MIN_DROP_INTERVAL, interval);
+    // Standard interval, could be an upgrade later
+    return CONFIG.BASE_DROP_INTERVAL;
 }
 
 function getBallCount() {
-    return 1 + gameState.upgrades.ballCount;
+    return 1 + (gameState.upgrades.multiDrop || 0);
 }
 
 function getDropperCount() {
-    return 1 + gameState.upgrades.multiDropper;
+    return 1; // Constant for now
 }
 
 function getBoardRows() {
-    return CONFIG.MIN_ROWS + gameState.upgrades.boardExpand;
+    return CONFIG.MIN_ROWS + (gameState.upgrades.pegLayer || 0);
 }
 
 function getGlobalMultiplier() {
@@ -125,9 +109,6 @@ function getGlobalMultiplier() {
     if (gameState.prestigeUpgrades.globalMult) {
         mult *= 1 + (gameState.prestigeUpgrades.globalMult * 0.5);
     }
-
-    // Slot boost upgrade
-    mult *= 1 + (gameState.upgrades.slotBoost * 0.15);
 
     // Fever multiplier
     if (runtimeState.feverActive) {
@@ -141,29 +122,27 @@ function getGlobalMultiplier() {
 }
 
 function getComboMultiplier() {
-    if (gameState.upgrades.comboMeter === 0) return 1;
-    const comboLevel = gameState.upgrades.comboMeter;
+    // Combo multiplier logic (simplified if upgrade removed, but keeping logic for now)
     const consecutive = runtimeState.consecutiveHits;
-    // Each consecutive hit adds (comboLevel * 5)% multiplier, up to 10 stacks
     const stacks = Math.min(consecutive, 10);
-    return 1 + (stacks * comboLevel * 0.05);
+    return 1 + (stacks * 0.05);
 }
 
 function getCritChance() {
-    return gameState.upgrades.critChance * 0.02; // 2% per level
+    return 0; // Upgrade removed
 }
 
 function getLuckyBallChance() {
-    return gameState.upgrades.luckyBalls * 0.03; // 3% per level
+    return 0; // Upgrade removed
 }
 
 function getMultiBallChance() {
-    return gameState.upgrades.multiBall * 0.04; // 4% per level
+    return 0; // Upgrade removed
 }
 
 function getOfflineRate() {
     const baseRate = getCoinsPerSecond();
-    const offlineLevel = gameState.upgrades.offlineEarn;
+    const offlineLevel = gameState.upgrades.offlineEarnings || 0;
     const efficiency = CONFIG.OFFLINE_EFFICIENCY + (offlineLevel * 0.05);
     return baseRate * Math.min(efficiency, 1.0);
 }
@@ -177,7 +156,7 @@ function getCoinsPerSecond() {
 
     // Average multiplier across slots
     const rows = getBoardRows();
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
+    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[CONFIG.MIN_ROWS];
     const avgMult = multipliers.reduce((a, b) => a + b, 0) / multipliers.length;
 
     return ballsPerSec * CONFIG.BASE_BET * avgMult * getGlobalMultiplier();
