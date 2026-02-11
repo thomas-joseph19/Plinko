@@ -206,8 +206,8 @@ body::before {
   height: 100dvh;
   z-index: 1;
   display: grid;
-  /* HUD height (150px) = 100px padding + room for balance info */
-  grid-template-rows: 150px 1fr var(--tab-h);
+  /* Exactly 130px HUD as requested */
+  grid-template-rows: 130px 1fr var(--tab-h);
   grid-template-columns: 1fr;
   width: 100%;
   margin: 0 auto;
@@ -226,8 +226,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* Use a massive top padding (130px) to shove everything down */
-  padding: 100px 16px 0 16px;
+  /* 80px top padding clears the notch while fitting in the 130px bar */
+  padding: 80px 16px 0 16px;
   min-height: 100%;
   background: linear-gradient(180deg, var(--bg-panel), rgba(20, 16, 42, 0.9));
   border-bottom: 1px solid var(--border);
