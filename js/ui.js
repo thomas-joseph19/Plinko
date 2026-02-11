@@ -324,8 +324,21 @@ function initPrestigeButton() {
 function initManualDrop() {
     const btn = document.getElementById('manualDropBtn');
     if (btn) {
+        // Use both touchstart (iOS) and click (desktop) with dedup
+        let btnTouched = false;
+
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            btnTouched = true;
+            const count = getBallCount();
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => spawnBall(null, 15), i * 50);
+            }
+        }, { passive: false });
+
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+            if (btnTouched) { btnTouched = false; return; } // Skip if just handled by touch
             const count = getBallCount();
             for (let i = 0; i < count; i++) {
                 setTimeout(() => spawnBall(null, 15), i * 50);
@@ -333,16 +346,29 @@ function initManualDrop() {
         });
     }
 
-    // Also allow clicking on the board to drop
+    // Also allow touching/clicking on the board to drop
     const boardEl = document.getElementById('plinkoBoard');
     if (boardEl) {
+        let boardTouched = false;
+
+        boardEl.addEventListener('touchstart', (e) => {
+            const rect = boardEl.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            // Only drop if touching in top 15% of board
+            if (touch.clientY - rect.top < rect.height * 0.15) {
+                boardTouched = true;
+                spawnBall(x, 15);
+            }
+        }, { passive: true });
+
         boardEl.addEventListener('click', (e) => {
+            if (boardTouched) { boardTouched = false; return; }
             const rect = boardEl.getBoundingClientRect();
             const x = e.clientX - rect.left;
-            const y = 15;
             // Only drop if clicking in top 15% of board
             if (e.clientY - rect.top < rect.height * 0.15) {
-                spawnBall(x, y);
+                spawnBall(x, 15);
             }
         });
     }

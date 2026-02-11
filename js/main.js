@@ -55,6 +55,59 @@ function boot() {
         rebuildBoard();
     });
 
+    // ═══ iOS-Specific Handlers ═══
+
+    // Prevent iOS context menu / callout on long-press
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Prevent pull-to-refresh and bounce scrolling
+    document.addEventListener('touchmove', (e) => {
+        // Allow scrolling inside panel-scroll elements
+        if (!e.target.closest('.panel-scroll') && !e.target.closest('.side-panel')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Prevent double-tap zoom on iOS
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+
+    // Handle app being backgrounded / foregrounded (iOS task switching)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            // App sent to background — save immediately
+            gameState.lastOnlineTime = Date.now();
+            saveGame();
+        } else if (document.visibilityState === 'visible') {
+            // App brought back — calculate offline earnings
+            calculateOfflineEarnings();
+            gameState.lastOnlineTime = Date.now();
+            // Restart auto-droppers (timers may have been throttled)
+            stopAutoDroppers();
+            startAutoDroppers();
+            // Rebuild board in case orientation changed
+            resizeCanvas();
+            rebuildBoard();
+        }
+    });
+
+    // Handle iOS orientation changes
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            resizeCanvas();
+            rebuildBoard();
+        }, 200); // Short delay to let iOS settle the new dimensions
+    });
+
+    // Request Wake Lock to prevent screen dimming during gameplay
+    requestWakeLock();
+
     // Start game loop
     lastFrameTime = performance.now();
     requestAnimationFrame(gameLoop);
@@ -64,6 +117,9 @@ function boot() {
 
     // Save on tab close
     window.addEventListener('beforeunload', () => saveGame());
+
+    // Also save on page hide (more reliable on iOS)
+    window.addEventListener('pagehide', () => saveGame());
 
     console.log('Game booted successfully!');
 }
@@ -126,3 +182,29 @@ if (document.readyState === 'loading') {
 } else {
     boot();
 }
+
+// ── Wake Lock (prevents screen dimming during gameplay) ──
+let wakeLock = null;
+
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock released');
+            });
+            console.log('Wake Lock acquired');
+        }
+    } catch (err) {
+        // Wake lock can fail silently — that's fine
+        console.log('Wake Lock not available:', err.message);
+    }
+}
+
+// Re-acquire wake lock when app comes back to foreground
+document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && !wakeLock) {
+        await requestWakeLock();
+    }
+});
+
