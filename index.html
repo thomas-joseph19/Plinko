@@ -3,292 +3,348 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PLINKO∞ — Idle Plinko Game</title>
-  <meta name="description"
-    content="Drop balls, earn coins, upgrade everything. A satisfying idle Plinko game with physics, upgrades, and prestige.">
-
-  <!-- iOS PWA / Standalone App -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PLINKO∞">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#14102a">
-  <meta name="format-detection" content="telephone=no">
-
-  <!-- iOS Icons -->
-  <link rel="apple-touch-icon" href="icons/icon.svg">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon.svg">
-  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
-
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Fonts & Styles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLINKO∞ — Mobile Preview</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #08060f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Rajdhani', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Starfield background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 10%, #c4b5fd 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 35%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 70%, #a78bfa 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 80%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 60%, #c4b5fd 0%, transparent 100%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Ambient glowing orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(192, 132, 252, 0.15), transparent 70%);
+      top: -100px;
+      left: -100px;
+      animation: orbFloat 20s ease-in-out infinite alternate;
+    }
+
+    .orb-2 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
+      bottom: -80px;
+      right: -80px;
+      animation: orbFloat 25s ease-in-out 2s infinite alternate;
+    }
+
+    @keyframes orbFloat {
+      from {
+        transform: translate(0, 0);
+      }
+
+      to {
+        transform: translate(40px, 30px);
+      }
+    }
+
+    /* ═══ Phone Container ═══ */
+    .phone-wrapper {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .phone-frame {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background: #1a1a1a;
+      border-radius: 55px;
+      padding: 14px;
+      border: 3px solid #2a2a2a;
+      box-shadow:
+        0 60px 120px -30px rgba(0, 0, 0, 0.7),
+        0 30px 60px -20px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+        0 0 80px rgba(192, 132, 252, 0.08);
+    }
+
+    /* Side buttons */
+    .side-btn {
+      position: absolute;
+      background: #222;
+      border-radius: 2px;
+    }
+
+    .power-btn {
+      right: -5px;
+      top: 180px;
+      width: 4px;
+      height: 80px;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .vol-up {
+      left: -5px;
+      top: 160px;
+      width: 4px;
+      height: 45px;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .vol-down {
+      left: -5px;
+      top: 215px;
+      width: 4px;
+      height: 45px;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .mute-switch {
+      left: -5px;
+      top: 125px;
+      width: 4px;
+      height: 22px;
+      border-radius: 3px 0 0 3px;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 37px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .dynamic-island::after {
+      content: '';
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 11px;
+      height: 11px;
+      background: #0d0d1a;
+      border-radius: 50%;
+      border: 1px solid #1a1a2e;
+    }
+
+    /* Screen */
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #14102a;
+      border-radius: 42px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .phone-screen iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #14102a;
+    }
+
+    /* Home indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      z-index: 100;
+    }
+
+    /* ═══ Controls ═══ */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      transform: translateY(-1px);
+      border-color: rgba(192, 132, 252, 0.4);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.96);
+    }
+
+    .ctrl-btn.active {
+      background: rgba(192, 132, 252, 0.15);
+      border-color: rgba(192, 132, 252, 0.5);
+      color: #c084fc;
+    }
+
+    /* Label */
+    .preview-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+    }
+
+    /* Size info */
+    .size-info {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.3);
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Responsive: if the browser is small, scale the phone down */
+    @media (max-height: 920px) {
+      .phone-frame {
+        transform: scale(0.85);
+        transform-origin: top center;
+      }
+    }
+
+    @media (max-height: 780px) {
+      .phone-frame {
+        transform: scale(0.72);
+        transform-origin: top center;
+      }
+    }
+
+    @media (max-height: 650px) {
+      .phone-frame {
+        transform: scale(0.6);
+        transform-origin: top center;
+      }
+    }
+
+    /* Landscape handling */
+    .phone-frame.landscape {
+      width: 844px;
+      height: 390px;
+    }
+
+    @media (max-width: 900px) {
+      .phone-frame.landscape {
+        transform: scale(0.7);
+        transform-origin: top center;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-  <!-- Ambient background orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
 
-  <!-- Offline earnings toast -->
-  <div class="offline-toast" id="offlineToast" style="display:none;">
-    <div class="toast-icon">🌙</div>
-    <div class="toast-body">
-      <div class="toast-title">Welcome back!</div>
-      <div class="toast-sub" id="offlineMsg">Earned <strong>+0 coins</strong> while away</div>
-    </div>
-    <div class="toast-close" id="toastClose">✕</div>
-  </div>
+  <div class="phone-wrapper">
+    <span class="preview-label">📱 Mobile Preview</span>
 
-  <!-- Fever Mode Overlay -->
-  <div class="fever-overlay" id="feverOverlay"></div>
+    <div class="phone-frame" id="phoneFrame">
+      <!-- Hardware buttons -->
+      <div class="side-btn power-btn"></div>
+      <div class="side-btn vol-up"></div>
+      <div class="side-btn vol-down"></div>
+      <div class="side-btn mute-switch"></div>
 
-  <div class="app" id="app">
+      <!-- Dynamic Island -->
+      <div class="dynamic-island"></div>
 
-    <!-- ═══════════ HUD BAR ═══════════ -->
-    <header class="hud" id="hud">
-      <div class="hud-logo">PLINKO∞</div>
-      <div class="hud-currencies">
-        <div class="currency-chip coins" id="coinChip">
-          <span class="icon">🪙</span>
-          <span id="coinDisplay">0</span>
-        </div>
-        <div class="currency-chip gems" id="gemChip">
-          <span class="icon">💎</span>
-          <span id="gemDisplay">0</span>
-        </div>
-      </div>
-      <div class="hud-actions">
-        <div class="hud-btn" title="Stats" id="statsBtn">📊</div>
-        <div class="hud-btn" title="Settings" id="settingsBtn">⚙️</div>
-      </div>
-    </header>
-
-    <!-- ═══════════ MAIN CONTENT AREA ═══════════ -->
-    <div class="main-content" id="mainContent">
-
-      <!-- ── BOARD VIEW (default) ── -->
-      <div class="view-panel board-view active" id="boardView">
-        <main class="board-area">
-          <!-- Drop zone -->
-          <div class="drop-zone" id="dropZone">
-            <div class="dropper-indicators" id="dropperIndicators"></div>
-            <span class="drop-label" id="dropLabel">AUTO-DROP ×1</span>
-          </div>
-
-          <!-- The Plinko board canvas -->
-          <div class="plinko-board" id="plinkoBoard">
-            <canvas id="gameCanvas"></canvas>
-
-            <!-- Fever banner -->
-            <div class="fever-banner" id="feverBanner">🔥 FEVER MODE 🔥</div>
-
-            <!-- Slot tray rendered by JS -->
-            <div class="slot-tray" id="slotTray"></div>
-          </div>
-
-          <!-- Floating manual drop button -->
-          <button class="manual-drop-btn" id="manualDropBtn" title="Drop a ball!">⬇</button>
-        </main>
+      <!-- Screen -->
+      <div class="phone-screen">
+        <iframe src="game.html" id="gameFrame" title="PLINKO∞ Game"></iframe>
       </div>
 
-      <!-- ── UPGRADES VIEW ── -->
-      <div class="view-panel upgrades-view" id="upgradesView">
-        <div class="panel-scroll">
-          <div class="panel-header">
-            <h2 class="panel-title">🔧 Upgrades</h2>
-            <p class="panel-subtitle">Spend coins to power up your Plinko machine</p>
-          </div>
-
-          <div class="upgrade-category">
-            <div class="category-label">⚡ Ball Upgrades</div>
-            <div class="upgrade-grid" id="ballUpgrades"></div>
-          </div>
-
-          <div class="upgrade-category">
-            <div class="category-label">🎯 Dropper Upgrades</div>
-            <div class="upgrade-grid" id="dropperUpgrades"></div>
-          </div>
-
-          <div class="upgrade-category">
-            <div class="category-label">🏗️ Board Upgrades</div>
-            <div class="upgrade-grid" id="boardUpgrades"></div>
-          </div>
-
-          <div class="upgrade-category">
-            <div class="category-label">💰 Passive Upgrades</div>
-            <div class="upgrade-grid" id="passiveUpgrades"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PRESTIGE VIEW ── -->
-      <div class="view-panel prestige-view" id="prestigeView">
-        <div class="panel-scroll">
-          <div class="panel-header">
-            <h2 class="panel-title">⭐ Prestige</h2>
-            <p class="panel-subtitle">Reset progress for powerful permanent bonuses</p>
-          </div>
-
-          <div class="prestige-info-card" id="prestigeInfo">
-            <div class="prestige-stats">
-              <div class="p-stat">
-                <span class="p-stat-label">Current Prestige</span>
-                <span class="p-stat-value" id="prestigeLevel">0</span>
-              </div>
-              <div class="p-stat">
-                <span class="p-stat-label">Tokens Available</span>
-                <span class="p-stat-value" id="prestigeTokens">0</span>
-              </div>
-              <div class="p-stat">
-                <span class="p-stat-label">Tokens on Reset</span>
-                <span class="p-stat-value highlight" id="tokensOnReset">0</span>
-              </div>
-              <div class="p-stat">
-                <span class="p-stat-label">Total Earned</span>
-                <span class="p-stat-value" id="totalEarned">0</span>
-              </div>
-            </div>
-            <button class="prestige-reset-btn" id="prestigeResetBtn">
-              <span class="prestige-reset-label">⭐ PRESTIGE RESET</span>
-              <span class="prestige-reset-sub" id="prestigeResetSub">Earn 0 tokens</span>
-            </button>
-          </div>
-
-          <div class="prestige-tree" id="prestigeTree"></div>
-        </div>
-      </div>
-
-      <!-- ── DAILY VIEW ── -->
-      <div class="view-panel daily-view" id="dailyView">
-        <div class="panel-scroll">
-          <div class="panel-header">
-            <h2 class="panel-title">🎁 Daily Rewards</h2>
-            <p class="panel-subtitle">Log in every day for escalating rewards</p>
-          </div>
-          <div class="daily-grid" id="dailyGrid"></div>
-          <div class="challenge-section">
-            <div class="category-label">🎯 Daily Challenges</div>
-            <div id="dailyChallenges"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SHOP VIEW ── -->
-      <div class="view-panel shop-view" id="shopView">
-        <div class="panel-scroll">
-          <div class="panel-header">
-            <h2 class="panel-title">💎 Shop</h2>
-            <p class="panel-subtitle">Premium items and special offers</p>
-          </div>
-          <div id="shopItems"></div>
-        </div>
-      </div>
-
+      <!-- Home indicator -->
+      <div class="home-indicator"></div>
     </div>
 
-    <!-- ═══════════ SIDE STATS PANEL ═══════════ -->
-    <aside class="side-panel" id="sidePanel">
-      <div class="stats-card">
-        <div class="card-title">Live Stats</div>
-        <div class="stat-row">
-          <span class="stat-label">Coins / sec</span>
-          <span class="stat-value highlight" id="statCps">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Balls / sec</span>
-          <span class="stat-value" id="statBps">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Multiplier</span>
-          <span class="stat-value highlight" id="statMult">×1.0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Board Rows</span>
-          <span class="stat-value" id="statRows">4</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Prestige</span>
-          <span class="stat-value" id="statPrestige">Lv. 0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Combo</span>
-          <span class="stat-value" id="statCombo">×1</span>
-        </div>
-      </div>
-
-      <!-- Quick upgrades in side panel -->
-      <div class="stats-card">
-        <div class="card-title">Quick Upgrades</div>
-        <div id="quickUpgrades"></div>
-      </div>
-
-      <!-- Prestige teaser -->
-      <div class="prestige-btn" id="prestigeTeaser">
-        <div class="prestige-label">⭐ PRESTIGE</div>
-        <div class="prestige-sub" id="prestigeTeaserSub">Reset for permanent boost</div>
-      </div>
-    </aside>
-
-    <!-- ═══════════ TAB BAR ═══════════ -->
-    <nav class="tab-bar" id="tabBar">
-      <div class="tab active" data-view="boardView">
-        <span class="tab-icon">🎯</span>
-        <span>Board</span>
-      </div>
-      <div class="tab" data-view="upgradesView">
-        <span class="tab-icon">🔧</span>
-        <span>Upgrades</span>
-        <span class="badge" id="upgradeBadge" style="display:none">0</span>
-      </div>
-      <div class="tab" data-view="prestigeView">
-        <span class="tab-icon">⭐</span>
-        <span>Prestige</span>
-      </div>
-      <div class="tab" data-view="dailyView">
-        <span class="tab-icon">🎁</span>
-        <span>Daily</span>
-        <span class="badge" id="dailyBadge" style="display:none">!</span>
-      </div>
-      <div class="tab" data-view="shopView">
-        <span class="tab-icon">💎</span>
-        <span>Shop</span>
-      </div>
-    </nav>
-
+    <div class="controls">
+      <button class="ctrl-btn" onclick="reloadGame()" title="Reload">🔄 Reload</button>
+      <button class="ctrl-btn" id="rotateBtn" onclick="toggleRotation()" title="Rotate">🔄 Rotate</button>
+      <button class="ctrl-btn" onclick="window.location.href='game.html'" title="Full Screen">🌐 Full Screen</button>
+      <span class="size-info" id="sizeInfo">390 × 844</span>
+    </div>
   </div>
 
-  <!-- Matter.js physics engine -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
-
-  <!-- Game modules -->
-  <script src="js/config.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/upgrades.js"></script>
-  <script src="js/prestige.js"></script>
-  <script src="js/board.js"></script>
-  <script src="js/renderer.js"></script>
-  <script src="js/effects.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/daily.js"></script>
-  <script src="js/shop.js"></script>
-  <script src="js/main.js"></script>
-
-  <!-- Service Worker Registration -->
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').then(() => {
-        console.log('Service Worker registered');
-      }).catch(err => console.warn('SW registration failed:', err));
+    const frame = document.getElementById('gameFrame');
+    const phoneFrame = document.getElementById('phoneFrame');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const sizeInfo = document.getElementById('sizeInfo');
+    let isLandscape = false;
+
+    function reloadGame() {
+      try { frame.contentWindow.location.reload(); } catch (e) { frame.src = frame.src; }
+    }
+
+    function toggleRotation() {
+      isLandscape = !isLandscape;
+      phoneFrame.classList.toggle('landscape', isLandscape);
+      rotateBtn.classList.toggle('active', isLandscape);
+      sizeInfo.textContent = isLandscape ? '844 × 390' : '390 × 844';
     }
   </script>
 </body>
