@@ -206,8 +206,8 @@ body::before {
   height: 100dvh;
   z-index: 1;
   display: grid;
-  /* Large HUD (140px) to move balance down away from camera */
-  grid-template-rows: 140px 1fr var(--tab-h);
+  /* Massive 200px HUD bar to ensure clearance */
+  grid-template-rows: 200px 1fr var(--tab-h);
   grid-template-columns: 1fr;
   width: 100%;
   margin: 0 auto;
@@ -224,11 +224,10 @@ body::before {
 .hud {
   grid-column: 1 / -1;
   display: flex;
-  align-items: flex-end;
-  /* Push balance to the bottom of the 140px bar */
+  align-items: center;
   justify-content: space-between;
-  padding: 0 16px 20px 16px;
-  /* 20px padding from the bottom border */
+  /* Use a massive top padding (130px) to shove everything down */
+  padding: 130px 16px 0 16px;
   min-height: 100%;
   background: linear-gradient(180deg, var(--bg-panel), rgba(20, 16, 42, 0.9));
   border-bottom: 1px solid var(--border);
@@ -237,9 +236,8 @@ body::before {
   z-index: 10;
 }
 
-/* Center the HUD content vertically in the non-safe-area portion */
 .hud>* {
-  padding-bottom: 8px;
+  padding-bottom: 0;
 }
 
 .hud-logo {
