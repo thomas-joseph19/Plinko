@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Platform, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
 
@@ -15,6 +17,7 @@ export default function App() {
     if (Platform.OS === 'web') {
         return (
             <View style={styles.container}>
+                <StatusBar style="light" />
                 <iframe
                     src="/game.html"
                     style={{ width: '100%', height: '100%', border: 'none' }}
@@ -24,12 +27,13 @@ export default function App() {
         );
     }
 
-    // On Native (iOS/Android via Expo Go): WebView pointing to Vite dev server
+    // On Native (iOS/Android via Expo Go): SafeAreaView pushes content below the notch
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
+            <StatusBar style="light" />
             <WebView
                 source={{ uri: gameUrl }}
-                style={styles.container}
+                style={styles.webview}
                 allowsBackForwardNavigationGestures
                 domStorageEnabled
                 javaScriptEnabled
@@ -37,12 +41,16 @@ export default function App() {
                 mediaPlaybackRequiresUserAction={false}
                 scrollEnabled={false}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#08060f',
+    },
+    webview: {
         flex: 1,
         backgroundColor: '#08060f',
     },

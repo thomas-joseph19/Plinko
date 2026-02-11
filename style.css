@@ -52,7 +52,8 @@
   --tab-h: 60px;
   --side-w: 280px;
 
-  /* iOS Safe Areas — fallback to 0 if not supported */
+  /* iOS Safe Areas — env() works in Safari/PWA mode.
+     In Expo WebView, SafeAreaView handles safe areas, so fallback is 0. */
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
@@ -79,9 +80,8 @@ body {
   background: var(--bg-deep);
   color: var(--text-bright);
   font-family: 'Rajdhani', sans-serif;
-  min-height: 100vh;
-  /* Use dvh for iOS Safari which accounts for the URL bar */
-  min-height: 100dvh;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   /* iOS touch optimizations */
@@ -92,9 +92,8 @@ body {
   touch-action: manipulation;
   /* Prevent overscroll bounce */
   overscroll-behavior: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* ─── Animated starfield ─── */
@@ -198,42 +197,35 @@ body::before {
 
 /* ═══════════ APP LAYOUT ═══════════ */
 .app {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
   display: grid;
-  /* Account for iOS safe areas in the grid layout */
-  grid-template-rows: calc(var(--hud-h) + var(--sat)) 1fr calc(var(--tab-h) + var(--sab));
-  grid-template-columns: 1fr var(--side-w);
-  height: 100vh;
-  height: 100dvh;
+  grid-template-rows: var(--hud-h) 1fr var(--tab-h);
+  grid-template-columns: 1fr;
   width: 100%;
-  max-width: 1000px;
+  max-width: 500px;
   margin: 0 auto;
   overflow: hidden;
   background: var(--bg-panel);
-  box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
 }
 
-/* Force mobile layout on very narrow screens or when in a simulator */
-@media (max-width: 900px) {
-  .app {
-    grid-template-columns: 1fr;
-    grid-template-rows: calc(var(--hud-h) + var(--sat)) 1fr auto calc(var(--tab-h) + var(--sab));
-    max-width: 500px;
-    /* Force a phone-like width even on tablet/web if small */
-  }
+/* Hide old side-panel (stats are now a tab) */
+.side-panel {
+  display: none;
 }
 
 /* ═══════════ HUD BAR ═══════════ */
 .hud {
   grid-column: 1 / -1;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  /* Push content below notch / dynamic island */
-  padding: var(--sat) calc(16px + var(--sar)) 0 calc(16px + var(--sal));
-  padding-bottom: 0;
-  min-height: calc(var(--hud-h) + var(--sat));
+  padding: 0 16px;
+  min-height: var(--hud-h);
   background: linear-gradient(180deg, rgba(20, 16, 42, 0.95), rgba(20, 16, 42, 0.7));
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(16px);
@@ -1420,16 +1412,14 @@ body::before {
 .tab-bar {
   grid-column: 1 / -1;
   display: flex;
-  align-items: flex-start;
-  /* Account for iOS home indicator safe area */
-  padding-bottom: var(--sab);
-  padding-left: var(--sal);
-  padding-right: var(--sar);
+  align-items: center;
+  padding: 0 10px;
   background: linear-gradient(0deg, rgba(20, 16, 42, 0.98), rgba(20, 16, 42, 0.85));
   border-top: 1px solid var(--border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 10;
+  height: var(--tab-h);
 }
 
 .tab {

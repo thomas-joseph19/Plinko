@@ -130,11 +130,14 @@ function renderUpgradesView() {
     }
 }
 
-// ── Render Quick Upgrades (side panel) ──
+// ── Render Quick Upgrades (side panel + stats tab) ──
 function renderQuickUpgrades() {
-    const container = document.getElementById('quickUpgrades');
-    if (!container) return;
-    container.innerHTML = '';
+    const containers = [
+        document.getElementById('quickUpgrades'),
+        document.getElementById('quickUpgrades2')
+    ].filter(Boolean);
+    if (containers.length === 0) return;
+    containers.forEach(c => c.innerHTML = '');
 
     // Show top 3 affordable + cheapest unaffordable
     const sortedIds = Object.keys(UPGRADES)
@@ -144,7 +147,7 @@ function renderQuickUpgrades() {
     const shown = sortedIds.slice(0, 4);
 
     for (const id of shown) {
-        container.appendChild(createUpgradeCard(id, true));
+        containers.forEach(c => c.appendChild(createUpgradeCard(id, true)));
     }
 }
 
@@ -179,30 +182,45 @@ function updateStatsPanel() {
 
     const cps = runtimeState.smoothCps > 0 ? runtimeState.smoothCps : getCoinsPerSecond();
 
-    setTextIfChanged('statCps', formatNumber(Math.round(cps)));
-    setTextIfChanged('statBps', getBallsPerSecond().toFixed(1));
-    setTextIfChanged('statMult', '×' + getGlobalMultiplier().toFixed(1));
-    setTextIfChanged('statRows', String(getBoardRows()));
-    setTextIfChanged('statPrestige', 'Lv. ' + gameState.prestigeLevel);
-
+    const cpsText = formatNumber(Math.round(cps));
+    const bpsText = getBallsPerSecond().toFixed(1);
+    const multText = '×' + getGlobalMultiplier().toFixed(1);
+    const rowsText = String(getBoardRows());
+    const prestigeText = 'Lv. ' + gameState.prestigeLevel;
     const combo = runtimeState.consecutiveHits || 0;
-    setTextIfChanged('statCombo', combo > 1 ? `×${combo}` : '×1');
+    const comboText = combo > 1 ? `×${combo}` : '×1';
+
+    // Update both old side-panel IDs and new Stats tab IDs
+    setTextIfChanged('statCps', cpsText);
+    setTextIfChanged('statCps2', cpsText);
+    setTextIfChanged('statBps', bpsText);
+    setTextIfChanged('statBps2', bpsText);
+    setTextIfChanged('statMult', multText);
+    setTextIfChanged('statMult2', multText);
+    setTextIfChanged('statRows', rowsText);
+    setTextIfChanged('statRows2', rowsText);
+    setTextIfChanged('statPrestige', prestigeText);
+    setTextIfChanged('statPrestige2', prestigeText);
+    setTextIfChanged('statCombo', comboText);
+    setTextIfChanged('statCombo2', comboText);
 
     // Currency displays
     setTextIfChanged('coinDisplay', formatNumber(Math.floor(gameState.coins)));
     setTextIfChanged('gemDisplay', formatNumber(gameState.gems));
 
-    // Prestige teaser
+    // Prestige teaser (both old and new)
     const tokens = calculatePrestigeTokens();
-    const teaserSub = document.getElementById('prestigeTeaserSub');
-    if (teaserSub) {
-        if (canPrestige()) {
-            teaserSub.textContent = `Reset for ${tokens} token${tokens !== 1 ? 's' : ''}`;
-        } else {
-            const needed = CONFIG.PRESTIGE_THRESHOLD - gameState.totalCoinsEarned;
-            teaserSub.textContent = `Need ${formatNumber(Math.max(0, needed))} more coins`;
+    ['prestigeTeaserSub', 'prestigeTeaserSub2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (canPrestige()) {
+                el.textContent = `Reset for ${tokens} token${tokens !== 1 ? 's' : ''}`;
+            } else {
+                const needed = CONFIG.PRESTIGE_THRESHOLD - gameState.totalCoinsEarned;
+                el.textContent = `Need ${formatNumber(Math.max(0, needed))} more coins`;
+            }
         }
-    }
+    });
 }
 
 // ── Helper: only update text if changed (reduce DOM writes) ──
@@ -278,6 +296,7 @@ function initTabs() {
 
             // Render view content on switch
             if (viewId === 'upgradesView') renderUpgradesView();
+            if (viewId === 'statsView') { updateStatsPanel(); renderQuickUpgrades(); }
             if (viewId === 'prestigeView') renderPrestigeView();
             if (viewId === 'dailyView') renderDailyView();
             if (viewId === 'shopView') renderShopView();
@@ -310,14 +329,15 @@ function initPrestigeButton() {
         });
     }
 
-    // Side panel prestige teaser
-    const teaser = document.getElementById('prestigeTeaser');
-    if (teaser) {
-        teaser.addEventListener('click', () => {
-            // Switch to prestige tab
-            document.querySelector('.tab[data-view="prestigeView"]')?.click();
-        });
-    }
+    // Prestige teasers (both old and new)
+    ['prestigeTeaser', 'prestigeTeaser2'].forEach(id => {
+        const teaser = document.getElementById(id);
+        if (teaser) {
+            teaser.addEventListener('click', () => {
+                document.querySelector('.tab[data-view="prestigeView"]')?.click();
+            });
+        }
+    });
 }
 
 // ── Manual Drop Button ──
