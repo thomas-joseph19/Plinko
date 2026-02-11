@@ -1,15 +1,12 @@
 import React from 'react';
 import { View, Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
 
 // Build the URL to the Vite dev server running the game
-// When on a real device, we need the local network IP
 const debuggerHost = Constants.expoConfig?.hostUri || 'localhost:5173';
 const localIp = debuggerHost.split(':')[0];
-// Vite dev server should be running on port 5173
 const gameUrl = `http://${localIp}:5173/game.html`;
 
 export default function App() {
@@ -27,9 +24,9 @@ export default function App() {
         );
     }
 
-    // On Native (iOS/Android via Expo Go): SafeAreaView pushes content below the notch
+    // On Native: Full screen WebView
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <StatusBar style="light" />
             <WebView
                 source={{ uri: gameUrl }}
@@ -40,8 +37,9 @@ export default function App() {
                 allowsInlineMediaPlayback
                 mediaPlaybackRequiresUserAction={false}
                 scrollEnabled={false}
+                bounces={false}
             />
-        </SafeAreaView>
+        </View>
     );
 }
 

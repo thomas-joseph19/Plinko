@@ -202,9 +202,12 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
+  /* Fill the whole unit */
   z-index: 1;
   display: grid;
-  grid-template-rows: var(--hud-h) 1fr var(--tab-h);
+  /* HUD is taller (110px) to push content down below camera 
+     while maintaining a solid background */
+  grid-template-rows: 110px 1fr var(--tab-h);
   grid-template-columns: 1fr;
   width: 100%;
   max-width: 500px;
@@ -222,11 +225,16 @@ body::before {
 .hud {
   grid-column: 1 / -1;
   display: flex;
-  align-items: center;
+  /* Push coin/gem info further down into the HUD space */
+  align-items: flex-end;
+  padding-bottom: 12px;
   justify-content: space-between;
-  padding: 0 16px;
-  min-height: var(--hud-h);
-  background: linear-gradient(180deg, rgba(20, 16, 42, 0.95), rgba(20, 16, 42, 0.7));
+  padding-left: 16px;
+  padding-right: 16px;
+  /* HUD takes up the top space (110px) but the balance bar 
+     is pushed to the bottom of that space */
+  min-height: 100%;
+  background: linear-gradient(180deg, rgba(20, 16, 42, 1), rgba(20, 16, 42, 0.85));
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
