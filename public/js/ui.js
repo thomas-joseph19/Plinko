@@ -85,8 +85,23 @@ function createUpgradeCard(id, compact) {
   `;
 
     if (!maxed) {
+<<<<<<< HEAD
         card.addEventListener('click', () => {
             if (purchaseUpgrade(id)) {
+=======
+        // Enhanced touch/click handler with haptic feedback
+        const handleInteraction = (e) => {
+            if (e.type === 'touchstart') {
+                e.preventDefault();
+                if (typeof triggerHaptic === 'function') triggerHaptic('selection');
+            }
+        };
+        
+        card.addEventListener('touchstart', handleInteraction, { passive: false });
+        card.addEventListener('click', () => {
+            if (purchaseUpgrade(id)) {
+                if (typeof triggerHaptic === 'function') triggerHaptic('success');
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
                 card.classList.add('purchased');
                 setTimeout(() => card.classList.remove('purchased'), 400);
                 // Refresh UI
@@ -99,6 +114,10 @@ function createUpgradeCard(id, compact) {
                     startAutoDroppers();
                 }
             } else {
+<<<<<<< HEAD
+=======
+                if (typeof triggerHaptic === 'function') triggerHaptic('error');
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
                 card.classList.add('rejected');
                 setTimeout(() => card.classList.remove('rejected'), 350);
             }
@@ -130,6 +149,7 @@ function renderUpgradesView() {
     }
 }
 
+<<<<<<< HEAD
 // ── Render Quick Upgrades (side panel + stats tab) ──
 function renderQuickUpgrades() {
     const containers = [
@@ -138,6 +158,13 @@ function renderQuickUpgrades() {
     ].filter(Boolean);
     if (containers.length === 0) return;
     containers.forEach(c => c.innerHTML = '');
+=======
+// ── Render Quick Upgrades (side panel) ──
+function renderQuickUpgrades() {
+    const container = document.getElementById('quickUpgrades');
+    if (!container) return;
+    container.innerHTML = '';
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 
     // Show top 3 affordable + cheapest unaffordable
     const sortedIds = Object.keys(UPGRADES)
@@ -147,7 +174,11 @@ function renderQuickUpgrades() {
     const shown = sortedIds.slice(0, 4);
 
     for (const id of shown) {
+<<<<<<< HEAD
         containers.forEach(c => c.appendChild(createUpgradeCard(id, true)));
+=======
+        container.appendChild(createUpgradeCard(id, true));
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
     }
 }
 
@@ -182,6 +213,7 @@ function updateStatsPanel() {
 
     const cps = runtimeState.smoothCps > 0 ? runtimeState.smoothCps : getCoinsPerSecond();
 
+<<<<<<< HEAD
     const cpsText = formatNumber(Math.round(cps));
     const bpsText = getBallsPerSecond().toFixed(1);
     const multText = '×' + getGlobalMultiplier().toFixed(1);
@@ -203,11 +235,22 @@ function updateStatsPanel() {
     setTextIfChanged('statPrestige2', prestigeText);
     setTextIfChanged('statCombo', comboText);
     setTextIfChanged('statCombo2', comboText);
+=======
+    setTextIfChanged('statCps', formatNumber(Math.round(cps)));
+    setTextIfChanged('statBps', getBallsPerSecond().toFixed(1));
+    setTextIfChanged('statMult', '×' + getGlobalMultiplier().toFixed(1));
+    setTextIfChanged('statRows', String(getBoardRows()));
+    setTextIfChanged('statPrestige', 'Lv. ' + gameState.prestigeLevel);
+
+    const combo = runtimeState.consecutiveHits || 0;
+    setTextIfChanged('statCombo', combo > 1 ? `×${combo}` : '×1');
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 
     // Currency displays
     setTextIfChanged('coinDisplay', formatNumber(Math.floor(gameState.coins)));
     setTextIfChanged('gemDisplay', formatNumber(gameState.gems));
 
+<<<<<<< HEAD
     // Prestige teaser (both old and new)
     const tokens = calculatePrestigeTokens();
     ['prestigeTeaserSub', 'prestigeTeaserSub2'].forEach(id => {
@@ -221,6 +264,19 @@ function updateStatsPanel() {
             }
         }
     });
+=======
+    // Prestige teaser
+    const tokens = calculatePrestigeTokens();
+    const teaserSub = document.getElementById('prestigeTeaserSub');
+    if (teaserSub) {
+        if (canPrestige()) {
+            teaserSub.textContent = `Reset for ${tokens} token${tokens !== 1 ? 's' : ''}`;
+        } else {
+            const needed = CONFIG.PRESTIGE_THRESHOLD - gameState.totalCoinsEarned;
+            teaserSub.textContent = `Need ${formatNumber(Math.max(0, needed))} more coins`;
+        }
+    }
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 }
 
 // ── Helper: only update text if changed (reduce DOM writes) ──
@@ -284,6 +340,14 @@ function initTabs() {
     const views = document.querySelectorAll('.view-panel');
 
     tabs.forEach(tab => {
+<<<<<<< HEAD
+=======
+        // Enhanced touch handling
+        tab.addEventListener('touchstart', (e) => {
+            if (typeof triggerHaptic === 'function') triggerHaptic('selection');
+        }, { passive: true });
+        
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
         tab.addEventListener('click', () => {
             const viewId = tab.dataset.view;
 
@@ -296,7 +360,10 @@ function initTabs() {
 
             // Render view content on switch
             if (viewId === 'upgradesView') renderUpgradesView();
+<<<<<<< HEAD
             if (viewId === 'statsView') { updateStatsPanel(); renderQuickUpgrades(); }
+=======
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
             if (viewId === 'prestigeView') renderPrestigeView();
             if (viewId === 'dailyView') renderDailyView();
             if (viewId === 'shopView') renderShopView();
@@ -329,6 +396,7 @@ function initPrestigeButton() {
         });
     }
 
+<<<<<<< HEAD
     // Prestige teasers (both old and new)
     ['prestigeTeaser', 'prestigeTeaser2'].forEach(id => {
         const teaser = document.getElementById(id);
@@ -338,6 +406,16 @@ function initPrestigeButton() {
             });
         }
     });
+=======
+    // Side panel prestige teaser
+    const teaser = document.getElementById('prestigeTeaser');
+    if (teaser) {
+        teaser.addEventListener('click', () => {
+            // Switch to prestige tab
+            document.querySelector('.tab[data-view="prestigeView"]')?.click();
+        });
+    }
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 }
 
 // ── Manual Drop Button ──
@@ -350,6 +428,10 @@ function initManualDrop() {
         btn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             btnTouched = true;
+<<<<<<< HEAD
+=======
+            if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
             const count = getBallCount();
             for (let i = 0; i < count; i++) {
                 setTimeout(() => spawnBall(null, 15), i * 50);
@@ -378,6 +460,10 @@ function initManualDrop() {
             // Only drop if touching in top 15% of board
             if (touch.clientY - rect.top < rect.height * 0.15) {
                 boardTouched = true;
+<<<<<<< HEAD
+=======
+                if (typeof triggerHaptic === 'function') triggerHaptic('light');
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
                 spawnBall(x, 15);
             }
         }, { passive: true });

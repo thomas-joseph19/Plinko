@@ -7,6 +7,83 @@ let saveTimer = 0;
 let uiRefreshTimer = 0;
 let cleanupTimer = 0;
 
+<<<<<<< HEAD
+=======
+// ── Haptic Feedback Support (for mobile devices) ──
+window.triggerHaptic = function(type = 'light') {
+    if ('vibrate' in navigator) {
+        const patterns = {
+            light: 10,
+            medium: 20,
+            heavy: 30,
+            success: [10, 50, 10],
+            error: [20, 50, 20, 50, 20],
+            selection: 5
+        };
+        navigator.vibrate(patterns[type] || patterns.light);
+    }
+};
+
+// ── Enhanced Touch Handler (prevents double-tap zoom and improves responsiveness) ──
+function setupTouchHandlers() {
+    let lastTap = 0;
+    let touchStartTime = 0;
+    let touchStartY = 0;
+    
+    // Prevent double-tap zoom
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTap;
+        
+        if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        lastTap = now;
+    }, { passive: false });
+    
+    // Prevent pull-to-refresh on iOS Safari
+    document.addEventListener('touchstart', (e) => {
+        touchStartTime = Date.now();
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        const touchY = e.touches[0].clientY;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Prevent pull-to-refresh when at top of page
+        if (scrollTop === 0 && touchY > touchStartY) {
+            // Allow scrolling inside scrollable containers
+            if (!e.target.closest('.panel-scroll') && 
+                !e.target.closest('.side-panel') &&
+                !e.target.closest('.tab-bar')) {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+    
+    // Improve touch responsiveness
+    document.addEventListener('touchstart', (e) => {
+        // Add active class for visual feedback
+        if (e.target.classList.contains('upgrade-card') ||
+            e.target.classList.contains('tab') ||
+            e.target.classList.contains('hud-btn') ||
+            e.target.classList.contains('manual-drop-btn')) {
+            e.target.classList.add('touch-active');
+            triggerHaptic('selection');
+        }
+    }, { passive: true });
+    
+    document.addEventListener('touchend', (e) => {
+        // Remove active class
+        const activeElements = document.querySelectorAll('.touch-active');
+        activeElements.forEach(el => el.classList.remove('touch-active'));
+    }, { passive: true });
+}
+
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 // ── Boot sequence ──
 function boot() {
     console.log('%c PLINKO∞ ', 'background: linear-gradient(135deg, #c084fc, #38bdf8); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
@@ -34,6 +111,12 @@ function boot() {
     initTabs();
     initPrestigeButton();
     initManualDrop();
+<<<<<<< HEAD
+=======
+    
+    // Setup enhanced touch handlers
+    setupTouchHandlers();
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 
     // Calculate offline earnings
     if (hadSave) {
@@ -68,6 +151,7 @@ function boot() {
         }
     }, { passive: false });
 
+<<<<<<< HEAD
     // Prevent double-tap zoom on iOS
     let lastTouchEnd = 0;
     document.addEventListener('touchend', (e) => {
@@ -77,6 +161,9 @@ function boot() {
         }
         lastTouchEnd = now;
     }, { passive: false });
+=======
+    // Double-tap zoom prevention is now handled in setupTouchHandlers()
+>>>>>>> 968190d (Enhance mobile compatibility for all modern devices)
 
     // Handle app being backgrounded / foregrounded (iOS task switching)
     document.addEventListener('visibilitychange', () => {
