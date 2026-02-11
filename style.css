@@ -197,20 +197,18 @@ body::before {
 
 /* ═══════════ APP LAYOUT ═══════════ */
 .app {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  /* Fill the whole unit */
+  height: 100vh;
+  height: 100dvh;
   z-index: 1;
   display: grid;
-  /* HUD is taller (110px) to push content down below camera 
-     while maintaining a solid background */
-  grid-template-rows: 110px 1fr var(--tab-h);
+  grid-template-rows: 85px 1fr var(--tab-h);
   grid-template-columns: 1fr;
   width: 100%;
-  max-width: 500px;
   margin: 0 auto;
   overflow: hidden;
   background: var(--bg-panel);
@@ -225,16 +223,12 @@ body::before {
 .hud {
   grid-column: 1 / -1;
   display: flex;
-  /* Push coin/gem info further down into the HUD space */
-  align-items: flex-end;
-  padding-bottom: 12px;
+  align-items: center;
   justify-content: space-between;
-  padding-left: 16px;
-  padding-right: 16px;
-  /* HUD takes up the top space (110px) but the balance bar 
-     is pushed to the bottom of that space */
+  /* Padding-top clears the notch while flex centers the content */
+  padding: 30px 16px 0 16px;
   min-height: 100%;
-  background: linear-gradient(180deg, rgba(20, 16, 42, 1), rgba(20, 16, 42, 0.85));
+  background: linear-gradient(180deg, var(--bg-panel), rgba(20, 16, 42, 0.8));
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -404,7 +398,8 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 12px 10px 16px;
+  padding: 0;
+  /* Fill entire space */
   height: 100%;
 }
 
