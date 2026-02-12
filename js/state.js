@@ -122,10 +122,10 @@ function getMultiBallChance() {
 }
 
 // Slot Boost: +1% payout per level
-// Slot Boost: +1% compounded per level (1.01^level)
+// Slot Boost: +5% compounded per level (1.05^level)
 function getSlotBoostMultiplier() {
     const level = gameState.upgrades.slotBoost || 0;
-    return Math.pow(1.01, level);
+    return Math.pow(1.05, level);
 }
 
 // Global multiplier (combines slot boost + prestige + fever)

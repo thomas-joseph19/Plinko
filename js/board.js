@@ -180,6 +180,17 @@ function handleCollisions(event) {
                 spawnSparkle(peg.position.x, peg.position.y);
             }
 
+            // Event: Ball Evolution — track peg hits
+            if (typeof isEventActive === 'function' && isEventActive('ball_evolution')) {
+                if (ball.pegHits === undefined) ball.pegHits = 0;
+                ball.pegHits++;
+            }
+
+            // Event: Peg Cascade — destroy pegs on hit
+            if (typeof handlePegCascadeHit === 'function' && typeof isEventActive === 'function' && isEventActive('peg_cascade')) {
+                handlePegCascadeHit(peg);
+            }
+
             // Multi-ball split
             if (gameState.upgrades.multiBall > 0 && !ball.hasSplit) {
                 const splitChance = getMultiBallChance();
@@ -205,10 +216,25 @@ function handleCollisions(event) {
 // ── Handle Ball Landing in Slot ──
 function handleSlotHit(slotIndex, ballBody) {
     const rows = getBoardRows();
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
-    let mult = multipliers[slotIndex] || 1;
 
-    // Is it the jackpot slot?
+    // Event: Bin Roulette — override bin values
+    let baseMult;
+    if (typeof getBinRouletteValue === 'function') {
+        const rouletteVal = getBinRouletteValue(slotIndex);
+        if (rouletteVal !== null) {
+            baseMult = rouletteVal;
+        }
+    }
+    if (baseMult === undefined) {
+        const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
+        baseMult = multipliers[slotIndex] || 1;
+    }
+    let mult = baseMult;
+
+    // Event: Ball Evolution — per-ball multiplier from peg hits
+    if (typeof getBallEvolutionMultiplier === 'function') {
+        mult *= getBallEvolutionMultiplier(ballBody);
+    }
 
     // Lucky ball bonus
     const isLucky = ballBody.isLucky;
@@ -262,7 +288,20 @@ function spawnBall(x, y, forceGolden) {
 
     // Sub-pixel jitter (0.1px) is invisible but prevents "perfect" physics paths
     // without it, every ball would follow the exact same left/right path
-    const dropX = x || boardWidth / 2 + (Math.random() - 0.5) * 0.1;
+    // Determine drop position
+    let dropX;
+    if (x) {
+        dropX = x;
+    } else {
+        // Default drop behavior
+        if (typeof isEventActive === 'function' && isEventActive('peg_cascade')) {
+            // Peg Cascade Active: Random drop across full width
+            dropX = 10 + Math.random() * (boardWidth - 20);
+        } else {
+            // Normal: Center drop with tiny jitter
+            dropX = boardWidth / 2 + (Math.random() - 0.5) * 0.1;
+        }
+    }
     const dropY = y || 15;
 
     const ball = Matter.Bodies.circle(dropX, dropY, CONFIG.BALL_RADIUS, {
@@ -275,12 +314,17 @@ function spawnBall(x, y, forceGolden) {
     ball.isLucky = isLucky;
     ball.scored = false;
     ball.hasSplit = false;
+    ball.pegHits = 0;
     ball.spawnTime = Date.now();
     ball.trailPoints = [];
 
     // Pinpoint drop: zero horizontal velocity
-    // Apply drop speed upgrade
-    const speedMult = typeof getDropSpeedMultiplier === 'function' ? getDropSpeedMultiplier() : 1;
+    // Apply drop speed upgrade + event modifier
+    let speedMult = typeof getDropSpeedMultiplier === 'function' ? getDropSpeedMultiplier() : 1;
+    // Event: Hyper Ball Storm — reduce drop speed
+    if (typeof getStormDropSpeedMod === 'function') {
+        speedMult *= (1 + getStormDropSpeedMod());
+    }
     Matter.Body.setVelocity(ball, { x: 0, y: 1.0 * speedMult });
 
     balls.push(ball);
@@ -392,6 +436,11 @@ function updatePhysics(delta) {
             Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
         }
 
+        // Event: Edge Singularity — pull balls toward edges
+        if (typeof applyEdgeSingularity === 'function') {
+            applyEdgeSingularity(ball);
+        }
+
         // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
         ball.trailPoints.push({ x: ball.position.x, y: ball.position.y, t: Date.now() });
@@ -403,4 +452,7 @@ function updatePhysics(delta) {
     for (const p of pegPositions) {
         if (p.lit > 0) p.lit = Math.max(0, p.lit - 0.04);
     }
+
+    // Tick event system
+    if (typeof tickEvents === 'function') tickEvents();
 }

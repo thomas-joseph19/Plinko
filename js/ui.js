@@ -226,6 +226,33 @@ function updateStatsPanel() {
             }
         }
     });
+
+    // Update events panel if visible (now in Upgrades view)
+    if (typeof isAnyEventActive === 'function') {
+        const upgradesView = document.getElementById('upgradesView');
+        if (upgradesView && upgradesView.classList.contains('active')) {
+            renderEventsPanel();
+        }
+        // Update global status bar
+        const statusEl = document.getElementById('eventGlobalStatus');
+        if (statusEl) {
+            if (isAnyEventActive()) {
+                const ev = EVENTS[eventState.activeEvent];
+                const remaining = Math.ceil(getEventTimeRemaining() / 1000);
+                statusEl.textContent = `${ev.name} — ${remaining}s left`;
+                statusEl.style.color = 'var(--accent2)';
+            } else if (isEventOnCooldown()) {
+                const cdSec = Math.ceil(getCooldownRemaining() / 1000);
+                const mins = Math.floor(cdSec / 60);
+                const secs = cdSec % 60;
+                statusEl.textContent = `Cooldown: ${mins}:${String(secs).padStart(2, '0')}`;
+                statusEl.style.color = 'var(--text-dim)';
+            } else {
+                statusEl.textContent = 'Ready — Choose an event!';
+                statusEl.style.color = 'var(--success)';
+            }
+        }
+    }
 }
 
 // ── Helper: only update text if changed (reduce DOM writes) ──
@@ -300,11 +327,15 @@ function initTabs() {
             if (target) target.classList.add('active');
 
             // Render view content on switch
-            if (viewId === 'upgradesView') renderUpgradesView();
+            if (viewId === 'upgradesView') {
+                renderUpgradesView();
+                if (typeof renderEventsPanel === 'function') renderEventsPanel();
+            }
             if (viewId === 'statsView') { updateStatsPanel(); renderQuickUpgrades(); }
             if (viewId === 'prestigeView') renderPrestigeView();
             if (viewId === 'dailyView') renderDailyView();
             if (viewId === 'shopView') renderShopView();
+
 
             // Hide badge on tab
             const badge = tab.querySelector('.badge');

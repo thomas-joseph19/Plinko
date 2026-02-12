@@ -52,6 +52,15 @@
   <!-- Fever Mode Overlay -->
   <div class="fever-overlay" id="feverOverlay"></div>
 
+  <button id="debugMoneyBtn"
+    style="position: fixed; top: 80px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
+    +100k 💰
+  </button>
+  <button id="debugCooldownBtn"
+    style="position: fixed; top: 110px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
+    Reset 🕐
+  </button>
+
   <div class="app" id="app">
 
     <!-- ═══════════ HUD BAR ═══════════ -->
@@ -92,6 +101,11 @@
             <!-- Fever banner -->
             <div class="fever-banner" id="feverBanner">🔥 FEVER MODE 🔥</div>
 
+            <!-- Event banner -->
+            <div class="fever-banner" id="eventBanner"
+              style="background: linear-gradient(135deg, rgba(56,189,248,0.95), rgba(99,102,241,0.95));">⚡ EVENT ACTIVE
+              ⚡</div>
+
             <!-- Slot tray rendered by JS -->
             <div class="slot-tray" id="slotTray"></div>
           </div>
@@ -122,6 +136,14 @@
           <div class="upgrade-category">
             <div class="category-label">💰 Passive Upgrades</div>
             <div class="upgrade-grid" id="passiveUpgrades"></div>
+          </div>
+
+          <div class="upgrade-category">
+            <div class="category-label">⚡ Events</div>
+            <div class="event-info-bar" id="eventInfoBar">
+              <span class="event-info-status" id="eventGlobalStatus">Ready</span>
+            </div>
+            <div class="event-grid" id="eventCards"></div>
           </div>
         </div>
       </div>
@@ -188,6 +210,7 @@
           <div id="shopItems"></div>
         </div>
       </div>
+
 
       <!-- ── STATS VIEW (was side panel) ── -->
       <div class="view-panel stats-view" id="statsView">
@@ -287,10 +310,12 @@
   <script src="js/state.js"></script>
   <script src="js/upgrades.js"></script>
   <script src="js/prestige.js"></script>
+  <script src="js/events.js"></script>
   <script src="js/board.js"></script>
   <script src="js/renderer.js"></script>
   <script src="js/effects.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/debug.js"></script>
   <script src="js/daily.js"></script>
   <script src="js/shop.js"></script>
   <script src="js/main.js"></script>

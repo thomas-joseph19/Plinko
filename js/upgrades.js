@@ -49,7 +49,7 @@ const UPGRADES = {
         maxLevel: 30,
         baseCost: 1000,
         costScale: 2.0,
-        effect: (lvl) => `×${Math.pow(1.01, lvl).toFixed(2)} payout`,
+        effect: (lvl) => `×${Math.pow(1.05, lvl).toFixed(2)} payout`,
     },
 
     // ── Passive Upgrades ──

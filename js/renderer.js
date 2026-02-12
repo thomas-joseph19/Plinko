@@ -123,6 +123,9 @@ function renderFrame() {
 // ── Draw Pegs ──
 function drawPegs() {
     for (const peg of pegPositions) {
+        // Skip pegs destroyed by Peg Cascade event
+        if (peg.destroyed) continue;
+
         const lit = peg.lit;
 
         if (lit > 0.01) {
