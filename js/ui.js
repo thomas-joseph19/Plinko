@@ -7,7 +7,7 @@ function renderSlotTray(rows) {
     const tray = document.getElementById('slotTray');
     if (!tray) return;
 
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
+    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[10];
     tray.innerHTML = '';
 
     multipliers.forEach((mult, i) => {
@@ -94,7 +94,7 @@ function createUpgradeCard(id, compact) {
                 updateStatsPanel();
                 renderDroppers();
                 // Restart auto-droppers if relevant upgrade
-                if (['dropSpeed', 'ballCount', 'multiDropper', 'dropAim'].includes(id)) {
+                if (['ballRate', 'dropSpeed'].includes(id)) {
                     stopAutoDroppers();
                     startAutoDroppers();
                 }
@@ -112,7 +112,6 @@ function createUpgradeCard(id, compact) {
 function renderUpgradesView() {
     const categories = {
         ball: document.getElementById('ballUpgrades'),
-        dropper: document.getElementById('dropperUpgrades'),
         board: document.getElementById('boardUpgrades'),
         passive: document.getElementById('passiveUpgrades'),
     };
@@ -187,8 +186,7 @@ function updateStatsPanel() {
     const multText = '×' + getGlobalMultiplier().toFixed(1);
     const rowsText = String(getBoardRows());
     const prestigeText = 'Lv. ' + gameState.prestigeLevel;
-    const combo = runtimeState.consecutiveHits || 0;
-    const comboText = combo > 1 ? `×${combo}` : '×1';
+    const comboText = '—';
 
     // Update both old side-panel IDs and new Stats tab IDs
     setTextIfChanged('statCps', cpsText);
@@ -201,9 +199,6 @@ function updateStatsPanel() {
     setTextIfChanged('statRows2', rowsText);
     setTextIfChanged('statPrestige', prestigeText);
     setTextIfChanged('statPrestige2', prestigeText);
-    setTextIfChanged('statCombo', comboText);
-    setTextIfChanged('statCombo2', comboText);
-
     // Currency displays
     setTextIfChanged('coinDisplay', formatNumber(Math.floor(gameState.coins)));
     setTextIfChanged('gemDisplay', formatNumber(gameState.gems));

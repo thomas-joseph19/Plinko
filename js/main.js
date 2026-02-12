@@ -35,6 +35,35 @@ function boot() {
     initPrestigeButton();
     initManualDrop();
 
+    // Hard Reset Handler
+    const hardResetBtn = document.getElementById('hardResetBtn');
+    if (hardResetBtn) {
+        hardResetBtn.addEventListener('click', () => {
+            if (confirm('⚠️ HARD RESET ⚠️\n\nThis will permanently delete ALL progress, coins, and prestige levels.\n\nAre you absolutely sure?')) {
+                // Remove save listeners to prevent writing back old data during reload
+                // Clear all storage
+                localStorage.clear();
+
+                // Clear Service Worker Caches
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
+
+                // Unregister Service Workers
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        for (let registration of registrations) registration.unregister();
+                    });
+                }
+
+                // Force a hard reload with a reset flag
+                window.location.href = window.location.origin + window.location.pathname + '?reset=true';
+            }
+        });
+    }
+
     // Calculate offline earnings
     if (hadSave) {
         calculateOfflineEarnings();

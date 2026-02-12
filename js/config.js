@@ -7,15 +7,15 @@ const CONFIG = {
   GRAVITY: 1.2,
   BALL_RADIUS: 6,
   PEG_RADIUS: 4,
-  BALL_RESTITUTION: 0.5,
-  BALL_FRICTION: 0.02,
+  BALL_RESTITUTION: 0.4,
+  BALL_FRICTION: 0.05,
   BALL_DENSITY: 0.002,
-  PEG_FRICTION: 0.05,
+  PEG_FRICTION: 0.1,
   WALL_THICKNESS: 10,
 
   // ── Board ──
-  MIN_ROWS: 4,
-  MAX_ROWS: 16,
+  MIN_ROWS: 10,
+  MAX_ROWS: 10,
   SLOT_HEIGHT: 48,
   BOARD_PADDING_TOP: 0.06,    // % of board height
   BOARD_PADDING_BOTTOM: 0.12, // % of board height (for slots)
@@ -30,21 +30,13 @@ const CONFIG = {
   MAX_BALLS_ON_BOARD: 200,
 
   // ── Economy ──
-  BASE_BET: 10,                // base cost/value per ball
+  BASE_BET: 1,                // Each "1x" pays 1 coin
   SLOT_MULTIPLIERS: {
-    4:  [50, 10, 3, 1, 1, 3, 10, 50],
-    5:  [100, 25, 5, 2, 1, 2, 5, 25, 100],
-    6:  [100, 25, 10, 3, 1.5, 1, 1.5, 3, 10, 25, 100],
-    7:  [200, 50, 10, 5, 2, 1, 1, 1, 2, 5, 10, 50, 200],
-    8:  [200, 50, 25, 10, 3, 1.5, 1, 1.5, 3, 10, 25, 50, 200],
-    9:  [500, 100, 25, 10, 5, 2, 1, 2, 5, 10, 25, 100, 500],
-    10: [500, 100, 50, 25, 10, 3, 1.5, 1, 1.5, 3, 10, 25, 50, 100, 500],
-    11: [500, 200, 100, 25, 10, 5, 2, 1, 2, 5, 10, 25, 100, 200, 500],
-    12: [1000, 200, 100, 50, 10, 5, 3, 1.5, 1, 1.5, 3, 5, 10, 50, 100, 200, 1000],
-    13: [1000, 500, 200, 50, 25, 10, 3, 1.5, 1, 1.5, 3, 10, 25, 50, 200, 500, 1000],
-    14: [1000, 500, 200, 100, 25, 10, 5, 2, 1.5, 1, 1.5, 2, 5, 10, 25, 100, 200, 500, 1000],
-    15: [2000, 500, 200, 100, 50, 25, 10, 3, 1.5, 1, 1.5, 3, 10, 25, 50, 100, 200, 500, 2000],
-    16: [5000, 1000, 500, 200, 100, 25, 10, 5, 2, 1, 2, 5, 10, 25, 100, 200, 500, 1000, 5000],
+    // Custom 12-bin layout for 10 rows
+    // Pegs end at 11 -> 12 bins
+    10: [
+      50, 25, 10, 5, 1, 1, 1, 1, 5, 10, 25, 50
+    ],
   },
 
   // ── Prestige ──
@@ -65,10 +57,14 @@ const CONFIG = {
 };
 
 // Slot type classification
+// Slot type classification
 function getSlotType(mult) {
-  if (mult >= 100) return 'edge-high';
-  if (mult >= 10) return 'mid-high';
-  return 'center';
+  if (mult >= 100) return 'tier-5';
+  if (mult >= 25) return 'tier-4';
+  if (mult >= 10) return 'tier-3';
+  if (mult >= 3) return 'tier-2';
+  if (mult >= 1) return 'tier-1';
+  return 'tier-0';
 }
 
 // Number formatting

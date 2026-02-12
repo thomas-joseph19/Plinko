@@ -58,15 +58,17 @@ function rebuildBoard() {
     // ── Create walls ──
     const wallOpts = { isStatic: true, restitution: 0.3, friction: 0.1, render: { visible: false } };
 
-    // Left wall
+    // Left wall with high friction to stop edge-riding
     walls.push(Matter.Bodies.rectangle(
         -CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight, wallOpts
+        CONFIG.WALL_THICKNESS, boardHeight,
+        { isStatic: true, restitution: 0.1, friction: 0.8, render: { visible: false } }
     ));
-    // Right wall
+    // Right wall with high friction to stop edge-riding
     walls.push(Matter.Bodies.rectangle(
         boardWidth + CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight, wallOpts
+        CONFIG.WALL_THICKNESS, boardHeight,
+        { isStatic: true, restitution: 0.1, friction: 0.8, render: { visible: false } }
     ));
     // Bottom floor
     walls.push(Matter.Bodies.rectangle(
@@ -85,15 +87,27 @@ function rebuildBoard() {
         label: 'peg',
     };
 
-    for (let r = 0; r < rows; r++) {
-        const cols = 3 + r; // Start with 3 pegs, add one per row
-        const rowY = padTop + (r / (rows - 1 || 1)) * usableH;
+    // Requirement: Start with 2 pegs, end with 11 pegs (creating 12-ish bins but user wants specific peg counts)
+    // Sequence: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 (Total 10 rows)
+    const numRows = 10;
+    const finalPegCount = 11;
+    const startPegCount = 2;
+
+    // We calculate horizontal spacing based on the widest row
+    const dx = usableW / (finalPegCount - 1);
+    const dy = usableH / (numRows - 1);
+
+    for (let r = 0; r < numRows; r++) {
+        const rowY = padTop + r * dy;
+
+        // Linear interpolation from Start to End
+        const cols = Math.round(startPegCount + (r * (finalPegCount - startPegCount) / (numRows - 1)));
+
+        const rowWidth = (cols - 1) * dx;
+        const xStart = (boardWidth - rowWidth) / 2;
 
         for (let c = 0; c < cols; c++) {
-            const spacing = usableW / cols;
-            const rowOffset = (usableW - (cols - 1) * spacing) / 2;
-            const pegX = padSide + rowOffset + c * spacing;
-
+            const pegX = xStart + c * dx;
             const peg = Matter.Bodies.circle(pegX, rowY, CONFIG.PEG_RADIUS, pegOpts);
             peg.pegIndex = pegPositions.length;
             pegs.push(peg);
@@ -104,8 +118,8 @@ function rebuildBoard() {
     Matter.World.add(world, pegs);
 
     // ── Create slot dividers and sensors ──
-    const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
-    const numSlots = multipliers.length;
+    // Final row has 11 pegs -> creates 12 spaces/bins
+    const numSlots = 12;
     const slotWidth = boardWidth / numSlots;
 
     // Slot dividers
@@ -137,7 +151,7 @@ function rebuildBoard() {
     runtimeState.jackpotSlot = Math.floor(Math.random() * numSlots);
 
     // Render slot tray HTML
-    renderSlotTray(rows);
+    renderSlotTray(numRows);
 
     // ── Collision events ──
     Matter.Events.off(engine); // Clear old events
@@ -165,25 +179,6 @@ function handleCollisions(event) {
             // Sparkle effect
             if (typeof spawnSparkle === 'function') {
                 spawnSparkle(peg.position.x, peg.position.y);
-            }
-
-            // Ball weight: bias toward edges
-            if (gameState.upgrades.ballWeight > 0) {
-                const bias = gameState.upgrades.ballWeight * 0.003;
-                const centerX = boardWidth / 2;
-                const direction = ball.position.x < centerX ? -1 : 1;
-                Matter.Body.applyForce(ball, ball.position, { x: bias * direction, y: 0 });
-            }
-
-            // Magnetic pegs
-            if (gameState.upgrades.magneticPegs > 0) {
-                const chance = gameState.upgrades.magneticPegs * 0.05;
-                if (Math.random() < chance) {
-                    // Pull toward nearest edge
-                    const centerX = boardWidth / 2;
-                    const direction = ball.position.x < centerX ? -1 : 1;
-                    Matter.Body.applyForce(ball, ball.position, { x: 0.008 * direction, y: 0 });
-                }
             }
 
             // Multi-ball split
@@ -222,22 +217,9 @@ function handleSlotHit(slotIndex, ballBody) {
     const isLucky = ballBody.isLucky;
     if (isLucky) mult *= 10;
 
-    // Critical hit
-    let isCrit = false;
-    if (getCritChance() > 0 && Math.random() < getCritChance()) {
-        isCrit = true;
-        const critMult = gameState.prestigeUpgrades.critBoost ? 200 : 100;
-        mult *= critMult;
-    }
-
-    // Bumper bonus check
-    if (ballBody.bumperHit) {
-        mult *= 2;
-    }
-
     // Global multiplier
     const globalMult = getGlobalMultiplier();
-    const coins = Math.round(CONFIG.BASE_BET * mult * globalMult);
+    const coins = Math.round(mult * globalMult);
 
     // Award coins
     gameState.coins += coins;
@@ -246,33 +228,11 @@ function handleSlotHit(slotIndex, ballBody) {
     // Track CPS
     runtimeState.recentCps.push({ amount: coins, time: Date.now() });
 
-    // Combo tracking
-    if (gameState.upgrades.comboMeter > 0) {
-        if (slotIndex === runtimeState.comboSlot) {
-            runtimeState.consecutiveHits++;
-            if (runtimeState.consecutiveHits > gameState.highestCombo) {
-                gameState.highestCombo = runtimeState.consecutiveHits;
-            }
-        } else {
-            runtimeState.comboSlot = slotIndex;
-            runtimeState.consecutiveHits = 1;
-        }
-    }
-
-    // Fever tracking
-    const highValue = mult >= 10;
-    if (highValue) {
-        runtimeState.consecutiveHighHits++;
-        if (runtimeState.consecutiveHighHits >= CONFIG.FEVER_TRIGGER && !runtimeState.feverActive) {
-            triggerFever();
-        }
-    } else {
-        runtimeState.consecutiveHighHits = Math.max(0, runtimeState.consecutiveHighHits - 1);
-    }
+    // Fever tracking removed
 
     // Visual effects
     if (typeof showSlotHit === 'function') {
-        showSlotHit(slotIndex, coins, isCrit || isJackpot || isLucky);
+        showSlotHit(slotIndex, coins, isJackpot || isLucky);
     }
 
     // Slot flash
@@ -303,21 +263,12 @@ function spawnBall(x, y, forceGolden) {
 
     const isLucky = forceGolden || (Math.random() < getLuckyBallChance());
 
-    // Slight random offset for natural feel
-    const dropX = x || boardWidth / 2 + (Math.random() - 0.5) * (boardWidth * 0.4);
+    // Sub-pixel jitter (0.1px) is invisible but prevents "perfect" physics paths
+    // without it, every ball would follow the exact same left/right path
+    const dropX = x || boardWidth / 2 + (Math.random() - 0.5) * 0.1;
     const dropY = y || 15;
 
-    // Drop aim: bias x position towards edges
-    let finalX = dropX;
-    if (!x && gameState.upgrades.dropAim > 0) {
-        const aimBias = gameState.upgrades.dropAim * 0.08;
-        if (Math.random() < aimBias) {
-            finalX = Math.random() < 0.5 ? boardWidth * 0.1 : boardWidth * 0.9;
-            finalX += (Math.random() - 0.5) * 30;
-        }
-    }
-
-    const ball = Matter.Bodies.circle(finalX, dropY, CONFIG.BALL_RADIUS, {
+    const ball = Matter.Bodies.circle(dropX, dropY, CONFIG.BALL_RADIUS, {
         restitution: CONFIG.BALL_RESTITUTION,
         friction: CONFIG.BALL_FRICTION,
         density: CONFIG.BALL_DENSITY,
@@ -330,11 +281,10 @@ function spawnBall(x, y, forceGolden) {
     ball.spawnTime = Date.now();
     ball.trailPoints = [];
 
-    // Small random initial velocity for natural spread
-    Matter.Body.setVelocity(ball, {
-        x: (Math.random() - 0.5) * 2,
-        y: Math.random() * 1.5 + 0.5,
-    });
+    // Pinpoint drop: zero horizontal velocity
+    // Apply drop speed upgrade
+    const speedMult = typeof getDropSpeedMultiplier === 'function' ? getDropSpeedMultiplier() : 1;
+    Matter.Body.setVelocity(ball, { x: 0, y: 1.0 * speedMult });
 
     balls.push(ball);
     Matter.World.add(world, [ball]);
@@ -413,10 +363,8 @@ function stopAutoDroppers() {
 }
 
 function getDropperX(index, total) {
-    if (total === 1) return boardWidth / 2 + (Math.random() - 0.5) * (boardWidth * 0.5);
-    const spacing = boardWidth * 0.7 / (total - 1);
-    const startX = boardWidth * 0.15;
-    return startX + index * spacing + (Math.random() - 0.5) * 20;
+    // ALWAYS return the exact center, regardless of how many droppers are active
+    return boardWidth / 2;
 }
 
 function flashDropper(index) {
@@ -433,8 +381,21 @@ function updatePhysics(delta) {
         Matter.Engine.update(engine, delta);
     }
 
-    // Store trail points for active balls
+    // Centering Bias: Nudges balls toward center to achieve requested probabilities
+    // (1k bin = 0.0001%, 100 bin = 0.1%, 25 bin = 1%)
+    const centerX = boardWidth / 2;
     for (const ball of balls) {
+        const distFromCenter = ball.position.x - centerX;
+        const absDist = Math.abs(distFromCenter);
+
+        if (absDist > 5) {
+            // Natural 25x Cubic Pull: Baseline for 0.1% odds but looks organic
+            const pullStrength = 0.00005 * Math.pow(absDist / centerX, 3);
+            const forceX = distFromCenter > 0 ? -pullStrength : pullStrength;
+            Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
+        }
+
+        // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
         ball.trailPoints.push({ x: ball.position.x, y: ball.position.y, t: Date.now() });
         // Keep only last 8 trail points

@@ -115,13 +115,13 @@ function performPrestige() {
     gameState.dailyStreak = savedDaily;
     gameState.lastDailyClaim = savedLastDaily;
 
-    // Prestige bonus: start with ball count levels
+    // Prestige bonus: start with ball rate levels
     if (savedPrestige.startBalls) {
-        gameState.upgrades.ballCount = Math.min(savedPrestige.startBalls, UPGRADES.ballCount.maxLevel);
+        gameState.upgrades.ballRate = Math.min(savedPrestige.startBalls, UPGRADES.ballRate.maxLevel);
     }
 
-    // Starting coins scale with prestige
-    gameState.coins = 100 * Math.pow(2, savedLevel);
+    // Starting coins fixed to 0 even on prestige
+    gameState.coins = 0;
 
     saveGame();
     return true;

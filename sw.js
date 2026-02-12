@@ -2,7 +2,7 @@
    PLINKO∞ — Service Worker for PWA / iOS
    ═══════════════════════════════════════════════ */
 
-const CACHE_NAME = 'plinko-v1';
+const CACHE_NAME = 'plinko-v2';
 const ASSETS = [
     './',
     './index.html',
