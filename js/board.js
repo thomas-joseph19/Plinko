@@ -441,6 +441,12 @@ function updatePhysics(delta) {
             applyEdgeSingularity(ball);
         }
 
+        // Gem Rain: extra edge gravity
+        if (ball.isRainBall) {
+            const side = ball.position.x < boardWidth / 2 ? -1 : 1;
+            Matter.Body.applyForce(ball, ball.position, { x: 0.0003 * side, y: 0 });
+        }
+
         // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
         ball.trailPoints.push({ x: ball.position.x, y: ball.position.y, t: Date.now() });
@@ -455,4 +461,32 @@ function updatePhysics(delta) {
 
     // Tick event system
     if (typeof tickEvents === 'function') tickEvents();
+}
+
+/**
+ * Gem Shop Effect: Rain 1000 balls with edge-focused gravity
+ */
+function triggerBallRain() {
+    const count = 1000;
+    const batchSize = 25;
+    const interval = 50; // ms between batches
+
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD + 1000) return; // Allow some overflow for rain
+
+            // Random X across the board
+            const x = 20 + Math.random() * (boardWidth - 40);
+            const ball = spawnBall(x, 15);
+
+            if (ball) {
+                // Apply initial kick toward nearest edge
+                const side = x < boardWidth / 2 ? -1 : 1;
+                Matter.Body.applyForce(ball, ball.position, { x: 0.002 * side, y: 0 });
+
+                // Tag the ball so updatePhysics can apply extra edge gravity
+                ball.isRainBall = true;
+            }
+        }, Math.floor(i / batchSize) * interval);
+    }
 }

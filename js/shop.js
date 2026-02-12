@@ -3,12 +3,11 @@
    ═══════════════════════════════════════════════ */
 
 const SHOP_ITEMS = [
-    { id: 'coin_small', icon: '🪙', name: 'Coin Pack S', desc: '5,000 Coins', price: '💎 10', cost: 10, type: 'gems', give: 'coins', amount: 5000 },
-    { id: 'coin_med', icon: '💰', name: 'Coin Pack M', desc: '25,000 Coins', price: '💎 40', cost: 40, type: 'gems', give: 'coins', amount: 25000 },
-    { id: 'coin_lg', icon: '🏦', name: 'Coin Pack L', desc: '100,000 Coins', price: '💎 120', cost: 120, type: 'gems', give: 'coins', amount: 100000 },
-    { id: 'ball_storm', icon: '🌪️', name: 'Ball Storm', desc: 'Drop 50 balls instantly!', price: '💎 15', cost: 15, type: 'gems', give: 'storm', amount: 50 },
-    { id: 'lucky_pack', icon: '🍀', name: 'Lucky Pack', desc: '10 guaranteed golden balls', price: '💎 20', cost: 20, type: 'gems', give: 'lucky', amount: 10 },
-    { id: 'fever_now', icon: '🔥', name: 'Instant Fever', desc: 'Trigger Fever Mode now!', price: '💎 25', cost: 25, type: 'gems', give: 'fever', amount: 1 },
+    { id: 'bin_doubler', icon: '🎰', name: 'Bin Doubler', desc: 'Permanently double all bin values', price: '💎 100', cost: 100, type: 'gems' },
+    { id: 'ball_rain', icon: '🌧️', name: 'Ball Rain', desc: '1,000 balls with edge gravity', price: '💎 10', cost: 10, type: 'gems' },
+    { id: 'coin_trade', icon: '🪙', name: 'Coin Trade', desc: 'Get 100,000 coins', price: '💎 10', cost: 10, type: 'gems' },
+    { id: 'drop_doubler', icon: '⚡', name: 'Drop Doubler', desc: 'Permanently double ball drop rate', price: '💎 20', cost: 20, type: 'gems' },
+    { id: 'event_extender', icon: '⏱️', name: 'Event Extender', desc: 'All events last +15s (Max 5m)', price: '💎 20', cost: 20, type: 'gems' },
 ];
 
 function renderShopView() {
@@ -22,29 +21,41 @@ function renderShopView() {
     for (const item of SHOP_ITEMS) {
         const el = document.createElement('div');
         el.className = 'shop-item';
-        const affordable = gameState.gems >= item.cost;
+
+        let disabled = false;
+        if (item.id === 'event_extender' && (gameState.upgrades.gemEventDurationBonus || 0) >= 270) {
+            disabled = true;
+        }
+
+        const affordable = gameState.gems >= item.cost && !disabled;
+
         el.innerHTML = `
       <div class="shop-item-icon">${item.icon}</div>
       <div class="shop-item-name">${item.name}</div>
       <div class="shop-item-desc">${item.desc}</div>
-      <div class="shop-item-price" style="${affordable ? '' : 'opacity:0.4'}">${item.price}</div>
+      <div class="shop-item-price" style="${affordable ? '' : 'opacity:0.4; color: #ef4444'}">${disabled ? 'MAXED' : item.price}</div>
     `;
+
         el.addEventListener('click', () => {
-            if (gameState.gems < item.cost) return;
+            if (gameState.gems < item.cost || disabled) return;
             gameState.gems -= item.cost;
-            if (item.give === 'coins') {
-                gameState.coins += item.amount;
-            } else if (item.give === 'storm') {
-                for (let i = 0; i < item.amount; i++) {
-                    setTimeout(() => spawnBall(null, 15), i * 40);
-                }
-            } else if (item.give === 'lucky') {
-                for (let i = 0; i < item.amount; i++) {
-                    setTimeout(() => spawnBall(null, 15, true), i * 100);
-                }
-            } else if (item.give === 'fever') {
-                triggerFever();
+
+            if (item.id === 'bin_doubler') {
+                gameState.upgrades.gemBinMultiplier = (gameState.upgrades.gemBinMultiplier || 0) + 1;
+                if (typeof renderSlotTray === 'function') renderSlotTray(getBoardRows());
+            } else if (item.id === 'ball_rain') {
+                if (typeof triggerBallRain === 'function') triggerBallRain();
+            } else if (item.id === 'coin_trade') {
+                gameState.coins += 100000;
+                gameState.totalCoinsEarned += 100000;
+            } else if (item.id === 'drop_doubler') {
+                gameState.upgrades.gemDropRateMultiplier = (gameState.upgrades.gemDropRateMultiplier || 1) * 2;
+                if (typeof startAutoDroppers === 'function') startAutoDroppers();
+                if (typeof renderDroppers === 'function') renderDroppers();
+            } else if (item.id === 'event_extender') {
+                gameState.upgrades.gemEventDurationBonus = (gameState.upgrades.gemEventDurationBonus || 0) + 15;
             }
+
             renderShopView();
             updateStatsPanel();
             saveGame();

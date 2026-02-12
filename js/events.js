@@ -116,8 +116,9 @@ function activateEvent(eventId) {
 
     // Set active
     eventState.activeEvent = eventId;
-    eventState.activeEndTime = Date.now() + ev.duration;
-    eventState.cooldownEndTime = Date.now() + ev.duration + ev.cooldown;
+    const bonus = (gameState.upgrades.gemEventDurationBonus || 0) * 1000;
+    eventState.activeEndTime = Date.now() + ev.duration + bonus;
+    eventState.cooldownEndTime = Date.now() + ev.duration + bonus + ev.cooldown;
 
     // Apply event-specific setup
     switch (eventId) {
@@ -458,7 +459,7 @@ function renderEventsPanel() {
                 ${idleTag}
             </div>
             <div class="event-desc">${ev.desc}</div>
-            <div class="event-duration">Duration: ${ev.duration / 1000}s</div>
+            <div class="event-duration">Duration: ${(ev.duration / 1000) + (gameState.upgrades.gemEventDurationBonus || 0)}s</div>
             <div class="event-footer">
                 ${statusHTML}
             </div>

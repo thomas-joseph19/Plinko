@@ -35,6 +35,24 @@ function initDebug() {
             }, 1000);
         });
     }
+
+    const gemsBtn = document.getElementById('debugGemsBtn');
+    if (gemsBtn) {
+        gemsBtn.addEventListener('click', () => {
+            gameState.gems += 100;
+            updateStatsPanel();
+            if (typeof renderShopView === 'function') renderShopView();
+
+            // Visual feedback
+            const originalText = gemsBtn.textContent;
+            gemsBtn.textContent = 'Rich! ✅';
+            gemsBtn.style.background = '#22c55e';
+            setTimeout(() => {
+                gemsBtn.textContent = originalText;
+                gemsBtn.style.background = '#a855f7';
+            }, 1000);
+        });
+    }
 }
 
 // Ensure this is called when the script loads or UI inits
