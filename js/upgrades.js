@@ -10,7 +10,7 @@ const UPGRADES = {
         category: 'ball',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `Drop every ${(2000 * Math.pow(0.75, lvl) / 1000).toFixed(2)}s`,
     },
     dropSpeed: {
@@ -19,7 +19,7 @@ const UPGRADES = {
         category: 'ball',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `+${lvl * 10}% fall speed`,
     },
     ballMultiplier: {
@@ -28,7 +28,7 @@ const UPGRADES = {
         category: 'ball',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `${Math.min(25, 1 + lvl * 0.8).toFixed(1)}% chance`,
     },
     multiBall: {
@@ -37,7 +37,7 @@ const UPGRADES = {
         category: 'ball',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `${Math.min(30, lvl * 1)}% split chance`,
     },
 
@@ -48,7 +48,7 @@ const UPGRADES = {
         category: 'board',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `×${Math.pow(1.05, lvl).toFixed(2)} payout`,
     },
 
@@ -59,7 +59,7 @@ const UPGRADES = {
         category: 'passive',
         maxLevel: 30,
         baseCost: 1000,
-        costScale: 2.0,
+        costScale: 1.5,
         effect: (lvl) => `+${lvl}% offline income`,
     },
 };
