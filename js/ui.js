@@ -2,6 +2,98 @@
    PLINKO∞ — UI Rendering & Interaction
    ═══════════════════════════════════════════════ */
 
+const THEME_STORAGE_KEY = 'plinko_theme';
+
+// ── Theme: respect system preference by default, then user choice ──
+function getStoredTheme() {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+    } catch (_) {
+        return 'system';
+    }
+}
+
+function setStoredTheme(value) {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, value);
+    } catch (_) {}
+}
+
+function getSystemPrefersDark() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getEffectiveTheme() {
+    const stored = getStoredTheme();
+    if (stored === 'light') return 'light';
+    if (stored === 'dark') return 'dark';
+    return getSystemPrefersDark() ? 'dark' : 'light';
+}
+
+function applyTheme() {
+    const theme = getEffectiveTheme();
+    document.documentElement.setAttribute('data-theme', theme);
+    // Update meta theme-color for mobile browser chrome
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14102a' : '#e9e5f0');
+}
+
+function initSettings() {
+    const settingsBtn = document.getElementById('settingsBtn');
+    const overlay = document.getElementById('settingsOverlay');
+    const modal = document.getElementById('settingsModal');
+    const closeBtn = document.getElementById('settingsClose');
+    const themeBtns = document.querySelectorAll('.theme-btn[data-theme]');
+
+    function openSettings() {
+        if (overlay) {
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+        }
+        if (modal) modal.setAttribute('aria-hidden', 'false');
+        updateThemeButtonsActive();
+    }
+
+    function closeSettings() {
+        if (overlay) {
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        if (modal) modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateThemeButtonsActive() {
+        const stored = getStoredTheme();
+        themeBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-theme') === stored);
+        });
+    }
+
+    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+    if (closeBtn) closeBtn.addEventListener('click', closeSettings);
+    if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSettings(); });
+
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.getAttribute('data-theme');
+            setStoredTheme(theme);
+            applyTheme();
+            updateThemeButtonsActive();
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeSettings();
+    });
+
+    // When user chose "System", react to OS theme changes
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (getStoredTheme() === 'system') applyTheme();
+        });
+    }
+}
+
 // ── Render Slot Tray ──
 function renderSlotTray(rows) {
     const tray = document.getElementById('slotTray');
@@ -227,6 +319,33 @@ function updateStatsPanel() {
             }
         }
     });
+
+    // Update events panel if visible (now in Upgrades view)
+    if (typeof isAnyEventActive === 'function') {
+        const upgradesView = document.getElementById('upgradesView');
+        if (upgradesView && upgradesView.classList.contains('active')) {
+            renderEventsPanel();
+        }
+        // Update global status bar
+        const statusEl = document.getElementById('eventGlobalStatus');
+        if (statusEl) {
+            if (isAnyEventActive()) {
+                const ev = EVENTS[eventState.activeEvent];
+                const remaining = Math.ceil(getEventTimeRemaining() / 1000);
+                statusEl.textContent = `${ev.name} — ${remaining}s left`;
+                statusEl.style.color = 'var(--accent2)';
+            } else if (isEventOnCooldown()) {
+                const cdSec = Math.ceil(getCooldownRemaining() / 1000);
+                const mins = Math.floor(cdSec / 60);
+                const secs = cdSec % 60;
+                statusEl.textContent = `Cooldown: ${mins}:${String(secs).padStart(2, '0')}`;
+                statusEl.style.color = 'var(--text-dim)';
+            } else {
+                statusEl.textContent = 'Ready — Choose an event!';
+                statusEl.style.color = 'var(--success)';
+            }
+        }
+    }
 }
 
 // ── Helper: only update text if changed (reduce DOM writes) ──
@@ -303,11 +422,15 @@ function initTabs() {
             if (target) target.classList.add('active');
 
             // Render view content on switch
-            if (viewId === 'upgradesView') renderUpgradesView();
+            if (viewId === 'upgradesView') {
+                renderUpgradesView();
+                if (typeof renderEventsPanel === 'function') renderEventsPanel();
+            }
             if (viewId === 'statsView') { updateStatsPanel(); renderQuickUpgrades(); }
             if (viewId === 'prestigeView') renderPrestigeView();
             if (viewId === 'dailyView') renderDailyView();
             if (viewId === 'shopView') renderShopView();
+
 
             // Hide badge on tab
             const badge = tab.querySelector('.badge');

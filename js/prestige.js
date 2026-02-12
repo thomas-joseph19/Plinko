@@ -36,14 +36,6 @@ const PRESTIGE_UPGRADES = [
         cost: () => 15,
     },
     {
-        id: 'feverExtend',
-        name: 'Fever Frenzy',
-        icon: '🔥',
-        desc: '+5s fever duration per level',
-        maxLevel: 5,
-        cost: (lvl) => 3 + lvl * 2,
-    },
-    {
         id: 'offlineBoost',
         name: 'Night Shift',
         icon: '🌙',
@@ -51,22 +43,14 @@ const PRESTIGE_UPGRADES = [
         maxLevel: 5,
         cost: (lvl) => 2 + lvl * 2,
     },
-    {
-        id: 'autoPrestige',
-        name: 'Board Themes',
-        icon: '🎨',
-        desc: 'Unlock unique board visual themes',
-        maxLevel: 3,
-        cost: (lvl) => 5 + lvl * 5,
-    },
 ];
 
 // ── Prestige Token Calculation ──
 function calculatePrestigeTokens() {
     const earned = gameState.totalCoinsEarned;
     if (earned < CONFIG.PRESTIGE_THRESHOLD) return 0;
-    // Sqrt-based scaling: more coins = more tokens, but diminishing
-    return Math.floor(Math.sqrt(earned / CONFIG.PRESTIGE_THRESHOLD) * (1 + gameState.prestigeLevel * 0.2));
+    // Base 5 tokens at threshold, scales with coins and prestige level
+    return Math.floor(5 * Math.sqrt(earned / CONFIG.PRESTIGE_THRESHOLD) * (1 + gameState.prestigeLevel * 0.2));
 }
 
 // ── Can Prestige ──

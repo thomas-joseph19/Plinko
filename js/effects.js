@@ -57,7 +57,7 @@ function triggerFever() {
     runtimeState.consecutiveHighHits = 0;
     gameState.feverCount++;
 
-    const duration = CONFIG.FEVER_DURATION + (gameState.prestigeUpgrades.feverExtend || 0) * 5000;
+    const duration = CONFIG.FEVER_DURATION;
 
     // Banner
     const banner = document.getElementById('feverBanner');

@@ -24,6 +24,9 @@ function getDefaultState() {
             multiBall: 0,
             slotBoost: 0,
             offlineEarnings: 0,
+            gemBinMultiplier: 0,
+            gemDropRateMultiplier: 1,
+            gemEventDurationBonus: 0,
         },
 
         // Prestige
@@ -99,7 +102,8 @@ function resetGame() {
 function getDropInterval() {
     const base = CONFIG.BASE_DROP_INTERVAL;
     const level = gameState.upgrades.ballRate || 0;
-    const interval = base * Math.pow(0.75, level);
+    const gemMult = gameState.upgrades.gemDropRateMultiplier || 1;
+    const interval = (base * Math.pow(0.75, level)) / gemMult;
     return Math.max(CONFIG.MIN_DROP_INTERVAL, interval);
 }
 
@@ -122,10 +126,10 @@ function getMultiBallChance() {
 }
 
 // Slot Boost: +1% payout per level
-// Slot Boost: +1% compounded per level (1.01^level)
+// Slot Boost: +5% compounded per level (1.05^level)
 function getSlotBoostMultiplier() {
     const level = gameState.upgrades.slotBoost || 0;
-    return Math.pow(1.01, level);
+    return Math.pow(1.05, level);
 }
 
 // Global multiplier (combines slot boost + prestige + fever)
@@ -140,6 +144,10 @@ function getGlobalMultiplier() {
     // Slot boost
     mult *= getSlotBoostMultiplier();
 
+    // Gem Bin Doubler
+    if (gameState.upgrades.gemBinMultiplier) {
+        mult *= Math.pow(2, gameState.upgrades.gemBinMultiplier);
+    }
 
     return mult;
 }
