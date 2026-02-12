@@ -148,7 +148,6 @@ function rebuildBoard() {
     Matter.World.add(world, slotSensorBodies);
 
     // ── Pick jackpot slot ──
-    runtimeState.jackpotSlot = Math.floor(Math.random() * numSlots);
 
     // Render slot tray HTML
     renderSlotTray(numRows);
@@ -210,8 +209,6 @@ function handleSlotHit(slotIndex, ballBody) {
     let mult = multipliers[slotIndex] || 1;
 
     // Is it the jackpot slot?
-    const isJackpot = slotIndex === runtimeState.jackpotSlot;
-    if (isJackpot) mult *= 500;
 
     // Lucky ball bonus
     const isLucky = ballBody.isLucky;
@@ -232,7 +229,7 @@ function handleSlotHit(slotIndex, ballBody) {
 
     // Visual effects
     if (typeof showSlotHit === 'function') {
-        showSlotHit(slotIndex, coins, isJackpot || isLucky);
+        showSlotHit(slotIndex, coins, isLucky); // check isLucky only
     }
 
     // Slot flash

@@ -10,13 +10,18 @@ function renderSlotTray(rows) {
     const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[10];
     tray.innerHTML = '';
 
-    multipliers.forEach((mult, i) => {
-        const slot = document.createElement('div');
-        const type = getSlotType(mult);
-        slot.className = 'slot ' + type;
-        if (i === runtimeState.jackpotSlot) slot.classList.add('jackpot');
+    const boost = getGlobalMultiplier(); // Includes slot boost + prestige
 
-        slot.innerHTML = `<span class="mult">${mult >= 1000 ? formatCost(mult) : mult}</span><span class="x">×</span>`;
+    multipliers.forEach((baseMult, i) => {
+        const slot = document.createElement('div');
+        // Calculate actual displayed value
+        const val = +(baseMult * boost).toFixed(2);
+
+        const type = getSlotType(val);
+        slot.className = 'slot ' + type;
+        if (i === -1) slot.classList.add('jackpot'); // disabled
+
+        slot.innerHTML = `<span class="mult">${val >= 1000 ? formatCost(val) : formatNumber(val)}</span><span class="x">×</span>`;
         tray.appendChild(slot);
     });
 }
@@ -97,6 +102,11 @@ function createUpgradeCard(id, compact) {
                 if (['ballRate', 'dropSpeed'].includes(id)) {
                     stopAutoDroppers();
                     startAutoDroppers();
+                }
+
+                // Refresh slot display if boost purchased
+                if (id === 'slotBoost') {
+                    renderSlotTray(getBoardRows());
                 }
             } else {
                 card.classList.add('rejected');

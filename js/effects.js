@@ -3,9 +3,16 @@
    ═══════════════════════════════════════════════ */
 
 // ── Spawn Sparkle on Peg Hit ──
+// ── Spawn Sparkle on Peg Hit ──
 function spawnSparkle(x, y) {
+    // Throttle: only 30% of hits create a visual sparkle to save DOM perf
+    if (Math.random() > 0.3) return;
+
     const board = document.getElementById('plinkoBoard');
     if (!board) return;
+
+    // Hard limit: if too many sparkles, don't add more
+    if (board.childElementCount > 100) return;
 
     const el = document.createElement('div');
     el.className = 'peg-sparkle';
@@ -18,9 +25,15 @@ function spawnSparkle(x, y) {
 
 // ── Show Coin Pop on Slot Hit ──
 function showSlotHit(slotIndex, coins, isBig) {
+    // Throttle small wins if many balls are falling
+    if (!isBig && coins < 5 && Math.random() > 0.5) return;
+
     const board = document.getElementById('plinkoBoard');
     const slotEls = document.querySelectorAll('.slot');
     if (!board || !slotEls[slotIndex]) return;
+
+    // Performance limit
+    if (board.childElementCount > 150) return;
 
     const slotEl = slotEls[slotIndex];
     const boardRect = board.getBoundingClientRect();

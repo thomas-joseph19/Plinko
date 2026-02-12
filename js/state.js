@@ -95,11 +95,11 @@ function resetGame() {
 
 // ── Computed Getters ──
 
-// Ball Rate: each level makes drops 7% faster
+// Ball Rate: each level makes drops 25% faster
 function getDropInterval() {
     const base = CONFIG.BASE_DROP_INTERVAL;
     const level = gameState.upgrades.ballRate || 0;
-    const interval = base * Math.pow(0.93, level);
+    const interval = base * Math.pow(0.75, level);
     return Math.max(CONFIG.MIN_DROP_INTERVAL, interval);
 }
 
@@ -121,10 +121,11 @@ function getMultiBallChance() {
     return Math.min(0.30, level * 0.01);
 }
 
-// Slot Boost: +15% payout per level
+// Slot Boost: +1% payout per level
+// Slot Boost: +1% compounded per level (1.01^level)
 function getSlotBoostMultiplier() {
     const level = gameState.upgrades.slotBoost || 0;
-    return 1 + level * 0.15;
+    return Math.pow(1.01, level);
 }
 
 // Global multiplier (combines slot boost + prestige + fever)

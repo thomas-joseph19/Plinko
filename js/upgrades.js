@@ -11,7 +11,7 @@ const UPGRADES = {
         maxLevel: 30,
         baseCost: 1000,
         costScale: 2.0,
-        effect: (lvl) => `Drop every ${(2000 * Math.pow(0.93, lvl) / 1000).toFixed(2)}s`,
+        effect: (lvl) => `Drop every ${(2000 * Math.pow(0.75, lvl) / 1000).toFixed(2)}s`,
     },
     dropSpeed: {
         name: '🚀 Drop Speed',
@@ -44,12 +44,12 @@ const UPGRADES = {
     // ── Board Upgrades ──
     slotBoost: {
         name: '💰 Slot Boost',
-        desc: 'All slots pay +15% per level',
+        desc: 'All slots pay +1% per level',
         category: 'board',
         maxLevel: 30,
         baseCost: 1000,
         costScale: 2.0,
-        effect: (lvl) => `+${lvl * 15}% payout`,
+        effect: (lvl) => `×${Math.pow(1.01, lvl).toFixed(2)} payout`,
     },
 
     // ── Passive Upgrades ──

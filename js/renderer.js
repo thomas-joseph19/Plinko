@@ -10,6 +10,80 @@ function initRenderer() {
     if (!canvas) return;
     ctx = canvas.getContext('2d');
     dpr = window.devicePixelRatio || 1;
+    createBallSprites();
+}
+
+// ── Sprite Caching ──
+let ballSprite = null;
+let luckyBallSprite = null;
+
+function createBallSprites() {
+    const r = CONFIG.BALL_RADIUS;
+    // Padding to avoid clipping glow
+    const size = (r + 4) * 2;
+
+    // 1. Normal Ball Sprite
+    ballSprite = document.createElement('canvas');
+    ballSprite.width = size;
+    ballSprite.height = size;
+    const ctx1 = ballSprite.getContext('2d');
+    const c = size / 2;
+
+    // Glow
+    const glow = ctx1.createRadialGradient(c, c, r * 0.5, c, c, r + 2);
+    glow.addColorStop(0, '#a78bfa');
+    glow.addColorStop(1, 'rgba(167, 139, 250, 0)');
+    ctx1.fillStyle = glow;
+    ctx1.beginPath();
+    ctx1.arc(c, c, r + 2, 0, Math.PI * 2);
+    ctx1.fill();
+
+    // Body
+    const grad1 = ctx1.createRadialGradient(c - 2, c - 2, 0, c, c, r);
+    grad1.addColorStop(0, '#c4b5fd');
+    grad1.addColorStop(1, '#7c3aed');
+    ctx1.fillStyle = grad1;
+    ctx1.beginPath();
+    ctx1.arc(c, c, r, 0, Math.PI * 2);
+    ctx1.fill();
+
+    // Highlight
+    ctx1.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx1.beginPath();
+    ctx1.arc(c - 2, c - 2, r * 0.3, 0, Math.PI * 2);
+    ctx1.fill();
+
+    // 2. Lucky Ball Sprite
+    luckyBallSprite = document.createElement('canvas');
+    luckyBallSprite.width = size * 2; // Bigger for larger glow
+    luckyBallSprite.height = size * 2;
+    const ctx2 = luckyBallSprite.getContext('2d');
+    const c2 = size; // Center
+
+    // Golden Glow
+    const glow2 = ctx2.createRadialGradient(c2, c2, r * 0.5, c2, c2, r * 3);
+    glow2.addColorStop(0, 'rgba(251, 191, 36, 0.4)');
+    glow2.addColorStop(1, 'rgba(251, 191, 36, 0)');
+    ctx2.fillStyle = glow2;
+    ctx2.beginPath();
+    ctx2.arc(c2, c2, r * 3, 0, Math.PI * 2);
+    ctx2.fill();
+
+    // Body
+    const grad2 = ctx2.createRadialGradient(c2 - 2, c2 - 2, 0, c2, c2, r);
+    grad2.addColorStop(0, '#fef08a');
+    grad2.addColorStop(0.7, '#f59e0b');
+    grad2.addColorStop(1, '#d97706');
+    ctx2.fillStyle = grad2;
+    ctx2.beginPath();
+    ctx2.arc(c2, c2, r, 0, Math.PI * 2);
+    ctx2.fill();
+
+    // Highlight
+    ctx2.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx2.beginPath();
+    ctx2.arc(c2 - 2, c2 - 2, r * 0.3, 0, Math.PI * 2);
+    ctx2.fill();
 }
 
 function resizeCanvas() {
@@ -125,69 +199,19 @@ function drawTrails() {
     }
 }
 
-// ── Draw Balls ──
+// ── Draw Balls (Optimized) ──
 function drawBalls() {
     for (const ball of balls) {
+        if (!ball.position) continue;
         const x = ball.position.x;
         const y = ball.position.y;
-        const r = CONFIG.BALL_RADIUS;
 
-        ctx.save();
-
-        if (ball.isLucky) {
-            // Golden lucky ball
-            // Outer glow
-            const glow = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 3);
-            glow.addColorStop(0, 'rgba(251, 191, 36, 0.4)');
-            glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, r * 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Ball body
-            const grad = ctx.createRadialGradient(x - 2, y - 2, 0, x, y, r);
-            grad.addColorStop(0, '#fef08a');
-            grad.addColorStop(0.7, '#f59e0b');
-            grad.addColorStop(1, '#d97706');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Specular highlight
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            ctx.beginPath();
-            ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.3, 0, Math.PI * 2);
-            ctx.fill();
-        } else {
-            // Normal violet ball
-            // Subtle glow
-            const glow = ctx.createRadialGradient(x, y, r, x, y, r * 2.5);
-            glow.addColorStop(0, 'rgba(124, 58, 237, 0.3)');
-            glow.addColorStop(1, 'rgba(124, 58, 237, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Ball body
-            const grad = ctx.createRadialGradient(x - 2, y - 2, 0, x, y, r);
-            grad.addColorStop(0, '#e0d8ff');
-            grad.addColorStop(0.6, '#9f7aea');
-            grad.addColorStop(1, '#6d28d9');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Specular highlight
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.beginPath();
-            ctx.arc(x - r * 0.25, y - r * 0.3, r * 0.25, 0, Math.PI * 2);
-            ctx.fill();
+        if (ball.isLucky && luckyBallSprite) {
+            const size = luckyBallSprite.width;
+            ctx.drawImage(luckyBallSprite, Math.floor(x - size / 2), Math.floor(y - size / 2));
+        } else if (ballSprite) {
+            const size = ballSprite.width;
+            ctx.drawImage(ballSprite, Math.floor(x - size / 2), Math.floor(y - size / 2));
         }
-
-        ctx.restore();
     }
 }
