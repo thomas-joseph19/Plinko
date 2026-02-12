@@ -30,6 +30,13 @@
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    (function() {
+      var stored = localStorage.getItem('plinko_theme');
+      var theme = stored === 'light' ? 'light' : stored === 'dark' ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
 </head>
 
 <body>
@@ -81,7 +88,6 @@
         </div>
       </div>
       <div class="hud-actions">
-        <div class="hud-btn" title="Stats" id="statsBtn">📊</div>
         <div class="hud-btn" title="Settings" id="settingsBtn">⚙️</div>
       </div>
     </header>
@@ -304,6 +310,27 @@
       </div>
     </nav>
 
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
+    <div class="settings-modal" id="settingsModal" role="dialog" aria-labelledby="settingsTitle">
+      <div class="settings-header">
+        <h2 class="settings-title" id="settingsTitle">⚙️ Settings</h2>
+        <button type="button" class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-group">
+          <div class="settings-label">Theme</div>
+          <div class="theme-options" role="group" aria-label="Appearance">
+            <button type="button" class="theme-btn active" data-theme="system" id="themeSystem">System</button>
+            <button type="button" class="theme-btn" data-theme="light" id="themeLight">☀️ Light</button>
+            <button type="button" class="theme-btn" data-theme="dark" id="themeDark">🌙 Dark</button>
+          </div>
+          <p class="settings-hint">System uses your device’s light/dark preference.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Matter.js physics engine -->

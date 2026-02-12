@@ -11,6 +11,10 @@ let cleanupTimer = 0;
 function boot() {
     console.log('%c PLINKO∞ ', 'background: linear-gradient(135deg, #c084fc, #38bdf8); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
 
+    // Apply theme (in case script in head didn’t run) and init settings panel
+    if (typeof applyTheme === 'function') applyTheme();
+    if (typeof initSettings === 'function') initSettings();
+
     // Load saved game
     const hadSave = loadGame();
 

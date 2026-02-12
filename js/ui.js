@@ -2,6 +2,98 @@
    PLINKO∞ — UI Rendering & Interaction
    ═══════════════════════════════════════════════ */
 
+const THEME_STORAGE_KEY = 'plinko_theme';
+
+// ── Theme: respect system preference by default, then user choice ──
+function getStoredTheme() {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+    } catch (_) {
+        return 'system';
+    }
+}
+
+function setStoredTheme(value) {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, value);
+    } catch (_) {}
+}
+
+function getSystemPrefersDark() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getEffectiveTheme() {
+    const stored = getStoredTheme();
+    if (stored === 'light') return 'light';
+    if (stored === 'dark') return 'dark';
+    return getSystemPrefersDark() ? 'dark' : 'light';
+}
+
+function applyTheme() {
+    const theme = getEffectiveTheme();
+    document.documentElement.setAttribute('data-theme', theme);
+    // Update meta theme-color for mobile browser chrome
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14102a' : '#e9e5f0');
+}
+
+function initSettings() {
+    const settingsBtn = document.getElementById('settingsBtn');
+    const overlay = document.getElementById('settingsOverlay');
+    const modal = document.getElementById('settingsModal');
+    const closeBtn = document.getElementById('settingsClose');
+    const themeBtns = document.querySelectorAll('.theme-btn[data-theme]');
+
+    function openSettings() {
+        if (overlay) {
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+        }
+        if (modal) modal.setAttribute('aria-hidden', 'false');
+        updateThemeButtonsActive();
+    }
+
+    function closeSettings() {
+        if (overlay) {
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        if (modal) modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateThemeButtonsActive() {
+        const stored = getStoredTheme();
+        themeBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-theme') === stored);
+        });
+    }
+
+    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+    if (closeBtn) closeBtn.addEventListener('click', closeSettings);
+    if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSettings(); });
+
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.getAttribute('data-theme');
+            setStoredTheme(theme);
+            applyTheme();
+            updateThemeButtonsActive();
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeSettings();
+    });
+
+    // When user chose "System", react to OS theme changes
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (getStoredTheme() === 'system') applyTheme();
+        });
+    }
+}
+
 // ── Render Slot Tray ──
 function renderSlotTray(rows) {
     const tray = document.getElementById('slotTray');
