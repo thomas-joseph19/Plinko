@@ -9,7 +9,7 @@ let cleanupTimer = 0;
 
 // ── Boot sequence ──
 function boot() {
-    console.log('%c PLINKO∞ ', 'background: linear-gradient(135deg, #c084fc, #38bdf8); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
+    console.log('%c Plinko ', 'background: linear-gradient(135deg, #6C5CE7, #00CEFF); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
 
     // Load saved game
     const hadSave = loadGame();
@@ -20,9 +20,24 @@ function boot() {
     // Initialize renderer
     initRenderer();
 
+    // Initialize Audio
+    if (window.AudioEngine) window.AudioEngine.init();
+
+    // Initialize Monetization
+    if (window.Monetization) window.Monetization.init();
+
     // Build the board
-    rebuildBoard();
-    resizeCanvas();
+    // Build the board (wait for layout)
+    function dfltLayout() {
+        const b = document.getElementById('plinkoBoard');
+        if (b && b.getBoundingClientRect().width > 10) {
+            rebuildBoard();
+            resizeCanvas();
+        } else {
+            requestAnimationFrame(dfltLayout);
+        }
+    }
+    dfltLayout();
 
     // Render initial UI
     renderDroppers();
@@ -80,8 +95,8 @@ function boot() {
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        resizeCanvas();
         rebuildBoard();
+        resizeCanvas();
     });
 
     // ═══ iOS-Specific Handlers ═══
@@ -121,16 +136,16 @@ function boot() {
             stopAutoDroppers();
             startAutoDroppers();
             // Rebuild board in case orientation changed
-            resizeCanvas();
             rebuildBoard();
+            resizeCanvas();
         }
     });
 
     // Handle iOS orientation changes
     window.addEventListener('orientationchange', () => {
         setTimeout(() => {
-            resizeCanvas();
             rebuildBoard();
+            resizeCanvas();
         }, 200); // Short delay to let iOS settle the new dimensions
     });
 

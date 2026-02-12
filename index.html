@@ -4,10 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PLINKO∞ — Mobile Preview</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap"
-    rel="stylesheet">
+  <title>Plinko — Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -16,67 +14,25 @@
     }
 
     body {
-      background: #08060f;
+      background: #050510;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      font-family: 'Rajdhani', sans-serif;
+      font-family: 'Silkscreen', monospace;
       overflow: hidden;
       position: relative;
     }
 
-    /* Starfield background */
+    /* Warm ambient backdrop */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image:
-        radial-gradient(1px 1px at 15% 20%, #fff 0%, transparent 100%),
-        radial-gradient(1px 1px at 45% 10%, #c4b5fd 0%, transparent 100%),
-        radial-gradient(1px 1px at 75% 35%, #fff 0%, transparent 100%),
-        radial-gradient(1px 1px at 90% 70%, #a78bfa 0%, transparent 100%),
-        radial-gradient(1px 1px at 30% 80%, #fff 0%, transparent 100%),
-        radial-gradient(1px 1px at 60% 60%, #c4b5fd 0%, transparent 100%);
-      opacity: 0.35;
+      background:
+        radial-gradient(ellipse at 25% 0%, rgba(108, 92, 231, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 100%, rgba(0, 206, 255, 0.04) 0%, transparent 55%);
       pointer-events: none;
-    }
-
-    /* Ambient glowing orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(192, 132, 252, 0.15), transparent 70%);
-      top: -100px;
-      left: -100px;
-      animation: orbFloat 20s ease-in-out infinite alternate;
-    }
-
-    .orb-2 {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
-      bottom: -80px;
-      right: -80px;
-      animation: orbFloat 25s ease-in-out 2s infinite alternate;
-    }
-
-    @keyframes orbFloat {
-      from {
-        transform: translate(0, 0);
-      }
-
-      to {
-        transform: translate(40px, 30px);
-      }
     }
 
     /* ═══ Phone Container ═══ */
@@ -86,59 +42,54 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 20px;
     }
 
     .phone-frame {
       position: relative;
       width: 390px;
       height: 844px;
-      background: #1a1a1a;
+      background: #1C1C1E;
       border-radius: 55px;
       padding: 14px;
-      border: 3px solid #2a2a2a;
-      box-shadow:
-        0 60px 120px -30px rgba(0, 0, 0, 0.7),
-        0 30px 60px -20px rgba(0, 0, 0, 0.5),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.08),
-        0 0 80px rgba(192, 132, 252, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.06);
     }
 
     /* Side buttons */
     .side-btn {
       position: absolute;
-      background: #222;
+      background: #2C2C2E;
       border-radius: 2px;
     }
 
     .power-btn {
-      right: -5px;
+      right: -4px;
       top: 180px;
-      width: 4px;
+      width: 3px;
       height: 80px;
       border-radius: 0 3px 3px 0;
     }
 
     .vol-up {
-      left: -5px;
+      left: -4px;
       top: 160px;
-      width: 4px;
+      width: 3px;
       height: 45px;
       border-radius: 3px 0 0 3px;
     }
 
     .vol-down {
-      left: -5px;
+      left: -4px;
       top: 215px;
-      width: 4px;
+      width: 3px;
       height: 45px;
       border-radius: 3px 0 0 3px;
     }
 
     .mute-switch {
-      left: -5px;
+      left: -4px;
       top: 125px;
-      width: 4px;
+      width: 3px;
       height: 22px;
       border-radius: 3px 0 0 3px;
     }
@@ -154,7 +105,6 @@
       background: #000;
       border-radius: 20px;
       z-index: 100;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
     }
 
     .dynamic-island::after {
@@ -165,20 +115,19 @@
       transform: translateY(-50%);
       width: 11px;
       height: 11px;
-      background: #0d0d1a;
+      background: #0a0a0a;
       border-radius: 50%;
-      border: 1px solid #1a1a2e;
+      border: 1px solid #1a1a1a;
     }
 
     /* Screen */
     .phone-screen {
       width: 100%;
       height: 100%;
-      background: #14102a;
+      background: #050510;
       border-radius: 42px;
       overflow: hidden;
       position: relative;
-      /* Account for simulated notch/island in preview */
       padding-top: 55px;
     }
 
@@ -186,7 +135,7 @@
       width: 100%;
       height: 100%;
       border: none;
-      background: #14102a;
+      background: #050510;
     }
 
     /* Home indicator */
@@ -197,7 +146,7 @@
       transform: translateX(-50%);
       width: 130px;
       height: 5px;
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 10px;
       z-index: 100;
     }
@@ -205,62 +154,57 @@
     /* ═══ Controls ═══ */
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
     }
 
     .ctrl-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: rgba(255, 255, 255, 0.55);
       padding: 10px 18px;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(8px);
+      font-family: 'Silkscreen', monospace;
+      font-size: 10px;
+      font-weight: 400;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
     .ctrl-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
       color: white;
-      transform: translateY(-1px);
-      border-color: rgba(192, 132, 252, 0.4);
+      transform: scale(1.04);
     }
 
     .ctrl-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.93);
     }
 
     .ctrl-btn.active {
-      background: rgba(192, 132, 252, 0.15);
-      border-color: rgba(192, 132, 252, 0.5);
-      color: #c084fc;
+      background: rgba(108, 92, 231, 0.12);
+      color: #6C5CE7;
     }
 
     /* Label */
     .preview-label {
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: rgba(255, 255, 255, 0.3);
-      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.25);
+      font-weight: 400;
     }
 
     /* Size info */
     .size-info {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.3);
-      font-family: 'Rajdhani', sans-serif;
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.2);
+      font-weight: 400;
     }
 
-    /* Responsive: if the browser is small, scale the phone down */
+    /* Responsive */
     @media (max-height: 920px) {
       .phone-frame {
         transform: scale(0.85);
@@ -282,7 +226,6 @@
       }
     }
 
-    /* Landscape handling */
     .phone-frame.landscape {
       width: 844px;
       height: 390px;
@@ -298,28 +241,21 @@
 </head>
 
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
 
   <div class="phone-wrapper">
-    <span class="preview-label">📱 Mobile Preview</span>
+    <span class="preview-label">📱 Preview</span>
 
     <div class="phone-frame" id="phoneFrame">
-      <!-- Hardware buttons -->
       <div class="side-btn power-btn"></div>
       <div class="side-btn vol-up"></div>
       <div class="side-btn vol-down"></div>
       <div class="side-btn mute-switch"></div>
-
-      <!-- Dynamic Island -->
       <div class="dynamic-island"></div>
 
-      <!-- Screen -->
       <div class="phone-screen">
-        <iframe src="game.html" id="gameFrame" title="PLINKO∞ Game"></iframe>
+        <iframe src="game.html" id="gameFrame" title="Plinko Game"></iframe>
       </div>
 
-      <!-- Home indicator -->
       <div class="home-indicator"></div>
     </div>
 

@@ -14,23 +14,85 @@ const SHOP_ITEMS = [
 function renderShopView() {
     const container = document.getElementById('shopItems');
     if (!container) return;
-    container.innerHTML = '<div class="category-label">💎 Gem Shop</div>';
+    container.innerHTML = '';
+
+    // ── Premium Section (No Ads) ──
+    if (window.Monetization && !window.Monetization.isPremium) {
+        const premiumSection = document.createElement('div');
+        premiumSection.className = 'shop-section';
+        premiumSection.innerHTML = '<div class="category-label" style="color:var(--accent2)">🌟 Premium</div>';
+
+        const noAdsBtn = document.createElement('div');
+        noAdsBtn.className = 'shop-item premium-item remove-ads-btn';
+        noAdsBtn.innerHTML = `
+            <div class="shop-item-icon">🚫</div>
+            <div class="shop-item-name">No Ads Bundle</div>
+            <div class="shop-item-desc">Remove forced ads & support dev!</div>
+            <div class="shop-item-price">$2.99</div>
+        `;
+        noAdsBtn.addEventListener('click', () => {
+            window.Monetization.purchaseNoAds();
+        });
+        premiumSection.appendChild(noAdsBtn);
+        container.appendChild(premiumSection);
+    }
+
+    // ── Free Stuff (Ads) ──
+    if (window.Monetization) {
+        const adSection = document.createElement('div');
+        adSection.className = 'shop-section';
+        adSection.innerHTML = '<div class="category-label" style="color:var(--accent1)">📺 Free Stuff</div>';
+
+        const watchAdBtn = document.createElement('div');
+        watchAdBtn.className = 'shop-item ad-item';
+        watchAdBtn.innerHTML = `
+            <div class="shop-item-icon">🎁</div>
+            <div class="shop-item-name">Watch Ad</div>
+            <div class="shop-item-desc">Get +50 Balls instantly</div>
+            <div class="shop-item-price">FREE</div>
+        `;
+        watchAdBtn.addEventListener('click', () => {
+            window.Monetization.showRewardedAd(() => {
+                // Reward: 50 balls
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => spawnBall(null, 15), i * 50);
+                }
+                alert('Reward: +50 Balls delivered!');
+            }, () => {
+                alert('Ad cancelled - no reward.');
+            });
+        });
+        adSection.appendChild(watchAdBtn);
+        container.appendChild(adSection);
+    }
+
+    // ── Gem Shop ──
+    const gemSection = document.createElement('div');
+    gemSection.className = 'shop-section';
+    gemSection.innerHTML = '<div class="category-label">💎 Gem Shop</div>';
 
     const grid = document.createElement('div');
     grid.className = 'shop-grid';
 
     for (const item of SHOP_ITEMS) {
+        // ... (existing item logic)
         const el = document.createElement('div');
         el.className = 'shop-item';
         const affordable = gameState.gems >= item.cost;
+        // Make unavailable items dimmer
+        const style = affordable ? '' : 'opacity: 0.5; filter: grayscale(1); pointer-events: none;';
+
         el.innerHTML = `
       <div class="shop-item-icon">${item.icon}</div>
       <div class="shop-item-name">${item.name}</div>
       <div class="shop-item-desc">${item.desc}</div>
-      <div class="shop-item-price" style="${affordable ? '' : 'opacity:0.4'}">${item.price}</div>
+      <div class="shop-item-price" style="${style}">${item.price}</div>
     `;
         el.addEventListener('click', () => {
             if (gameState.gems < item.cost) return;
+            // Purchase logic
+            if (window.AudioEngine) window.AudioEngine.upgradeBuy();
+
             gameState.gems -= item.cost;
             if (item.give === 'coins') {
                 gameState.coins += item.amount;
@@ -43,7 +105,7 @@ function renderShopView() {
                     setTimeout(() => spawnBall(null, 15, true), i * 100);
                 }
             } else if (item.give === 'fever') {
-                triggerFever();
+                if (typeof triggerFever === 'function') triggerFever();
             }
             renderShopView();
             updateStatsPanel();
@@ -51,5 +113,6 @@ function renderShopView() {
         });
         grid.appendChild(el);
     }
-    container.appendChild(grid);
+    gemSection.appendChild(grid);
+    container.appendChild(gemSection);
 }

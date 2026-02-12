@@ -92,6 +92,7 @@ function createUpgradeCard(id, compact) {
     if (!maxed) {
         card.addEventListener('click', () => {
             if (purchaseUpgrade(id)) {
+                if (window.AudioEngine) window.AudioEngine.upgradeBuy();
                 card.classList.add('purchased');
                 setTimeout(() => card.classList.remove('purchased'), 400);
                 // Refresh UI
@@ -273,6 +274,7 @@ function renderPrestigeView() {
         if (!maxed) {
             card.addEventListener('click', () => {
                 if (buyPrestigeUpgrade(pu.id)) {
+                    if (window.AudioEngine) window.AudioEngine.upgradeBuy();
                     renderPrestigeView();
                     updateStatsPanel();
                 }
@@ -290,6 +292,7 @@ function initTabs() {
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            if (window.AudioEngine) window.AudioEngine.click();
             const viewId = tab.dataset.view;
 
             tabs.forEach(t => t.classList.remove('active'));
@@ -322,6 +325,7 @@ function initPrestigeButton() {
             const tokens = calculatePrestigeTokens();
             if (confirm(`Prestige Reset?\n\nYou'll earn ${tokens} Prestige Token(s).\nYour coins and upgrades will reset, but prestige bonuses are permanent.\n\nContinue?`)) {
                 performPrestige();
+                if (window.AudioEngine) window.AudioEngine.prestige();
                 rebuildBoard();
                 stopAutoDroppers();
                 startAutoDroppers();
@@ -329,7 +333,7 @@ function initPrestigeButton() {
                 refreshUpgradeUI();
                 renderPrestigeView();
                 updateStatsPanel();
-                particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#c084fc', 30);
+                particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#7C6CF0', 30);
             }
         });
     }

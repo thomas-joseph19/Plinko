@@ -5,17 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PLINKO∞ — Idle Plinko Game</title>
+  <title>Plinko — Idle Plinko Game</title>
   <meta name="description"
     content="Drop balls, earn coins, upgrade everything. A satisfying idle Plinko game with physics, upgrades, and prestige.">
 
   <!-- iOS PWA / Standalone App -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PLINKO∞">
+  <meta name="apple-mobile-web-app-title" content="Plinko">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#14102a">
+  <meta name="theme-color" content="#050510">
   <meta name="format-detection" content="telephone=no">
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2818023938860764"
+    crossorigin="anonymous"></script>
 
   <!-- iOS Icons -->
   <link rel="apple-touch-icon" href="icons/icon.svg">
@@ -27,7 +31,7 @@
 
   <!-- Fonts & Styles -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -56,7 +60,7 @@
 
     <!-- ═══════════ HUD BAR ═══════════ -->
     <header class="hud" id="hud">
-      <div class="hud-logo">PLINKO∞</div>
+      <div class="hud-logo">Plinko</div>
       <div class="hud-currencies">
         <div class="currency-chip coins" id="coinChip">
           <span class="icon">🪙</span>
@@ -288,8 +292,11 @@
   <script src="js/upgrades.js"></script>
   <script src="js/prestige.js"></script>
   <script src="js/board.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="https://js.revenuecat.com/v1/purchases.js"></script>
   <script src="js/renderer.js"></script>
   <script src="js/effects.js"></script>
+  <script src="js/monetization.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/daily.js"></script>
   <script src="js/shop.js"></script>

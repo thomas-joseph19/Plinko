@@ -34,10 +34,8 @@ function rebuildBoard() {
     boardWidth = rect.width;
     boardHeight = rect.height;
 
-    canvas.width = boardWidth * window.devicePixelRatio;
-    canvas.height = boardHeight * window.devicePixelRatio;
-    canvas.style.width = boardWidth + 'px';
-    canvas.style.height = boardHeight + 'px';
+    // Canvas sizing is handled by renderer.js resizeCanvas() to maintain pixel scale
+
 
     // Clear existing bodies
     Matter.World.clear(world, false);
@@ -180,6 +178,12 @@ function handleCollisions(event) {
                 spawnSparkle(peg.position.x, peg.position.y);
             }
 
+            // Audio: Peg Hit
+            if (window.AudioEngine) {
+                const yPct = peg.position.y / boardHeight;
+                window.AudioEngine.pegHit(yPct, ball.isLucky);
+            }
+
             // Multi-ball split
             if (gameState.upgrades.multiBall > 0 && !ball.hasSplit) {
                 const splitChance = getMultiBallChance();
@@ -232,6 +236,13 @@ function handleSlotHit(slotIndex, ballBody) {
         showSlotHit(slotIndex, coins, isLucky); // check isLucky only
     }
 
+    // Audio: Slot Hit
+    if (window.AudioEngine) {
+        // Simple tier logic: mult > 10 is high tier
+        const tier = mult > 9 ? 3 : (mult > 2 ? 1 : 0);
+        window.AudioEngine.slotHit(isLucky, tier);
+    }
+
     // Slot flash
     const slotEls = document.querySelectorAll('.slot');
     if (slotEls[slotIndex]) {
@@ -259,6 +270,11 @@ function spawnBall(x, y, forceGolden) {
     if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return null;
 
     const isLucky = forceGolden || (Math.random() < getLuckyBallChance());
+
+    // Audio: Drop
+    if (window.AudioEngine) {
+        window.AudioEngine.drop();
+    }
 
     // Sub-pixel jitter (0.1px) is invisible but prevents "perfect" physics paths
     // without it, every ball would follow the exact same left/right path
