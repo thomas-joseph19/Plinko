@@ -1,0 +1,164 @@
+/* ═══════════════════════════════════════════════
+   PLINKO∞ — Daily Rewards & Challenges
+   ═══════════════════════════════════════════════ */
+
+const DAILY_LOGIN_COINS = 1000;
+
+// Pool of 50 daily challenges — cycled by day. progressKey: drop_ball | earn_coins | land_edge | land_center | land_high
+const DAILY_CHALLENGE_POOL = [
+    { id: 'dc_1', name: 'Edge Runner', desc: 'Land 5 balls in edge slots', target: 5, rewardType: 'gems', rewardAmount: 3, progressKey: 'land_edge' },
+    { id: 'dc_2', name: 'Ball Storm', desc: 'Drop 50 balls', target: 50, rewardType: 'coins', rewardAmount: 2000, progressKey: 'drop_ball' },
+    { id: 'dc_3', name: 'Money Maker', desc: 'Earn 10K coins', target: 10000, rewardType: 'gems', rewardAmount: 5, progressKey: 'earn_coins' },
+    { id: 'dc_4', name: 'Dropper', desc: 'Drop 25 balls', target: 25, rewardType: 'coins', rewardAmount: 500, progressKey: 'drop_ball' },
+    { id: 'dc_5', name: 'Edge Master', desc: 'Land 10 balls in edge slots', target: 10, rewardType: 'gems', rewardAmount: 8, progressKey: 'land_edge' },
+    { id: 'dc_6', name: 'Coin Collector', desc: 'Earn 5K coins', target: 5000, rewardType: 'coins', rewardAmount: 1000, progressKey: 'earn_coins' },
+    { id: 'dc_7', name: 'Center Shot', desc: 'Land 8 balls in center slots', target: 8, rewardType: 'gems', rewardAmount: 4, progressKey: 'land_center' },
+    { id: 'dc_8', name: 'Heavy Hitter', desc: 'Land 5 balls in high-value slots (10×+)', target: 5, rewardType: 'gems', rewardAmount: 6, progressKey: 'land_high' },
+    { id: 'dc_9', name: 'Ball Rain', desc: 'Drop 100 balls', target: 100, rewardType: 'coins', rewardAmount: 5000, progressKey: 'drop_ball' },
+    { id: 'dc_10', name: 'Big Earner', desc: 'Earn 25K coins', target: 25000, rewardType: 'gems', rewardAmount: 10, progressKey: 'earn_coins' },
+    { id: 'dc_11', name: 'Edge Seeker', desc: 'Land 3 balls in edge slots', target: 3, rewardType: 'coins', rewardAmount: 1500, progressKey: 'land_edge' },
+    { id: 'dc_12', name: 'Quick Drops', desc: 'Drop 15 balls', target: 15, rewardType: 'coins', rewardAmount: 300, progressKey: 'drop_ball' },
+    { id: 'dc_13', name: 'Pocket Change', desc: 'Earn 2K coins', target: 2000, rewardType: 'coins', rewardAmount: 500, progressKey: 'earn_coins' },
+    { id: 'dc_14', name: 'Center Focus', desc: 'Land 5 balls in center slots', target: 5, rewardType: 'coins', rewardAmount: 800, progressKey: 'land_center' },
+    { id: 'dc_15', name: 'High Roller', desc: 'Land 3 balls in high-value slots', target: 3, rewardType: 'gems', rewardAmount: 4, progressKey: 'land_high' },
+    { id: 'dc_16', name: 'Mass Drop', desc: 'Drop 200 balls', target: 200, rewardType: 'gems', rewardAmount: 7, progressKey: 'drop_ball' },
+    { id: 'dc_17', name: 'Rich', desc: 'Earn 50K coins', target: 50000, rewardType: 'gems', rewardAmount: 15, progressKey: 'earn_coins' },
+    { id: 'dc_18', name: 'Edge Pro', desc: 'Land 15 balls in edge slots', target: 15, rewardType: 'gems', rewardAmount: 12, progressKey: 'land_edge' },
+    { id: 'dc_19', name: 'Steady Drops', desc: 'Drop 75 balls', target: 75, rewardType: 'coins', rewardAmount: 3000, progressKey: 'drop_ball' },
+    { id: 'dc_20', name: 'Earn 20K', desc: 'Earn 20K coins', target: 20000, rewardType: 'coins', rewardAmount: 4000, progressKey: 'earn_coins' },
+    { id: 'dc_21', name: 'Center King', desc: 'Land 12 balls in center slots', target: 12, rewardType: 'gems', rewardAmount: 6, progressKey: 'land_center' },
+    { id: 'dc_22', name: 'Lucky Slots', desc: 'Land 8 balls in high-value slots', target: 8, rewardType: 'gems', rewardAmount: 9, progressKey: 'land_high' },
+    { id: 'dc_23', name: 'Drizzle', desc: 'Drop 10 balls', target: 10, rewardType: 'coins', rewardAmount: 200, progressKey: 'drop_ball' },
+    { id: 'dc_24', name: 'Small Stack', desc: 'Earn 1K coins', target: 1000, rewardType: 'coins', rewardAmount: 400, progressKey: 'earn_coins' },
+    { id: 'dc_25', name: 'Edges Only', desc: 'Land 7 balls in edge slots', target: 7, rewardType: 'gems', rewardAmount: 5, progressKey: 'land_edge' },
+    { id: 'dc_26', name: 'Hundred Club', desc: 'Drop 100 balls', target: 100, rewardType: 'gems', rewardAmount: 5, progressKey: 'drop_ball' },
+    { id: 'dc_27', name: '30K Earned', desc: 'Earn 30K coins', target: 30000, rewardType: 'gems', rewardAmount: 8, progressKey: 'earn_coins' },
+    { id: 'dc_28', name: 'Middle Path', desc: 'Land 10 balls in center slots', target: 10, rewardType: 'coins', rewardAmount: 2000, progressKey: 'land_center' },
+    { id: 'dc_29', name: 'Premium Bins', desc: 'Land 10 balls in high-value slots', target: 10, rewardType: 'gems', rewardAmount: 11, progressKey: 'land_high' },
+    { id: 'dc_30', name: 'Mega Drop', desc: 'Drop 300 balls', target: 300, rewardType: 'gems', rewardAmount: 10, progressKey: 'drop_ball' },
+    { id: 'dc_31', name: 'Fortune', desc: 'Earn 75K coins', target: 75000, rewardType: 'gems', rewardAmount: 20, progressKey: 'earn_coins' },
+    { id: 'dc_32', name: 'Edge Legend', desc: 'Land 20 balls in edge slots', target: 20, rewardType: 'gems', rewardAmount: 15, progressKey: 'land_edge' },
+    { id: 'dc_33', name: 'Light Rain', desc: 'Drop 30 balls', target: 30, rewardType: 'coins', rewardAmount: 600, progressKey: 'drop_ball' },
+    { id: 'dc_34', name: '15K Coins', desc: 'Earn 15K coins', target: 15000, rewardType: 'coins', rewardAmount: 2500, progressKey: 'earn_coins' },
+    { id: 'dc_35', name: 'Center Ace', desc: 'Land 15 balls in center slots', target: 15, rewardType: 'gems', rewardAmount: 8, progressKey: 'land_center' },
+    { id: 'dc_36', name: 'High Value', desc: 'Land 12 balls in high-value slots', target: 12, rewardType: 'gems', rewardAmount: 12, progressKey: 'land_high' },
+    { id: 'dc_37', name: 'Downpour', desc: 'Drop 150 balls', target: 150, rewardType: 'coins', rewardAmount: 4000, progressKey: 'drop_ball' },
+    { id: 'dc_38', name: '40K Earned', desc: 'Earn 40K coins', target: 40000, rewardType: 'gems', rewardAmount: 12, progressKey: 'earn_coins' },
+    { id: 'dc_39', name: 'Edge Hunter', desc: 'Land 8 balls in edge slots', target: 8, rewardType: 'coins', rewardAmount: 2500, progressKey: 'land_edge' },
+    { id: 'dc_40', name: 'Ball Flood', desc: 'Drop 250 balls', target: 250, rewardType: 'gems', rewardAmount: 8, progressKey: 'drop_ball' },
+    { id: 'dc_41', name: '50K Coins', desc: 'Earn 50K coins', target: 50000, rewardType: 'coins', rewardAmount: 8000, progressKey: 'earn_coins' },
+    { id: 'dc_42', name: 'Center Pro', desc: 'Land 6 balls in center slots', target: 6, rewardType: 'gems', rewardAmount: 3, progressKey: 'land_center' },
+    { id: 'dc_43', name: 'Jackpot Feel', desc: 'Land 6 balls in high-value slots', target: 6, rewardType: 'gems', rewardAmount: 5, progressKey: 'land_high' },
+    { id: 'dc_44', name: 'Steady Flow', desc: 'Drop 60 balls', target: 60, rewardType: 'coins', rewardAmount: 1500, progressKey: 'drop_ball' },
+    { id: 'dc_45', name: '8K Earned', desc: 'Earn 8K coins', target: 8000, rewardType: 'gems', rewardAmount: 4, progressKey: 'earn_coins' },
+    { id: 'dc_46', name: 'Sides', desc: 'Land 4 balls in edge slots', target: 4, rewardType: 'coins', rewardAmount: 1000, progressKey: 'land_edge' },
+    { id: 'dc_47', name: 'Center Star', desc: 'Land 20 balls in center slots', target: 20, rewardType: 'gems', rewardAmount: 10, progressKey: 'land_center' },
+    { id: 'dc_48', name: 'Elite Bins', desc: 'Land 15 balls in high-value slots', target: 15, rewardType: 'gems', rewardAmount: 14, progressKey: 'land_high' },
+    { id: 'dc_49', name: '500 Balls', desc: 'Drop 500 balls', target: 500, rewardType: 'gems', rewardAmount: 25, progressKey: 'drop_ball' },
+    { id: 'dc_50', name: '100K Club', desc: 'Earn 100K coins', target: 100000, rewardType: 'gems', rewardAmount: 30, progressKey: 'earn_coins' },
+];
+
+function getTodayDateKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function ensureDailyChallengeState() {
+    const today = getTodayDateKey();
+    if (gameState.lastDailyChallengeDate !== today) {
+        gameState.lastDailyChallengeDate = today;
+        gameState.dailyChallengeProgress = {};
+        gameState.dailyChallengesClaimed = {};
+    }
+}
+
+// Deterministic pick of 3 unique challenges for the day (cycled from pool of 50)
+function getTodaysChallenges() {
+    ensureDailyChallengeState();
+    const today = getTodayDateKey();
+    let seed = 0;
+    for (let i = 0; i < today.length; i++) seed += today.charCodeAt(i);
+    const poolLen = DAILY_CHALLENGE_POOL.length;
+    const indices = [];
+    for (let i = 0; i < 3; i++) {
+        let idx = (seed + i * 17 + i * i * 7) % poolLen;
+        while (indices.includes(idx)) idx = (idx + 1) % poolLen;
+        indices.push(idx);
+    }
+    return indices.map(i => ({ ...DAILY_CHALLENGE_POOL[i] }));
+}
+
+function isDailyAvailable() {
+    if (!gameState.lastDailyClaim) return true;
+    const last = new Date(gameState.lastDailyClaim);
+    return last.toDateString() !== new Date().toDateString();
+}
+
+function claimDaily() {
+    if (!isDailyAvailable()) return false;
+    gameState.coins += DAILY_LOGIN_COINS;
+    gameState.lastDailyClaim = new Date().toISOString();
+    saveGame();
+    return true;
+}
+
+// Call this when the player does something that counts toward a challenge. Awards and saves when a challenge completes.
+function recordDailyProgress(progressKey, amount) {
+    if (!progressKey || amount <= 0) return;
+    ensureDailyChallengeState();
+    const challenges = getTodaysChallenges();
+    let anyCompleted = false;
+    for (const c of challenges) {
+        if (c.progressKey !== progressKey) continue;
+        if (gameState.dailyChallengesClaimed[c.id]) continue;
+        const cur = gameState.dailyChallengeProgress[c.id] || 0;
+        const next = Math.min(c.target, cur + amount);
+        gameState.dailyChallengeProgress[c.id] = next;
+        if (next >= c.target) {
+            gameState.dailyChallengesClaimed[c.id] = true;
+            if (c.rewardType === 'coins') gameState.coins += c.rewardAmount;
+            else if (c.rewardType === 'gems') gameState.gems += c.rewardAmount;
+            anyCompleted = true;
+        }
+    }
+    if (anyCompleted || amount > 0) saveGame();
+    if (anyCompleted && typeof updateStatsPanel === 'function') updateStatsPanel();
+    if (anyCompleted && typeof renderDailyView === 'function') renderDailyView();
+}
+
+function renderDailyView() {
+    const grid = document.getElementById('dailyGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const available = isDailyAvailable();
+    const rewardStr = typeof formatNumber === 'function' ? formatNumber(DAILY_LOGIN_COINS) : '1,000';
+
+    const d = document.createElement('div');
+    d.className = 'daily-day' + (available ? ' available' : ' claimed');
+    d.innerHTML = `<div class="daily-day-num">Daily login</div><div class="daily-day-icon">🪙</div><div class="daily-day-reward">${available ? rewardStr + ' coins' : 'Claimed!'}</div>`;
+    if (available) {
+        d.addEventListener('click', () => {
+            if (claimDaily()) { renderDailyView(); updateStatsPanel(); }
+        });
+    }
+    grid.appendChild(d);
+
+    const badge = document.getElementById('dailyBadge');
+    if (badge) badge.style.display = available ? '' : 'none';
+
+    // Daily challenges (3 per day from pool of 50)
+    const container = document.getElementById('dailyChallenges');
+    if (!container) return;
+    container.innerHTML = '';
+    const challenges = getTodaysChallenges();
+    for (const c of challenges) {
+        const p = gameState.dailyChallengeProgress[c.id] || 0;
+        const claimed = !!gameState.dailyChallengesClaimed[c.id];
+        const pct = Math.min(100, (p / c.target) * 100);
+        const rewardStr = c.rewardType === 'gems' ? `💎 ${c.rewardAmount}` : `🪙 ${typeof formatNumber === 'function' ? formatNumber(c.rewardAmount) : c.rewardAmount}`;
+        const card = document.createElement('div');
+        card.className = 'challenge-card' + (claimed ? ' challenge-claimed' : '');
+        card.innerHTML = `<div class="challenge-header"><span class="challenge-name">${claimed ? '✅' : '🎯'} ${c.name}</span><span class="challenge-reward">${rewardStr}</span></div><div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width:${pct}%"></div></div><div class="challenge-text">${c.desc} — ${Math.min(p, c.target)}/${c.target}${claimed ? ' (claimed)' : ''}</div>`;
+        container.appendChild(card);
+    }
+}

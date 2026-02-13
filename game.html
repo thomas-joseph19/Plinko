@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PLINKO∞ — Idle Plinko Game</title>
+  <meta name="description"
+    content="Drop balls, earn coins, upgrade everything. A satisfying idle Plinko game with physics, upgrades, and prestige.">
+
+  <!-- iOS PWA / Standalone App -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PLINKO∞">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#14102a">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Fonts & Styles -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Ambient background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Offline earnings toast -->
+  <div class="offline-toast" id="offlineToast" style="display:none;">
+    <div class="toast-icon">🌙</div>
+    <div class="toast-body">
+      <div class="toast-title">Welcome back!</div>
+      <div class="toast-sub" id="offlineMsg">Earned <strong>+0 coins</strong> while away</div>
+    </div>
+    <div class="toast-close" id="toastClose">✕</div>
+  </div>
+
+  <!-- Fever Mode Overlay -->
+  <div class="fever-overlay" id="feverOverlay"></div>
+
+  <button id="debugMoneyBtn"
+    style="position: fixed; top: 80px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
+    +100k 💰
+  </button>
+  <button id="debugCooldownBtn"
+    style="position: fixed; top: 110px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
+    Reset 🕐
+  </button>
+
+  <div class="app" id="app">
+
+    <!-- ═══════════ HUD BAR ═══════════ -->
+    <header class="hud" id="hud">
+      <div class="hud-logo">PLINKO∞</div>
+      <div class="hud-currencies">
+        <div class="currency-chip coins" id="coinChip">
+          <span class="icon">🪙</span>
+          <span id="coinDisplay">0</span>
+        </div>
+        <div class="currency-chip gems" id="gemChip">
+          <span class="icon">💎</span>
+          <span id="gemDisplay">0</span>
+        </div>
+      </div>
+      <div class="hud-actions">
+        <button type="button" class="hud-btn" title="Settings" id="settingsBtn" aria-label="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <!-- ═══════════ MAIN CONTENT AREA ═══════════ -->
+    <div class="main-content" id="mainContent">
+
+      <!-- ── BOARD VIEW (default) ── -->
+      <div class="view-panel board-view active" id="boardView">
+        <main class="board-area">
+          <!-- Drop zone -->
+          <div class="drop-zone" id="dropZone">
+            <div class="dropper-indicators" id="dropperIndicators"></div>
+            <span class="drop-label" id="dropLabel">AUTO-DROP ×1</span>
+          </div>
+
+          <!-- The Plinko board canvas -->
+          <div class="plinko-board" id="plinkoBoard">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Fever banner -->
+            <div class="fever-banner" id="feverBanner">🔥 FEVER MODE 🔥</div>
+
+            <!-- Event banner -->
+            <div class="fever-banner" id="eventBanner"
+              style="background: linear-gradient(135deg, rgba(56,189,248,0.95), rgba(99,102,241,0.95));">⚡ EVENT ACTIVE
+              ⚡</div>
+
+            <!-- Slot tray rendered by JS -->
+            <div class="slot-tray" id="slotTray"></div>
+          </div>
+
+          <!-- Floating manual drop button -->
+          <button class="manual-drop-btn" id="manualDropBtn" title="Drop a ball!">⬇</button>
+        </main>
+      </div>
+
+      <!-- ── UPGRADES VIEW ── -->
+      <div class="view-panel upgrades-view" id="upgradesView">
+        <div class="panel-scroll">
+          <div class="panel-header">
+            <h2 class="panel-title">🔧 Upgrades</h2>
+            <p class="panel-subtitle">Spend coins to power up your Plinko machine</p>
+          </div>
+
+          <div class="upgrade-category">
+            <div class="category-label">⚡ Ball Upgrades</div>
+            <div class="upgrade-grid" id="ballUpgrades"></div>
+          </div>
+
+          <div class="upgrade-category">
+            <div class="category-label">🏗️ Board Upgrades</div>
+            <div class="upgrade-grid" id="boardUpgrades"></div>
+          </div>
+
+          <div class="upgrade-category">
+            <div class="category-label">💰 Passive Upgrades</div>
+            <div class="upgrade-grid" id="passiveUpgrades"></div>
+          </div>
+
+          <div class="upgrade-category">
+            <div class="category-label">⚡ Events</div>
+            <div class="event-info-bar" id="eventInfoBar">
+              <span class="event-info-status" id="eventGlobalStatus">Ready</span>
+            </div>
+            <div class="event-grid" id="eventCards"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRESTIGE VIEW ── -->
+      <div class="view-panel prestige-view" id="prestigeView">
+        <div class="panel-scroll">
+          <div class="panel-header">
+            <h2 class="panel-title">⭐ Prestige</h2>
+            <p class="panel-subtitle">Reset progress for powerful permanent bonuses</p>
+          </div>
+
+          <div class="prestige-info-card" id="prestigeInfo">
+            <div class="prestige-stats">
+              <div class="p-stat">
+                <span class="p-stat-label">Current Prestige</span>
+                <span class="p-stat-value" id="prestigeLevel">0</span>
+              </div>
+              <div class="p-stat">
+                <span class="p-stat-label">Tokens Available</span>
+                <span class="p-stat-value" id="prestigeTokens">0</span>
+              </div>
+              <div class="p-stat">
+                <span class="p-stat-label">Tokens on Reset</span>
+                <span class="p-stat-value highlight" id="tokensOnReset">0</span>
+              </div>
+              <div class="p-stat">
+                <span class="p-stat-label">Total Earned</span>
+                <span class="p-stat-value" id="totalEarned">0</span>
+              </div>
+            </div>
+            <button class="prestige-reset-btn" id="prestigeResetBtn">
+              <span class="prestige-reset-label">⭐ PRESTIGE RESET</span>
+              <span class="prestige-reset-sub" id="prestigeResetSub">Earn 0 tokens</span>
+            </button>
+          </div>
+
+          <div class="prestige-tree" id="prestigeTree"></div>
+        </div>
+      </div>
+
+      <!-- ── DAILY VIEW ── -->
+      <div class="view-panel daily-view" id="dailyView">
+        <div class="panel-scroll">
+          <div class="panel-header">
+            <h2 class="panel-title">🎁 Daily Rewards</h2>
+            <p class="panel-subtitle">Log in every day for escalating rewards</p>
+          </div>
+          <div class="daily-grid" id="dailyGrid"></div>
+          <div class="challenge-section">
+            <div class="category-label">🎯 Daily Challenges</div>
+            <div id="dailyChallenges"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SHOP VIEW ── -->
+      <div class="view-panel shop-view" id="shopView">
+        <div class="panel-scroll">
+          <div class="panel-header">
+            <h2 class="panel-title">💎 Shop</h2>
+            <p class="panel-subtitle">Premium items and special offers</p>
+          </div>
+          <div id="shopItems"></div>
+        </div>
+      </div>
+
+
+      <!-- ── STATS VIEW (was side panel) ── -->
+      <div class="view-panel stats-view" id="statsView">
+        <div class="panel-scroll">
+          <div class="panel-header">
+            <h2 class="panel-title">📊 Live Stats</h2>
+            <p class="panel-subtitle">Track your Plinko performance</p>
+          </div>
+
+          <div class="stats-card">
+            <div class="card-title">Performance</div>
+            <div class="stat-row">
+              <span class="stat-label">Coins / sec</span>
+              <span class="stat-value highlight" id="statCps2">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Balls / sec</span>
+              <span class="stat-value" id="statBps2">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Multiplier</span>
+              <span class="stat-value highlight" id="statMult2">×1.0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Board Rows</span>
+              <span class="stat-value" id="statRows2">4</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Prestige</span>
+              <span class="stat-value" id="statPrestige2">Lv. 0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Combo</span>
+              <span class="stat-value" id="statCombo2">×1</span>
+            </div>
+          </div>
+
+          <!-- Quick upgrades -->
+          <div class="stats-card">
+            <div class="card-title">Quick Upgrades</div>
+            <div id="quickUpgrades2"></div>
+          </div>
+
+          <!-- Prestige teaser -->
+          <div class="prestige-btn" id="prestigeTeaser2">
+            <div class="prestige-label">⭐ PRESTIGE</div>
+            <div class="prestige-sub" id="prestigeTeaserSub2">Reset for permanent boost</div>
+          </div>
+
+          <!-- Hard Reset -->
+          <button id="hardResetBtn"
+            style="margin-top: 32px; width: 100%; padding: 10px; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.2); color: #f87171; border-radius: 8px; font-family: 'Rajdhani'; font-weight: 600; cursor: pointer; font-size: 11px; letter-spacing: 1px;">
+            💀 HARD RESET ALL DATA
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════ TAB BAR ═══════════ -->
+    <nav class="tab-bar" id="tabBar">
+      <div class="tab active" data-view="boardView">
+        <span class="tab-icon">🎯</span>
+        <span>Board</span>
+      </div>
+      <div class="tab" data-view="upgradesView">
+        <span class="tab-icon">🔧</span>
+        <span>Upgrades</span>
+        <span class="badge" id="upgradeBadge" style="display:none">0</span>
+      </div>
+      <div class="tab" data-view="statsView">
+        <span class="tab-icon">📊</span>
+        <span>Stats</span>
+      </div>
+      <div class="tab" data-view="prestigeView">
+        <span class="tab-icon">⭐</span>
+        <span>Prestige</span>
+      </div>
+      <div class="tab" data-view="dailyView">
+        <span class="tab-icon">🎁</span>
+        <span>Daily</span>
+        <span class="badge" id="dailyBadge" style="display:none">!</span>
+      </div>
+      <div class="tab" data-view="shopView">
+        <span class="tab-icon">💎</span>
+        <span>Shop</span>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
+    <div class="settings-modal" id="settingsModal" role="dialog" aria-labelledby="settingsTitle">
+      <div class="settings-header">
+        <h2 class="settings-title" id="settingsTitle">⚙️ Settings</h2>
+        <button type="button" class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-group">
+          <div class="settings-label">Sound & Feedback</div>
+          <div class="settings-control">
+            <div class="control-info">
+              <span class="control-name">Audio Effects</span>
+              <span class="control-desc">Play arcade sounds and chimes</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="audioToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-control volume-control">
+            <div class="control-info">
+              <span class="control-name">Volume</span>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" class="volume-slider">
+          </div>
+          <div class="settings-control">
+            <div class="control-info">
+              <span class="control-name">Animations</span>
+              <span class="control-desc">Enable smooth visual effects</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="animationToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Information</div>
+          <div class="legal-links">
+            <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
+            <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
+          </div>
+          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matter.js physics engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+
+  <!-- Game modules -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/prestige.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/debug.js"></script>
+  <script src="js/daily.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        console.log('Service Worker registered');
+      }).catch(err => console.warn('SW registration failed:', err));
+    }
+  </script>
+</body>
+
+</html>

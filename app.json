@@ -1,0 +1,30 @@
+{
+    "expo": {
+        "name": "Plinko Infinity",
+        "slug": "plinko-infinity",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./icons/icon.svg",
+        "userInterfaceStyle": "dark",
+        "splash": {
+            "image": "./icons/icon.svg",
+            "resizeMode": "contain",
+            "backgroundColor": "#14102a"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./icons/icon.svg",
+                "backgroundColor": "#14102a"
+            }
+        },
+        "web": {
+            "favicon": "./icons/icon.svg"
+        }
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "plinko-infinity",
+  "version": "1.0.0",
+  "description": "Premium Idle Plinko Game — standalone, no overlap with other projects",
+  "private": true,
+  "scripts": {
+    "start": "vite --host",
+    "dev": "vite --host",
+    "expo": "npx expo start",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "^6.1.2",
+    "expo": "^54.0.33",
+    "expo-constants": "^18.0.13",
+    "expo-status-bar": "^3.0.9",
+    "matter-js": "^0.20.0",
+    "react-dom": "^19.2.4",
+    "react-native-web": "^0.21.2",
+    "react-native-webview": "13.15.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
