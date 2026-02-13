@@ -53,6 +53,25 @@ function initDebug() {
             }, 1000);
         });
     }
+
+    const resetDailyBtn = document.getElementById('debugResetDailyChallengesBtn');
+    if (resetDailyBtn) {
+        resetDailyBtn.addEventListener('click', () => {
+            gameState.dailyChallengeProgress = {};
+            gameState.dailyChallengesClaimed = {};
+            saveGame();
+            if (typeof renderDailyView === 'function') renderDailyView();
+            if (typeof updateStatsPanel === 'function') updateStatsPanel();
+
+            const originalText = resetDailyBtn.textContent;
+            resetDailyBtn.textContent = 'Reset! ✅';
+            resetDailyBtn.style.background = '#22c55e';
+            setTimeout(() => {
+                resetDailyBtn.textContent = originalText;
+                resetDailyBtn.style.background = '#f59e0b';
+            }, 1000);
+        });
+    }
 }
 
 // Ensure this is called when the script loads or UI inits

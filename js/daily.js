@@ -4,6 +4,31 @@
 
 const DAILY_LOGIN_COINS = 1000;
 
+const DAILY_CLAIM_TOAST_DURATION_MS = 2500;
+
+function showDailyClaimToast(title, sub) {
+    const existing = document.querySelectorAll('.daily-claim-toast, .daily-claim-popup');
+    existing.forEach(el => el.remove());
+    const toast = document.createElement('div');
+    toast.className = 'daily-claim-toast';
+    toast.innerHTML = `<div class="daily-claim-toast-icon">✅</div><div><div class="daily-claim-toast-title">${title}</div><div class="daily-claim-toast-sub">${sub}</div></div>`;
+    document.body.appendChild(toast);
+    // Centered popup overlay for unmissable "reward claimed" animation
+    const popup = document.createElement('div');
+    popup.className = 'daily-claim-popup';
+    popup.innerHTML = `<div class="daily-claim-popup-inner"><div class="daily-claim-popup-icon">🎉</div><div class="daily-claim-popup-title">${title}</div><div class="daily-claim-popup-sub">${sub}</div></div>`;
+    document.body.appendChild(popup);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.25s';
+        popup.classList.add('daily-claim-popup-out');
+        setTimeout(() => {
+            toast.remove();
+            popup.remove();
+        }, 400);
+    }, DAILY_CLAIM_TOAST_DURATION_MS);
+}
+
 // Pool of 50 daily challenges — cycled by day. progressKey: drop_ball | earn_coins | land_edge | land_center | land_high
 const DAILY_CHALLENGE_POOL = [
     { id: 'dc_1', name: 'Edge Runner', desc: 'Land 5 balls in edge slots', target: 5, rewardType: 'gems', rewardAmount: 3, progressKey: 'land_edge' },
@@ -102,28 +127,20 @@ function claimDaily() {
     return true;
 }
 
-// Call this when the player does something that counts toward a challenge. Awards and saves when a challenge completes.
+// Only updates progress. Reward is claimed when user taps the completed challenge in the Daily tab.
 function recordDailyProgress(progressKey, amount) {
     if (!progressKey || amount <= 0) return;
     ensureDailyChallengeState();
     const challenges = getTodaysChallenges();
-    let anyCompleted = false;
     for (const c of challenges) {
         if (c.progressKey !== progressKey) continue;
         if (gameState.dailyChallengesClaimed[c.id]) continue;
         const cur = gameState.dailyChallengeProgress[c.id] || 0;
         const next = Math.min(c.target, cur + amount);
         gameState.dailyChallengeProgress[c.id] = next;
-        if (next >= c.target) {
-            gameState.dailyChallengesClaimed[c.id] = true;
-            if (c.rewardType === 'coins') gameState.coins += c.rewardAmount;
-            else if (c.rewardType === 'gems') gameState.gems += c.rewardAmount;
-            anyCompleted = true;
-        }
     }
-    if (anyCompleted || amount > 0) saveGame();
-    if (anyCompleted && typeof updateStatsPanel === 'function') updateStatsPanel();
-    if (anyCompleted && typeof renderDailyView === 'function') renderDailyView();
+    saveGame();
+    if (typeof renderDailyView === 'function') renderDailyView();
 }
 
 function renderDailyView() {
@@ -138,7 +155,12 @@ function renderDailyView() {
     d.innerHTML = `<div class="daily-day-num">Daily login</div><div class="daily-day-icon">🪙</div><div class="daily-day-reward">${available ? rewardStr + ' coins' : 'Claimed!'}</div>`;
     if (available) {
         d.addEventListener('click', () => {
-            if (claimDaily()) { renderDailyView(); updateStatsPanel(); }
+            if (claimDaily()) {
+                const rewardStr = typeof formatNumber === 'function' ? formatNumber(DAILY_LOGIN_COINS) : '1,000';
+                showDailyClaimToast('Daily login claimed!', `+${rewardStr} coins added.`);
+                renderDailyView();
+                updateStatsPanel();
+            }
         });
     }
     grid.appendChild(d);
@@ -146,7 +168,7 @@ function renderDailyView() {
     const badge = document.getElementById('dailyBadge');
     if (badge) badge.style.display = available ? '' : 'none';
 
-    // Daily challenges (3 per day from pool of 50)
+    // Daily challenges (3 per day from pool of 50). User must tap completed challenge to claim reward.
     const container = document.getElementById('dailyChallenges');
     if (!container) return;
     container.innerHTML = '';
@@ -154,11 +176,27 @@ function renderDailyView() {
     for (const c of challenges) {
         const p = gameState.dailyChallengeProgress[c.id] || 0;
         const claimed = !!gameState.dailyChallengesClaimed[c.id];
+        const completed = p >= c.target;
         const pct = Math.min(100, (p / c.target) * 100);
         const rewardStr = c.rewardType === 'gems' ? `💎 ${c.rewardAmount}` : `🪙 ${typeof formatNumber === 'function' ? formatNumber(c.rewardAmount) : c.rewardAmount}`;
         const card = document.createElement('div');
-        card.className = 'challenge-card' + (claimed ? ' challenge-claimed' : '');
-        card.innerHTML = `<div class="challenge-header"><span class="challenge-name">${claimed ? '✅' : '🎯'} ${c.name}</span><span class="challenge-reward">${rewardStr}</span></div><div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width:${pct}%"></div></div><div class="challenge-text">${c.desc} — ${Math.min(p, c.target)}/${c.target}${claimed ? ' (claimed)' : ''}</div>`;
+        card.className = 'challenge-card' + (claimed ? ' challenge-claimed' : '') + (completed && !claimed ? ' challenge-ready' : '');
+        const statusText = claimed ? ' (claimed)' : (completed ? ' — Tap to claim!' : '');
+        card.innerHTML = `<div class="challenge-header"><span class="challenge-name">${claimed ? '✅' : (completed ? '🎁' : '🎯')} ${c.name}</span><span class="challenge-reward">${rewardStr}</span></div><div class="challenge-progress-bar"><div class="challenge-progress-fill" style="width:${pct}%"></div></div><div class="challenge-text">${c.desc} — ${Math.min(p, c.target)}/${c.target}${statusText}</div>`;
+        if (completed && !claimed) {
+            card.addEventListener('click', () => {
+                gameState.dailyChallengesClaimed[c.id] = true;
+                if (c.rewardType === 'coins') gameState.coins += c.rewardAmount;
+                else if (c.rewardType === 'gems') gameState.gems += c.rewardAmount;
+                saveGame();
+                const rewardText = c.rewardType === 'gems'
+                    ? `+${c.rewardAmount} gems`
+                    : `+${typeof formatNumber === 'function' ? formatNumber(c.rewardAmount) : c.rewardAmount} coins`;
+                showDailyClaimToast('Reward claimed!', `${c.name} — ${rewardText} added.`);
+                if (typeof updateStatsPanel === 'function') updateStatsPanel();
+                renderDailyView();
+            });
+        }
         container.appendChild(card);
     }
 }

@@ -2000,6 +2000,230 @@ body::before {
   color: var(--text-bright);
 }
 
+/* ═══════════ DAILY REWARD / CHALLENGE CLAIMED TOAST ═══════════ */
+.daily-claim-toast {
+  position: fixed;
+  top: calc(var(--sat) + 80px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--bg-panel), rgba(20, 16, 42, 0.97));
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  border-radius: 14px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  box-shadow: 0 0 40px rgba(52, 211, 153, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: dailyClaimToastIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.4) forwards;
+  z-index: 101;
+  min-width: 280px;
+  pointer-events: none;
+}
+
+.daily-claim-toast .daily-claim-toast-icon {
+  font-size: 28px;
+  animation: dailyClaimIconPop 0.5s ease-out 0.1s both;
+}
+
+.daily-claim-toast .daily-claim-toast-title {
+  font-weight: 700;
+  color: var(--success, #34d399);
+  margin-bottom: 2px;
+}
+
+.daily-claim-toast .daily-claim-toast-sub {
+  color: var(--text-mid);
+  font-size: 12px;
+}
+
+@keyframes dailyClaimToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes dailyClaimIconPop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Card pulse when daily login is claimed */
+.daily-day.claim-success {
+  animation: dailyCardClaimSuccess 0.6s ease-out forwards;
+}
+
+@keyframes dailyCardClaimSuccess {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(52, 211, 153, 0);
+  }
+  40% {
+    transform: scale(1.08);
+    box-shadow: 0 0 24px rgba(52, 211, 153, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+  }
+}
+
+/* Challenge card flash when completed */
+.challenge-card.challenge-just-claimed {
+  animation: challengeCardClaimed 0.6s ease-out forwards;
+}
+
+@keyframes challengeCardClaimed {
+  0% {
+    box-shadow: 0 0 0 rgba(52, 211, 153, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+/* Ready-to-claim challenge card */
+.challenge-card.challenge-ready {
+  border-color: rgba(52, 211, 153, 0.5);
+  cursor: pointer;
+  animation: challengeReadyPulse 1.5s ease-in-out infinite alternate;
+}
+
+.challenge-card.challenge-ready:hover {
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.3);
+}
+
+@keyframes challengeReadyPulse {
+  from {
+    box-shadow: 0 0 0 rgba(52, 211, 153, 0);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+  }
+}
+
+/* Centered popup overlay — "Reward claimed!" animation */
+.daily-claim-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  animation: dailyClaimOverlayIn 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+.daily-claim-popup-out {
+  animation: dailyClaimOverlayOut 0.4s ease-out forwards;
+}
+
+.daily-claim-popup-inner {
+  background: linear-gradient(135deg, var(--bg-panel), rgba(20, 16, 42, 0.98));
+  border: 2px solid rgba(52, 211, 153, 0.6);
+  border-radius: 20px;
+  padding: 28px 36px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(52, 211, 153, 0.25), 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: dailyClaimPopupIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.4) forwards;
+  max-width: 90%;
+}
+
+.daily-claim-popup-out .daily-claim-popup-inner {
+  animation: dailyClaimPopupOut 0.4s ease-in forwards;
+}
+
+.daily-claim-popup-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: dailyClaimIconBounce 0.6s ease-out 0.2s both;
+}
+
+.daily-claim-popup-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--success, #34d399);
+  margin-bottom: 8px;
+}
+
+.daily-claim-popup-sub {
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+@keyframes dailyClaimOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dailyClaimOverlayOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dailyClaimPopupIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dailyClaimPopupOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes dailyClaimIconBounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* ═══════════ EVENTS ═══════════ */
 .event-info-bar {
   display: flex;
