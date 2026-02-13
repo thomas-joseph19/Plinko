@@ -26,6 +26,9 @@ function boot() {
     // Initialize audio
     if (window.AudioEngine) window.AudioEngine.init();
 
+    // Initialize monetization
+    if (window.Monetization) window.Monetization.init();
+
     // Build the board
     rebuildBoard();
     resizeCanvas();
@@ -178,7 +181,6 @@ function calculateOfflineEarnings() {
     if (earned > 0) {
         gameState.coins += earned;
         gameState.totalCoinsEarned += earned;
-        if (typeof recordDailyProgress === 'function') recordDailyProgress('earn_coins', Math.floor(earned));
         showOfflineEarnings(earned, clampedElapsed);
     }
 }

@@ -1,14 +1,69 @@
-import React from 'react';
-import { View, Platform, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Platform, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
+import Purchases from 'react-native-purchases';
 
 const debuggerHost = Constants.expoConfig?.hostUri || 'localhost:5173';
 const localIp = debuggerHost.split(':')[0];
 const gameUrl = `http://${localIp}:5173/game.html`;
 
+// RevenueCat Config
+const RC_API_KEYS = {
+    apple: 'goog_FecausrHExPmUXyZUWXPFeFoDNM', // Example keys - user should replace
+    google: 'goog_FecausrHExPmUXyZUWXPFeFoDNM'
+};
+
 export default function App() {
+    const webViewRef = useRef(null);
+
+    useEffect(() => {
+        if (Platform.OS !== 'web') {
+            const apiKey = Platform.OS === 'ios' ? RC_API_KEYS.apple : RC_API_KEYS.google;
+            Purchases.configure({ apiKey });
+        }
+    }, []);
+
+    const handleMessage = async (event) => {
+        try {
+            const data = JSON.parse(event.nativeEvent.data);
+            console.log('Native received message:', data.type);
+
+            if (data.type === 'PURCHASE') {
+                try {
+                    const { customerInfo, productIdentifier } = await Purchases.purchaseProduct(data.productId);
+                    // Check if entitlement is active or just return success for gems
+                    webViewRef.current.postMessage(JSON.stringify({
+                        type: 'PURCHASE_SUCCESS',
+                        productId: productIdentifier,
+                        amount: data.amount,
+                        context: data.context
+                    }));
+                    Alert.alert('Success', 'Purchase completed!');
+                } catch (e) {
+                    if (!e.userCancelled) {
+                        Alert.alert('Error', e.message);
+                    }
+                    webViewRef.current.postMessage(JSON.stringify({
+                        type: 'PURCHASE_ERROR',
+                        error: e.message
+                    }));
+                }
+            }
+
+            if (data.type === 'RESTORE') {
+                const customerInfo = await Purchases.restorePurchases();
+                webViewRef.current.postMessage(JSON.stringify({
+                    type: 'RESTORE_RESULT',
+                    customerInfo
+                }));
+            }
+        } catch (e) {
+            console.warn('Error handling WebView message:', e);
+        }
+    };
+
     if (Platform.OS === 'web') {
         return (
             <View style={styles.container}>
@@ -27,8 +82,10 @@ export default function App() {
             <StatusBar style="light" />
             <View style={styles.container}>
                 <WebView
+                    ref={webViewRef}
                     source={{ uri: gameUrl }}
                     style={styles.webview}
+                    onMessage={handleMessage}
                     allowsBackForwardNavigationGestures
                     domStorageEnabled
                     javaScriptEnabled

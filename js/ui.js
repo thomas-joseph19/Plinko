@@ -27,7 +27,11 @@ function initSettings() {
 
         // Sync toggles with gameState
         if (audioToggle) audioToggle.checked = gameState.settings.audioEnabled;
-        if (volumeSlider) volumeSlider.value = gameState.settings.volume ?? 0.5;
+        if (volumeSlider) {
+            volumeSlider.value = gameState.settings.volume ?? 0.5;
+            const volumeValue = document.getElementById('volumeValue');
+            if (volumeValue) volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
+        }
         if (animationToggle) animationToggle.checked = gameState.settings.animationsEnabled;
     }
 
@@ -74,11 +78,18 @@ function initSettings() {
     }
 
     if (volumeSlider) {
+        const volumeValue = document.getElementById('volumeValue');
         volumeSlider.addEventListener('input', () => {
             const val = parseFloat(volumeSlider.value);
             gameState.settings.volume = val;
+            if (volumeValue) volumeValue.textContent = Math.round(val * 100) + '%';
             if (window.AudioEngine) {
                 window.AudioEngine.setVolume(val);
+                // Play a small test click when adjusting volume
+                if (!volumeSlider._lastTick || Date.now() - volumeSlider._lastTick > 100) {
+                    window.AudioEngine.playClick(1000, 0.2);
+                    volumeSlider._lastTick = Date.now();
+                }
             }
             // Debounced or throttled save? For now just save on change
         });
@@ -96,7 +107,36 @@ function initSettings() {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeSettings();
+        if (e.key === 'Escape' && legalOverlay && legalOverlay.classList.contains('open')) closeLegal();
     });
+
+    // ── Legal Overlay Logic ──
+    const legalOverlay = document.getElementById('legalOverlay');
+    const legalClose = document.getElementById('legalClose');
+    const legalFrame = document.getElementById('legalFrame');
+    const legalTitle = document.getElementById('legalTitle');
+    const privacyLink = document.getElementById('privacyLink');
+    const termsLink = document.getElementById('termsLink');
+
+    function openLegal(url, title) {
+        if (!legalOverlay || !legalFrame) return;
+        legalTitle.textContent = title;
+        legalFrame.src = url;
+        legalOverlay.classList.add('open');
+        legalOverlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeLegal() {
+        if (!legalOverlay || !legalFrame) return;
+        legalOverlay.classList.remove('open');
+        legalOverlay.setAttribute('aria-hidden', 'true');
+        legalFrame.src = ''; // Clear for next time
+    }
+
+    if (privacyLink) privacyLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/privacy.html', 'Privacy Policy'); });
+    if (termsLink) termsLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/terms.html', 'Terms of Service'); });
+    if (legalClose) legalClose.addEventListener('click', closeLegal);
+    if (legalOverlay) legalOverlay.addEventListener('click', (e) => { if (e.target === legalOverlay) closeLegal(); });
 }
 
 // ── Render Slot Tray ──

@@ -21,30 +21,36 @@ const Monetization = {
             this.updateUI();
         }
 
-        // Initialize RevenueCat SDK
-        if (window.Purchases && typeof window.Purchases.configure === 'function') {
+        // ── Native Bridge Listener ──
+        window.addEventListener('message', (event) => {
             try {
-                // Initialize for random user ID
-                const uid = 'user_' + Math.random().toString(36).substr(2, 9);
-                this.rc = window.Purchases.configure(this.REVENUECAT_API_KEY, uid);
+                const data = JSON.parse(event.data);
+                console.log('WebView Received:', data.type);
 
-                this.rc.addCustomerInfoUpdateListener((info) => {
-                    this.handleCustomerInfo(info);
-                });
+                if (data.type === 'PURCHASE_SUCCESS') {
+                    if (data.context === 'gems') {
+                        gameState.gems += data.amount;
+                    } else if (data.productId === 'premium_no_ads') {
+                        this.setPremium(true);
+                    }
+                    if (typeof updateStatsPanel === 'function') updateStatsPanel();
+                    if (typeof saveGame === 'function') saveGame();
+                    if (typeof renderShopView === 'function') renderShopView();
+                }
 
-                console.log('Monetization: RevenueCat Initialized');
+                if (data.type === 'RESTORE_RESULT') {
+                    // Check entitlements
+                    const info = data.customerInfo;
+                    if (info.entitlements.active[this.ENTITLEMENT_ID]) {
+                        this.setPremium(true);
+                    }
+                }
             } catch (e) {
-                console.warn('Monetization: RevenueCat Error (using mock):', e);
+                // Not a JSON message or not for us
             }
-        } else {
-            console.warn('Monetization: Purchases SDK not loaded (using mock)');
-        }
-    },
+        });
 
-    handleCustomerInfo(info) {
-        if (info.entitlements.active[this.ENTITLEMENT_ID] !== undefined) {
-            this.setPremium(true);
-        }
+        console.log('Monetization: Bridge Initialized');
     },
 
     // ── Purchasing ──
@@ -52,67 +58,59 @@ const Monetization = {
     async purchaseNoAds() {
         console.log('Monetization: Purchasing No Ads...');
 
-        // Mock success for web demo
-        // In real app: const { customerInfo } = await window.Purchases.purchasePackage(pkg);
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'PURCHASE',
+                productId: 'premium_no_ads',
+                context: 'upgrade'
+            }));
+            return true;
+        }
 
+        // Mock fallback for browser dev
         return new Promise((resolve) => {
             setTimeout(() => {
-                const success = confirm('Simulate successful purchase?');
-                if (success) {
+                if (confirm('Simulate successful purchase (No Ads)?')) {
                     this.setPremium(true);
-                    alert('Purchase Successful! Ads removed.');
                     resolve(true);
-                } else {
-                    alert('Purchase Cancelled.');
-                    resolve(false);
-                }
+                } else resolve(false);
             }, 500);
         });
     },
 
     async purchaseGems(amount, price) {
-        console.log(`Monetization: Purchasing ${amount} Gems for $${price}...`);
+        // Map amount to Product ID
+        const productId = `gems_${amount}`;
+        console.log(`Monetization: Purchasing ${productId} ($${price})...`);
 
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'PURCHASE',
+                productId: productId,
+                amount: amount,
+                context: 'gems'
+            }));
+            return true;
+        }
+
+        // Mock fallback
         return new Promise((resolve) => {
             setTimeout(() => {
-                const success = confirm(`Simulate successful purchase of ${amount} Gems for $${price}?`);
+                const success = confirm(`Simulate successful purchase of ${amount} Gems?`);
                 if (success) {
                     gameState.gems += amount;
-                    alert(`Purchase Successful! Added ${amount} Gems.`);
                     if (typeof updateStatsPanel === 'function') updateStatsPanel();
                     if (typeof saveGame === 'function') saveGame();
                     resolve(true);
-                } else {
-                    alert('Purchase Cancelled.');
-                    resolve(false);
-                }
+                } else resolve(false);
             }, 500);
         });
     },
 
     async restorePurchases() {
-        console.log('Monetization: Restoring...');
-        // In real app: const { customerInfo } = await window.Purchases.restorePurchases();
-
-        setTimeout(() => {
-            if (this._mockPurchased) {
-                this.setPremium(true);
-                alert('Purchases Restored.');
-            } else {
-                alert('No purchases found to restore.');
-            }
-        }, 1000);
-    },
-
-    setPremium(status) {
-        this.isPremium = status;
-        this._mockPurchased = status;
-        localStorage.setItem('plinko_premium', status);
-        this.updateUI();
-
-        // Hide banner if visible
-        const banner = document.getElementById('adBanner');
-        if (banner) banner.style.display = 'none';
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'RESTORE' }));
+        }
     },
 
     updateUI() {
