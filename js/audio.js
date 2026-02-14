@@ -141,20 +141,24 @@ const AudioEngine = {
             });
         } else {
             // Coin Sound
-            if (tier >= 2) { // Only play 'coin' for decent multipliers
+            if (tier >= 2) { // Only play 'coin' for decent multipliers (10x+)
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(987, this.ctx.currentTime); // B5
-                osc.frequency.setValueAtTime(1318, this.ctx.currentTime + 0.05); // E6
+
+                // Switch to sine for a smoother, less 8-bit annoying sound
+                osc.type = 'sine';
+
+                // Lower pitch slightly (G5 -> C6)
+                osc.frequency.setValueAtTime(784, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1046, this.ctx.currentTime + 0.1);
 
                 gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15); // Softer tail
 
                 osc.connect(gain);
                 gain.connect(this.masterGain);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.1);
+                osc.stop(this.ctx.currentTime + 0.15);
             } else {
                 // Low tier: Quiet thud
                 this.playClick(200, 0.05);
