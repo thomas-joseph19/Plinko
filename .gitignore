@@ -1,5 +1,9 @@
+# Dependencies
 node_modules/
-.expo/
+
+# Build / cache
 dist/
-.DS_Store
+.cache
 *.log
+.env
+.env.local

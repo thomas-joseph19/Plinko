@@ -43,8 +43,17 @@ function getDefaultState() {
         // Daily
         dailyStreak: 0,
         lastDailyClaim: null,
-        dailyChallenges: [],
+        lastDailyChallengeDate: null,
+        dailyChallengeProgress: {},
+        dailyChallengesClaimed: {},
         challengeProgress: {},
+
+        // Settings
+        settings: {
+            audioEnabled: true,
+            animationsEnabled: true,
+            volume: 0.5,
+        },
 
         // Runtime (not saved)
         lastSaveTime: Date.now(),
@@ -84,6 +93,10 @@ function loadGame() {
         gameState.upgrades = { ...defaults.upgrades, ...(saved.upgrades || {}) };
         gameState.prestigeUpgrades = { ...defaults.prestigeUpgrades, ...(saved.prestigeUpgrades || {}) };
         gameState.challengeProgress = { ...defaults.challengeProgress, ...(saved.challengeProgress || {}) };
+        gameState.dailyChallengeProgress = saved.dailyChallengeProgress || {};
+        gameState.dailyChallengesClaimed = saved.dailyChallengesClaimed || {};
+        gameState.lastDailyChallengeDate = saved.lastDailyChallengeDate || null;
+        gameState.settings = { ...defaults.settings, ...(saved.settings || {}) };
         return true;
     } catch (e) {
         console.warn('Failed to load save:', e);

@@ -2,56 +2,37 @@
    PLINKO∞ — UI Rendering & Interaction
    ═══════════════════════════════════════════════ */
 
-const THEME_STORAGE_KEY = 'plinko_theme';
-
-// ── Theme: respect system preference by default, then user choice ──
-function getStoredTheme() {
-    try {
-        return localStorage.getItem(THEME_STORAGE_KEY) || 'system';
-    } catch (_) {
-        return 'system';
-    }
-}
-
-function setStoredTheme(value) {
-    try {
-        localStorage.setItem(THEME_STORAGE_KEY, value);
-    } catch (_) {}
-}
-
-function getSystemPrefersDark() {
-    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
-function getEffectiveTheme() {
-    const stored = getStoredTheme();
-    if (stored === 'light') return 'light';
-    if (stored === 'dark') return 'dark';
-    return getSystemPrefersDark() ? 'dark' : 'light';
-}
-
-function applyTheme() {
-    const theme = getEffectiveTheme();
-    document.documentElement.setAttribute('data-theme', theme);
-    // Update meta theme-color for mobile browser chrome
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14102a' : '#e9e5f0');
-}
+const SETTINGS_STORAGE_KEY = 'plinko_settings';
 
 function initSettings() {
-    const settingsBtn = document.getElementById('settingsBtn');
     const overlay = document.getElementById('settingsOverlay');
     const modal = document.getElementById('settingsModal');
     const closeBtn = document.getElementById('settingsClose');
-    const themeBtns = document.querySelectorAll('.theme-btn[data-theme]');
 
-    function openSettings() {
+    // Toggles & Sliders
+    const audioToggle = document.getElementById('audioToggle');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const animationToggle = document.getElementById('animationToggle');
+
+    function openSettings(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         if (overlay) {
             overlay.classList.add('open');
             overlay.setAttribute('aria-hidden', 'false');
         }
         if (modal) modal.setAttribute('aria-hidden', 'false');
-        updateThemeButtonsActive();
+
+        // Sync toggles with gameState
+        if (audioToggle) audioToggle.checked = gameState.settings.audioEnabled;
+        if (volumeSlider) {
+            volumeSlider.value = gameState.settings.volume ?? 0.5;
+            const volumeValue = document.getElementById('volumeValue');
+            if (volumeValue) volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
+        }
+        if (animationToggle) animationToggle.checked = gameState.settings.animationsEnabled;
     }
 
     function closeSettings() {
@@ -62,36 +43,100 @@ function initSettings() {
         if (modal) modal.setAttribute('aria-hidden', 'true');
     }
 
-    function updateThemeButtonsActive() {
-        const stored = getStoredTheme();
-        themeBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-theme') === stored);
-        });
-    }
+    // Use document click so the settings button always works (delegation)
+    document.addEventListener('click', function handleDocClick(e) {
+        if (e.target.closest && e.target.closest('#settingsBtn')) {
+            openSettings(e);
+        }
+    });
+    document.addEventListener('touchstart', function handleDocTouch(e) {
+        if (e.target.closest && e.target.closest('#settingsBtn')) {
+            openSettings(e);
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
     if (closeBtn) closeBtn.addEventListener('click', closeSettings);
     if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSettings(); });
 
-    themeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.getAttribute('data-theme');
-            setStoredTheme(theme);
-            applyTheme();
-            updateThemeButtonsActive();
+    // Toggle Listeners
+    if (audioToggle) {
+        audioToggle.addEventListener('change', () => {
+            const isEnabled = audioToggle.checked;
+            gameState.settings.audioEnabled = isEnabled;
+            if (window.AudioEngine) {
+                window.AudioEngine.enabled = isEnabled;
+                if (isEnabled) {
+                    window.AudioEngine.init(); // Ensure context exists
+                    if (window.AudioEngine.ctx?.state === 'suspended') {
+                        window.AudioEngine.ctx.resume();
+                    }
+                }
+            }
+            saveGame();
         });
-    });
+    }
+
+    if (volumeSlider) {
+        const volumeValue = document.getElementById('volumeValue');
+        volumeSlider.addEventListener('input', () => {
+            const val = parseFloat(volumeSlider.value);
+            gameState.settings.volume = val;
+            if (volumeValue) volumeValue.textContent = Math.round(val * 100) + '%';
+            if (window.AudioEngine) {
+                window.AudioEngine.setVolume(val);
+                // Play a small test click when adjusting volume
+                if (!volumeSlider._lastTick || Date.now() - volumeSlider._lastTick > 100) {
+                    window.AudioEngine.playClick(1000, 0.2);
+                    volumeSlider._lastTick = Date.now();
+                }
+            }
+            // Debounced or throttled save? For now just save on change
+        });
+        volumeSlider.addEventListener('change', () => {
+            saveGame();
+        });
+    }
+
+    if (animationToggle) {
+        animationToggle.addEventListener('change', () => {
+            gameState.settings.animationsEnabled = animationToggle.checked;
+            saveGame();
+        });
+    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeSettings();
+        if (e.key === 'Escape' && legalOverlay && legalOverlay.classList.contains('open')) closeLegal();
     });
 
-    // When user chose "System", react to OS theme changes
-    if (window.matchMedia) {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (getStoredTheme() === 'system') applyTheme();
-        });
+    // ── Legal Overlay Logic ──
+    const legalOverlay = document.getElementById('legalOverlay');
+    const legalClose = document.getElementById('legalClose');
+    const legalFrame = document.getElementById('legalFrame');
+    const legalTitle = document.getElementById('legalTitle');
+    const privacyLink = document.getElementById('privacyLink');
+    const termsLink = document.getElementById('termsLink');
+
+    function openLegal(url, title) {
+        if (!legalOverlay || !legalFrame) return;
+        legalTitle.textContent = title;
+        legalFrame.src = url;
+        legalOverlay.classList.add('open');
+        legalOverlay.setAttribute('aria-hidden', 'false');
     }
+
+    function closeLegal() {
+        if (!legalOverlay || !legalFrame) return;
+        legalOverlay.classList.remove('open');
+        legalOverlay.setAttribute('aria-hidden', 'true');
+        legalFrame.src = ''; // Clear for next time
+    }
+
+    if (privacyLink) privacyLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/privacy.html', 'Privacy Policy'); });
+    if (termsLink) termsLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/terms.html', 'Terms of Service'); });
+    if (legalClose) legalClose.addEventListener('click', closeLegal);
+    if (legalOverlay) legalOverlay.addEventListener('click', (e) => { if (e.target === legalOverlay) closeLegal(); });
 }
 
 // ── Render Slot Tray ──
@@ -184,7 +229,6 @@ function createUpgradeCard(id, compact) {
     if (!maxed) {
         card.addEventListener('click', () => {
             if (purchaseUpgrade(id)) {
-                if (window.AudioEngine) window.AudioEngine.upgradeBuy();
                 card.classList.add('purchased');
                 setTimeout(() => card.classList.remove('purchased'), 400);
                 // Refresh UI
@@ -393,7 +437,6 @@ function renderPrestigeView() {
         if (!maxed) {
             card.addEventListener('click', () => {
                 if (buyPrestigeUpgrade(pu.id)) {
-                    if (window.AudioEngine) window.AudioEngine.upgradeBuy();
                     renderPrestigeView();
                     updateStatsPanel();
                 }
@@ -411,7 +454,6 @@ function initTabs() {
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            if (window.AudioEngine) window.AudioEngine.click();
             const viewId = tab.dataset.view;
 
             tabs.forEach(t => t.classList.remove('active'));
@@ -448,7 +490,6 @@ function initPrestigeButton() {
             const tokens = calculatePrestigeTokens();
             if (confirm(`Prestige Reset?\n\nYou'll earn ${tokens} Prestige Token(s).\nYour coins and upgrades will reset, but prestige bonuses are permanent.\n\nContinue?`)) {
                 performPrestige();
-                if (window.AudioEngine) window.AudioEngine.prestige();
                 rebuildBoard();
                 stopAutoDroppers();
                 startAutoDroppers();
@@ -456,7 +497,7 @@ function initPrestigeButton() {
                 refreshUpgradeUI();
                 renderPrestigeView();
                 updateStatsPanel();
-                particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#7C6CF0', 30);
+                particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#c084fc', 30);
             }
         });
     }

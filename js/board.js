@@ -192,6 +192,16 @@ function handleCollisions(event) {
                     spawnBall(ball.position.x, ball.position.y, ball.isLucky);
                 }
             }
+
+            // Peg Cascade Event
+            if (typeof handlePegCascadeHit === 'function') {
+                handlePegCascadeHit(peg);
+            }
+
+            // Ball Evolution tracking
+            if (ball.pegHits !== undefined) {
+                ball.pegHits++;
+            }
         }
 
         // Ball hitting slot sensor
@@ -212,11 +222,20 @@ function handleSlotHit(slotIndex, ballBody) {
     const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[4];
     let mult = multipliers[slotIndex] || 1;
 
-    // Is it the jackpot slot?
+    // Roulette multiplier override
+    if (typeof getBinRouletteValue === 'function') {
+        const rouletteVal = getBinRouletteValue(slotIndex);
+        if (rouletteVal !== null) mult = rouletteVal;
+    }
 
     // Lucky ball bonus
     const isLucky = ballBody.isLucky;
     if (isLucky) mult *= 10;
+
+    // Ball Evolution Event
+    if (typeof getBallEvolutionMultiplier === 'function') {
+        mult *= getBallEvolutionMultiplier(ballBody);
+    }
 
     // Global multiplier
     const globalMult = getGlobalMultiplier();
@@ -225,6 +244,16 @@ function handleSlotHit(slotIndex, ballBody) {
     // Award coins
     gameState.coins += coins;
     gameState.totalCoinsEarned += coins;
+
+    // Daily challenges: earn_coins, land_edge, land_center, land_high
+    if (typeof recordDailyProgress === 'function') {
+        recordDailyProgress('earn_coins', coins);
+        const numSlots = (multipliers && multipliers.length) || 12;
+        if (slotIndex === 0 || slotIndex === numSlots - 1) recordDailyProgress('land_edge', 1);
+        if (slotIndex === 5 || slotIndex === 6) recordDailyProgress('land_center', 1);
+        const baseMult = multipliers[slotIndex] || 1;
+        if (baseMult >= 10) recordDailyProgress('land_high', 1);
+    }
 
     // Track CPS
     runtimeState.recentCps.push({ amount: coins, time: Date.now() });
@@ -292,6 +321,7 @@ function spawnBall(x, y, forceGolden) {
     ball.scored = false;
     ball.hasSplit = false;
     ball.spawnTime = Date.now();
+    ball.pegHits = 0;
     ball.trailPoints = [];
 
     // Pinpoint drop: zero horizontal velocity
@@ -303,6 +333,8 @@ function spawnBall(x, y, forceGolden) {
     Matter.World.add(world, [ball]);
     runtimeState.activeBalls++;
     gameState.totalBallsDropped++;
+
+    if (typeof recordDailyProgress === 'function') recordDailyProgress('drop_ball', 1);
 
     return ball;
 }
@@ -390,6 +422,8 @@ function flashDropper(index) {
 
 // ── Update physics step ──
 function updatePhysics(delta) {
+    if (typeof tickEvents === 'function') tickEvents();
+
     if (engine) {
         Matter.Engine.update(engine, delta);
     }
@@ -408,6 +442,15 @@ function updatePhysics(delta) {
             Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
         }
 
+        // Apply event-specific forces
+        if (typeof applyEdgeSingularity === 'function') applyEdgeSingularity(ball);
+
+        // Gem Rain: extra edge gravity
+        if (ball.isRainBall) {
+            const side = ball.position.x < boardWidth / 2 ? -1 : 1;
+            Matter.Body.applyForce(ball, ball.position, { x: 0.0003 * side, y: 0 });
+        }
+
         // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
         ball.trailPoints.push({ x: ball.position.x, y: ball.position.y, t: Date.now() });
@@ -418,5 +461,27 @@ function updatePhysics(delta) {
     // Fade peg lights
     for (const p of pegPositions) {
         if (p.lit > 0) p.lit = Math.max(0, p.lit - 0.04);
+    }
+}
+
+// ── Gem Upgrades: Ball Rain ──
+function triggerBallRain() {
+    const count = 1000;
+    const batchSize = 25;
+    const interval = 50; // ms between batches
+
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD + 1000) return;
+
+            const x = 20 + Math.random() * (boardWidth - 40);
+            const ball = spawnBall(x, 15);
+
+            if (ball) {
+                const side = x < boardWidth / 2 ? -1 : 1;
+                Matter.Body.applyForce(ball, ball.position, { x: 0.002 * side, y: 0 });
+                ball.isRainBall = true;
+            }
+        }, Math.floor(i / batchSize) * interval);
     }
 }

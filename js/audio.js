@@ -12,6 +12,13 @@ const AudioEngine = {
     activeVoices: 0,
 
     init() {
+        if (gameState?.settings) {
+            this.enabled = gameState.settings.audioEnabled;
+        }
+
+        // If we're turning it off, don't do anything (it's already handled by play functions)
+        // If we're already initialized, don't re-init
+        if (this.ctx) return;
         if (!this.enabled) return;
 
         try {
@@ -19,7 +26,7 @@ const AudioEngine = {
             this.ctx = new AudioContext();
 
             this.masterGain = this.ctx.createGain();
-            this.masterGain.gain.value = 0.15; // Quieter overall
+            this.setVolume(gameState.settings.volume ?? 0.5);
             this.masterGain.connect(this.ctx.destination);
 
             // Resume context handler
@@ -36,6 +43,13 @@ const AudioEngine = {
             console.warn('Audio API not supported');
             this.enabled = false;
         }
+    },
+
+    setVolume(val) {
+        if (!this.masterGain) return;
+        // Map 0-1 range to a reasonable gain (0 to 0.4)
+        const targetGain = val * 0.4;
+        this.masterGain.gain.setTargetAtTime(targetGain, this.ctx?.currentTime || 0, 0.1);
     },
 
     // ── Ultra-short "Tick" (Mechanical Arcade Switch) ──

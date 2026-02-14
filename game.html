@@ -5,19 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Plinko — Idle Plinko Game</title>
+  <title>PLINKO∞ — Idle Plinko Game</title>
   <meta name="description"
     content="Drop balls, earn coins, upgrade everything. A satisfying idle Plinko game with physics, upgrades, and prestige.">
 
   <!-- iOS PWA / Standalone App -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Plinko">
+  <meta name="apple-mobile-web-app-title" content="PLINKO∞">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#050510">
+  <meta name="theme-color" content="#14102a">
   <meta name="format-detection" content="telephone=no">
 
-  <!-- Google AdSense -->
+  <!-- Google AdSense (Preserved from Local) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2818023938860764"
     crossorigin="anonymous"></script>
 
@@ -31,16 +31,9 @@
 
   <!-- Fonts & Styles -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script>
-    (function() {
-      var stored = localStorage.getItem('plinko_theme');
-      var theme = stored === 'light' ? 'light' : stored === 'dark' ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
 </head>
 
 <body>
@@ -71,16 +64,16 @@
     style="position: fixed; top: 110px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
     Reset 🕐
   </button>
-  <button id="debugGemsBtn"
-    style="position: fixed; top: 140px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #a855f7; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
-    +100 💎
+  <button id="debugResetDailyChallengesBtn"
+    style="position: fixed; top: 140px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #f59e0b; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
+    Reset daily challenges
   </button>
 
   <div class="app" id="app">
 
     <!-- ═══════════ HUD BAR ═══════════ -->
     <header class="hud" id="hud">
-      <div class="hud-logo">Plinko</div>
+      <div class="hud-logo">PLINKO∞</div>
       <div class="hud-currencies">
         <div class="currency-chip coins" id="coinChip">
           <span class="icon">🪙</span>
@@ -92,7 +85,7 @@
         </div>
       </div>
       <div class="hud-actions">
-        <div class="hud-btn" title="Settings" id="settingsBtn">⚙️</div>
+        <button type="button" class="hud-btn" title="Settings" id="settingsBtn" aria-label="Settings">⚙️</button>
       </div>
     </header>
 
@@ -325,13 +318,42 @@
       </div>
       <div class="settings-body">
         <div class="settings-group">
-          <div class="settings-label">Theme</div>
-          <div class="theme-options" role="group" aria-label="Appearance">
-            <button type="button" class="theme-btn active" data-theme="system" id="themeSystem">System</button>
-            <button type="button" class="theme-btn" data-theme="light" id="themeLight">☀️ Light</button>
-            <button type="button" class="theme-btn" data-theme="dark" id="themeDark">🌙 Dark</button>
+          <div class="settings-label">Sound & Feedback</div>
+          <div class="settings-control">
+            <div class="control-info">
+              <span class="control-name">Audio Effects</span>
+              <span class="control-desc">Play arcade sounds and chimes</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="audioToggle">
+              <span class="slider"></span>
+            </label>
           </div>
-          <p class="settings-hint">System uses your device’s light/dark preference.</p>
+          <div class="settings-control volume-control">
+            <div class="control-info">
+              <span class="control-name">Volume</span>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" class="volume-slider">
+          </div>
+          <div class="settings-control">
+            <div class="control-info">
+              <span class="control-name">Animations</span>
+              <span class="control-desc">Enable smooth visual effects</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="animationToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Information</div>
+          <div class="legal-links">
+            <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
+            <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
+          </div>
+          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
         </div>
       </div>
     </div>
@@ -340,6 +362,9 @@
   <!-- Matter.js physics engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
 
+  <!-- RevenueCat SDK (Preserved from Local) -->
+  <script src="https://js.revenuecat.com/v1/purchases.js"></script>
+
   <!-- Game modules -->
   <script src="js/config.js"></script>
   <script src="js/state.js"></script>
@@ -347,15 +372,14 @@
   <script src="js/prestige.js"></script>
   <script src="js/events.js"></script>
   <script src="js/board.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="https://js.revenuecat.com/v1/purchases.js"></script>
   <script src="js/renderer.js"></script>
   <script src="js/effects.js"></script>
-  <script src="js/monetization.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/debug.js"></script>
   <script src="js/daily.js"></script>
   <script src="js/shop.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/monetization.js"></script>
   <script src="js/main.js"></script>
 
   <!-- Service Worker Registration -->

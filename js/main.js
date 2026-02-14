@@ -9,10 +9,9 @@ let cleanupTimer = 0;
 
 // ── Boot sequence ──
 function boot() {
-    console.log('%c Plinko ', 'background: linear-gradient(135deg, #6C5CE7, #00CEFF); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
+    console.log('%c PLINKO∞ ', 'background: linear-gradient(135deg, #c084fc, #38bdf8); color: white; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
 
     // Apply theme (in case script in head didn’t run) and init settings panel
-    if (typeof applyTheme === 'function') applyTheme();
     if (typeof initSettings === 'function') initSettings();
 
     // Load saved game
@@ -24,24 +23,15 @@ function boot() {
     // Initialize renderer
     initRenderer();
 
-    // Initialize Audio
+    // Initialize audio
     if (window.AudioEngine) window.AudioEngine.init();
 
-    // Initialize Monetization
+    // Initialize monetization
     if (window.Monetization) window.Monetization.init();
 
     // Build the board
-    // Build the board (wait for layout)
-    function dfltLayout() {
-        const b = document.getElementById('plinkoBoard');
-        if (b && b.getBoundingClientRect().width > 10) {
-            rebuildBoard();
-            resizeCanvas();
-        } else {
-            requestAnimationFrame(dfltLayout);
-        }
-    }
-    dfltLayout();
+    rebuildBoard();
+    resizeCanvas();
 
     // Render initial UI
     renderDroppers();
@@ -99,8 +89,8 @@ function boot() {
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        rebuildBoard();
         resizeCanvas();
+        rebuildBoard();
     });
 
     // ═══ iOS-Specific Handlers ═══
@@ -110,8 +100,8 @@ function boot() {
 
     // Prevent pull-to-refresh and bounce scrolling
     document.addEventListener('touchmove', (e) => {
-        // Allow scrolling inside panel-scroll elements
-        if (!e.target.closest('.panel-scroll') && !e.target.closest('.side-panel')) {
+        // Allow scrolling inside panel-scroll, side-panel, and allow taps on HUD/tab bar
+        if (!e.target.closest('.panel-scroll') && !e.target.closest('.side-panel') && !e.target.closest('.hud') && !e.target.closest('.tab-bar')) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -140,16 +130,16 @@ function boot() {
             stopAutoDroppers();
             startAutoDroppers();
             // Rebuild board in case orientation changed
-            rebuildBoard();
             resizeCanvas();
+            rebuildBoard();
         }
     });
 
     // Handle iOS orientation changes
     window.addEventListener('orientationchange', () => {
         setTimeout(() => {
-            rebuildBoard();
             resizeCanvas();
+            rebuildBoard();
         }, 200); // Short delay to let iOS settle the new dimensions
     });
 
