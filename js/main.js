@@ -150,6 +150,9 @@ function boot() {
     lastFrameTime = performance.now();
     requestAnimationFrame(gameLoop);
 
+    // Initialize background effects
+    initBackgroundEffects();
+
     // Periodic save
     setInterval(() => saveGame(), CONFIG.SAVE_INTERVAL);
 
@@ -160,6 +163,23 @@ function boot() {
     window.addEventListener('pagehide', () => saveGame());
 
     console.log('Game booted successfully!');
+}
+
+// ── Background Effects ──
+function initBackgroundEffects() {
+    const container = document.getElementById('bgSparkles');
+    if (!container) return;
+
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'bg-sparkle';
+        sparkle.style.left = Math.random() * 100 + '%';
+        sparkle.style.top = Math.random() * 100 + '%';
+        sparkle.style.animationDelay = Math.random() * 3 + 's';
+        sparkle.style.animationDuration = 2 + Math.random() * 3 + 's';
+        container.appendChild(sparkle);
+    }
 }
 
 // ── Offline earnings calculation ──

@@ -434,6 +434,39 @@ body::after {
   }
 }
 
+/* ─── Background Glimmer ─── */
+.bg-sparkles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.bg-sparkle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px white, 0 0 8px var(--gold);
+  animation: bgSparkleFade 3s infinite ease-in-out;
+}
+
+@keyframes bgSparkleFade {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* ═══════════ APP LAYOUT ═══════════ */
 .app {
   position: fixed;
