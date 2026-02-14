@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PLINKO∞">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#14102a">
+  <meta name="theme-color" content="#050510">
   <meta name="format-detection" content="telephone=no">
 
   <!-- Google AdSense (Preserved from Local) -->
@@ -29,11 +29,20 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
 
-  <!-- Fonts & Styles -->
+  <!-- Fonts & Styles (Restored Pixel/Inter Fonts) -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Theme Script (Restored) -->
+  <script>
+    (function () {
+      var stored = localStorage.getItem('plinko_theme');
+      var theme = stored === 'light' ? 'light' : stored === 'dark' ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
 </head>
 
 <body>
@@ -317,6 +326,17 @@
         <button type="button" class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
       </div>
       <div class="settings-body">
+        <div class="settings-group">
+          <!-- Reverted to Theme Selector as in Pixel UI -->
+          <div class="settings-label">Theme</div>
+          <div class="theme-options" role="group" aria-label="Appearance">
+            <button type="button" class="theme-btn active" data-theme="system" id="themeSystem">System</button>
+            <button type="button" class="theme-btn" data-theme="light" id="themeLight">☀️ Light</button>
+            <button type="button" class="theme-btn" data-theme="dark" id="themeDark">🌙 Dark</button>
+          </div>
+          <p class="settings-hint">System uses your device’s light/dark preference.</p>
+        </div>
+
         <div class="settings-group">
           <div class="settings-label">Sound & Feedback</div>
           <div class="settings-control">
