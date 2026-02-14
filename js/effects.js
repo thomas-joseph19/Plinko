@@ -23,30 +23,101 @@ function spawnSparkle(x, y) {
     setTimeout(() => el.remove(), 350);
 }
 
-// ── Show Coin Pop on Slot Hit ──
-function showSlotHit(slotIndex, coins, isBig) {
-    // Throttle small wins if many balls are falling
-    if (!isBig && coins < 5 && Math.random() > 0.5) return;
+// ── Haptic Feedback (Vibration) ──
+function triggerHaptic(type) {
+    if (!navigator.vibrate) return;
 
+    // Check if settings allow haptics (assuming audioToggle covers "Sound & Feedback")
+    // Or we could add a specific haptic toggle. For now, we'll respect the global "Animations" or "Audio" setting?
+    // Let's assume haptics are always on if supported, unless user explicitly disabled (UI needs update later).
+    // For now, we'll just run it.
+
+    switch (type) {
+        case 'light':
+            navigator.vibrate(10); // Very short tick
+            break;
+        case 'medium':
+            navigator.vibrate(25); // Noticeable bump
+            break;
+        case 'heavy':
+            navigator.vibrate([50, 50, 50]); // Double bump
+            break;
+        case 'success':
+            navigator.vibrate([30, 30, 30]);
+            break;
+        case 'warning':
+            navigator.vibrate([50, 100, 50]);
+            break;
+    }
+}
+
+// ── Show Coin Pop on Slot Hit (Floating Text) ──
+function showSlotHit(slotIndex, coins, isBig, isCritical) {
     const board = document.getElementById('plinkoBoard');
     const slotEls = document.querySelectorAll('.slot');
     if (!board || !slotEls[slotIndex]) return;
 
-    // Performance limit
-    if (board.childElementCount > 150) return;
+    // Performance limit - strict for small hits, loose for big/crits
+    if (!isBig && !isCritical && board.childElementCount > 150) return;
+
+    // Throttle small wins unless they are critical
+    if (!isBig && !isCritical && coins < 5 && Math.random() > 0.5) return;
 
     const slotEl = slotEls[slotIndex];
     const boardRect = board.getBoundingClientRect();
     const slotRect = slotEl.getBoundingClientRect();
 
     const pop = document.createElement('div');
-    pop.className = 'coin-pop' + (isBig ? ' big' : '');
-    pop.textContent = '+' + formatNumber(coins);
+    // Base class
+    let className = 'coin-pop';
+    let text = '+' + formatNumber(coins);
+
+    // Styling logic
+    if (isCritical) {
+        className += ' crit'; // CSS needs to define this, or we set style inline
+        text = '🔥 +' + formatNumber(coins);
+        pop.style.fontSize = '14px';
+        pop.style.color = '#FFD740'; // Gold
+        pop.style.fontWeight = '800';
+        pop.style.textShadow = '0 0 8px rgba(255, 215, 64, 0.8)';
+        pop.style.zIndex = '100';
+    } else if (isBig) {
+        className += ' big';
+        pop.style.fontSize = '12px';
+        pop.style.color = '#3EE87F'; // Green/Success
+        pop.style.fontWeight = '700';
+    }
+
+    pop.className = className;
+    pop.textContent = text;
+
+    // Center text on slot
     pop.style.left = (slotRect.left - boardRect.left + slotRect.width / 2) + 'px';
-    pop.style.top = (slotRect.top - boardRect.top - 8) + 'px';
+    pop.style.top = (slotRect.top - boardRect.top - 12) + 'px'; // Float a bit higher
+
     board.appendChild(pop);
 
-    setTimeout(() => pop.remove(), 1000);
+    // Animation duration depends on importance
+    const duration = isCritical ? 1500 : 1000;
+
+    // Use Web Animations API for smoother float if critical
+    if (isCritical) {
+        pop.animate([
+            { transform: 'translate(-50%, 0) scale(0.5)', opacity: 0 },
+            { transform: 'translate(-50%, -20px) scale(1.5)', opacity: 1, offset: 0.2 },
+            { transform: 'translate(-50%, -80px) scale(1)', opacity: 0 }
+        ], {
+            duration: duration,
+            easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+            fill: 'forwards'
+        });
+    } else {
+        // Fallback to CSS animation 'coinFloat' defined in style.css, but with inline override if needed
+        // Since we didn't add .crit styles to CSS, we rely on js inline styles + standard animation
+        // We'll leave the standard CSS animation for non-crit
+    }
+
+    setTimeout(() => pop.remove(), duration);
 }
 
 // ── Fever Mode ──

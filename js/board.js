@@ -261,8 +261,22 @@ function handleSlotHit(slotIndex, ballBody) {
     // Fever tracking removed
 
     // Visual effects
+    // Critical if lucky ball OR high multiplier (>= 10)
+    const isCritical = isLucky || mult >= 10;
+
     if (typeof showSlotHit === 'function') {
-        showSlotHit(slotIndex, coins, isLucky); // check isLucky only
+        showSlotHit(slotIndex, coins, mult >= 3, isCritical);
+    }
+
+    // Haptic Feedback (No haptic for peg hits, only slots)
+    if (typeof triggerHaptic === 'function') {
+        if (isCritical) {
+            triggerHaptic('heavy');
+        } else if (mult >= 3) {
+            triggerHaptic('medium');
+        } else {
+            triggerHaptic('light'); // Very subtle for 0.2x / 0.5x / 1x
+        }
     }
 
     // Audio: Slot Hit
