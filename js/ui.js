@@ -500,6 +500,34 @@ function initTabs() {
             if (badge) badge.style.display = 'none';
         });
     });
+
+    // Swipe Navigation
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const touchEndY = e.changedTouches[0].screenY;
+
+        // Threshold check (50px min swipe, ignore vertical scrolls > 60px)
+        if (Math.abs(touchEndX - touchStartX) > 50 && Math.abs(touchEndY - touchStartY) < 60) {
+            const tabsArray = Array.from(document.querySelectorAll('.tab'));
+            const activeIndex = tabsArray.findIndex(t => t.classList.contains('active'));
+
+            if (touchEndX < touchStartX) {
+                // Swiped Left -> Next Tab
+                if (activeIndex < tabsArray.length - 1) tabsArray[activeIndex + 1].click();
+            } else {
+                // Swiped Right -> Prev Tab
+                if (activeIndex > 0) tabsArray[activeIndex - 1].click();
+            }
+        }
+    }, { passive: true });
 }
 
 // ── Prestige Reset Button ──
