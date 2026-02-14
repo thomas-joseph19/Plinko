@@ -2391,25 +2391,57 @@ body[data-bg]::after {
   pointer-events: none;
 }
 
-/* Royal Casino (Emerald & Gold) */
+/* Royal Plinko Machine (Emerald & Brass) */
 body[data-bg="royal"] {
-  background-color: #061a14;
+  background-color: #04120e;
   background-image:
-    radial-gradient(circle at 50% 50%, rgba(10, 61, 46, 0.4) 0%, transparent 70%),
-    linear-gradient(45deg, rgba(255, 215, 64, 0.02) 25%, transparent 25%, transparent 50%, rgba(255, 215, 64, 0.02) 50%, rgba(255, 215, 64, 0.02) 75%, transparent 75%, transparent);
-  background-size: 100% 100%, 60px 60px;
+    /* The Board Frame */
+    linear-gradient(90deg, rgba(255, 215, 64, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 215, 64, 0.05) 1px, transparent 1px),
+    /* Perspective Shadow */
+    radial-gradient(circle at 50% 10%, rgba(46, 213, 115, 0.15) 0%, transparent 80%),
+    /* The Felt Texture */
+    repeating-conic-gradient(rgba(10, 61, 46, 0.2) 0% 25%, rgba(6, 40, 30, 0.2) 0% 50%) 50% / 40px 40px;
+  background-size: 80px 80px, 80px 80px, 100% 100%, 40px 40px;
+}
+
+/* Decorative Machined Side Panels for Royal theme */
+body[data-bg="royal"]::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  background: linear-gradient(90deg, #1a1a1a, #333, #1a1a1a);
+  border-right: 2px solid var(--gold);
+  z-index: -2;
+  opacity: 0.8;
+}
+
+body[data-bg="royal"]::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  background: linear-gradient(-90deg, #1a1a1a, #333, #1a1a1a);
+  border-left: 2px solid var(--gold);
+  z-index: -2;
+  opacity: 0.8;
 }
 
 body[data-bg="royal"] .orb-1 {
-  background: radial-gradient(circle, rgba(255, 215, 64, 0.15), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 215, 64, 0.2), transparent 70%);
 }
 
 body[data-bg="royal"] .orb-2 {
-  background: radial-gradient(circle, rgba(46, 213, 115, 0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(46, 213, 115, 0.15), transparent 70%);
 }
 
 body[data-bg="royal"] .orb-3 {
-  background: radial-gradient(circle, rgba(124, 108, 240, 0.1), transparent 70%);
+  background: radial-gradient(circle, rgba(124, 108, 240, 0.12), transparent 70%);
 }
 
 /* Default (Midnight) */
