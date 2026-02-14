@@ -23,9 +23,9 @@ let luckyBallSprite = null;
 
 function createBallSprites() {
     const r = CONFIG.BALL_RADIUS;
-    const size = (r + 8) * 2; // Larger canvas for bigger glow
+    const size = (r + 4) * 2;
 
-    // 1. Normal Ball — Neon Cyan
+    // 1. Normal Ball — bright cyan, high contrast
     ballSprite = document.createElement('canvas');
     ballSprite.width = size;
     ballSprite.height = size;
@@ -33,54 +33,52 @@ function createBallSprites() {
     ctx1.imageSmoothingEnabled = false;
     const c = size / 2;
 
-    // Intense Glow (Outer)
-    const glow = ctx1.createRadialGradient(c, c, r * 0.5, c, c, r + 6);
-    glow.addColorStop(0, 'rgba(0, 255, 255, 0.8)'); // Brighter core
-    glow.addColorStop(0.5, 'rgba(0, 229, 255, 0.3)');
+    // Glow — bright
+    const glow = ctx1.createRadialGradient(c, c, r * 0.2, c, c, r + 3);
+    glow.addColorStop(0, 'rgba(0, 229, 255, 0.5)');
     glow.addColorStop(1, 'rgba(0, 229, 255, 0)');
     ctx1.fillStyle = glow;
     ctx1.beginPath();
-    ctx1.arc(c, c, r + 6, 0, Math.PI * 2);
+    ctx1.arc(c, c, r + 3, 0, Math.PI * 2);
     ctx1.fill();
 
-    // Body — Solid Core
+    // Body — solid bright fill
     const grad1 = ctx1.createRadialGradient(c - 1, c - 1, 0, c, c, r);
     grad1.addColorStop(0, '#FFFFFF');
-    grad1.addColorStop(0.4, '#80F0FF');
+    grad1.addColorStop(0.3, '#80F0FF');
     grad1.addColorStop(1, '#00E5FF');
     ctx1.fillStyle = grad1;
     ctx1.beginPath();
     ctx1.arc(c, c, r, 0, Math.PI * 2);
     ctx1.fill();
 
-    // Highlight
-    ctx1.fillStyle = 'rgba(255, 255, 255, 1)';
+    // Hard specular highlight
+    ctx1.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx1.beginPath();
-    ctx1.arc(c - 1.5, c - 2.5, r * 0.25, 0, Math.PI * 2);
+    ctx1.arc(c - 1.5, c - 2.5, r * 0.2, 0, Math.PI * 2);
     ctx1.fill();
 
-    // 2. Lucky Ball — Neon Gold
+    // 2. Lucky Ball — bright gold
     luckyBallSprite = document.createElement('canvas');
-    luckyBallSprite.width = size;
-    luckyBallSprite.height = size;
+    luckyBallSprite.width = size * 2;
+    luckyBallSprite.height = size * 2;
     const ctx2 = luckyBallSprite.getContext('2d');
     ctx2.imageSmoothingEnabled = false;
-    const c2 = size / 2;
+    const c2 = size;
 
     // Golden Glow
-    const glow2 = ctx2.createRadialGradient(c2, c2, r * 0.5, c2, c2, r + 6);
-    glow2.addColorStop(0, 'rgba(255, 215, 64, 0.8)');
-    glow2.addColorStop(0.6, 'rgba(255, 180, 0, 0.3)');
+    const glow2 = ctx2.createRadialGradient(c2, c2, r * 0.3, c2, c2, r * 3);
+    glow2.addColorStop(0, 'rgba(255, 215, 64, 0.4)');
     glow2.addColorStop(1, 'rgba(255, 215, 64, 0)');
     ctx2.fillStyle = glow2;
     ctx2.beginPath();
-    ctx2.arc(c2, c2, r + 6, 0, Math.PI * 2);
+    ctx2.arc(c2, c2, r * 3, 0, Math.PI * 2);
     ctx2.fill();
 
-    // Body
+    // Body — solid gold
     const grad2 = ctx2.createRadialGradient(c2 - 1, c2 - 1, 0, c2, c2, r);
     grad2.addColorStop(0, '#FFFFFF');
-    grad2.addColorStop(0.4, '#FFEA80');
+    grad2.addColorStop(0.3, '#FFEA80');
     grad2.addColorStop(1, '#FFD740');
     ctx2.fillStyle = grad2;
     ctx2.beginPath();
@@ -88,9 +86,9 @@ function createBallSprites() {
     ctx2.fill();
 
     // Highlight
-    ctx2.fillStyle = 'rgba(255, 255, 255, 1)';
+    ctx2.fillStyle = 'rgba(255, 255, 255, 0.85)';
     ctx2.beginPath();
-    ctx2.arc(c2 - 1.5, c2 - 2.5, r * 0.25, 0, Math.PI * 2);
+    ctx2.arc(c2 - 1.5, c2 - 2.5, r * 0.2, 0, Math.PI * 2);
     ctx2.fill();
 }
 
@@ -130,9 +128,10 @@ function renderFrame() {
     drawBalls();
 }
 
-// ── Draw Pegs — Neon Glow ──
+// ── Draw Pegs — bright against dark board ──
 function drawPegs() {
     for (const peg of pegPositions) {
+        // Skip pegs destroyed by Peg Cascade event
         if (peg.destroyed) continue;
 
         const lit = peg.lit;
@@ -140,83 +139,69 @@ function drawPegs() {
         if (lit > 0.01) {
             const glow = lit;
             ctx.save();
-            ctx.globalCompositeOperation = 'lighter'; // Additive blending -> Neon Look
 
-            // Intense core flash
-            const gradient = ctx.createRadialGradient(peg.x, peg.y, 0, peg.x, peg.y, 14 * glow);
-            gradient.addColorStop(0, `rgba(180, 240, 255, ${0.9 * glow})`);
-            gradient.addColorStop(0.4, `rgba(0, 229, 255, ${0.7 * glow})`);
+            // Bright glow burst
+            const gradient = ctx.createRadialGradient(peg.x, peg.y, 0, peg.x, peg.y, 12 * glow);
+            gradient.addColorStop(0, `rgba(0, 229, 255, ${0.6 * glow})`);
             gradient.addColorStop(1, 'rgba(0, 229, 255, 0)');
-
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(peg.x, peg.y, 14 * glow, 0, Math.PI * 2);
+            ctx.arc(peg.x, peg.y, 12 * glow, 0, Math.PI * 2);
             ctx.fill();
 
             // White-hot center
-            ctx.fillStyle = '#FFF';
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * glow})`;
             ctx.beginPath();
-            ctx.arc(peg.x, peg.y, CONFIG.PEG_RADIUS, 0, Math.PI * 2);
+            ctx.arc(peg.x, peg.y, CONFIG.PEG_RADIUS + 0.5, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.restore();
         } else {
-            // Normal peg (dim)
-            ctx.fillStyle = 'rgba(100, 100, 140, 0.3)'; // Dimmer base for contrast
+            // Normal peg — visible bright dots against dark board
+            ctx.save();
+
+            // Solid fill — brighter for contrast
+            ctx.fillStyle = 'rgba(168, 160, 216, 0.45)';
             ctx.beginPath();
             ctx.arc(peg.x, peg.y, CONFIG.PEG_RADIUS, 0, Math.PI * 2);
             ctx.fill();
 
-            // Tiny dot center
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            // Center dot highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.beginPath();
-            ctx.arc(peg.x, peg.y, 1, 0, Math.PI * 2);
+            ctx.arc(peg.x, peg.y, CONFIG.PEG_RADIUS * 0.3, 0, Math.PI * 2);
             ctx.fill();
+
+            ctx.restore();
         }
     }
 }
 
-// ── Draw Ball Trails — Neon Streaks ──
+// ── Draw Ball Trails — bright streaks ──
 function drawTrails() {
     const now = Date.now();
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter'; // Additive trails
 
     for (const ball of balls) {
         if (!ball.trailPoints || ball.trailPoints.length < 2) continue;
 
-        const isLucky = ball.isLucky;
-        const colorBase = isLucky ? '255, 200, 0' : '0, 240, 255'; // RGB values
+        const color = ball.isLucky
+            ? 'rgba(255, 215, 64, '
+            : 'rgba(0, 229, 255, ';
 
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        // Draw connected line for smoother neon look
-        ctx.beginPath();
-
-        // Start from current position
-        ctx.moveTo(ball.position.x, ball.position.y);
-
-        for (let i = ball.trailPoints.length - 1; i >= 0; i--) {
+        for (let i = 0; i < ball.trailPoints.length - 1; i++) {
             const pt = ball.trailPoints[i];
             const age = now - pt.t;
-            if (age > 400) break; // Longer trails
+            if (age > 300) continue;
 
-            // Draw segments manually to handle opacity fading (gradient stroke is complex on path)
-            // or just draw the path with a single gradient?
-            // Simpler: Draw dots but closer together creates a line feel?
-            // Actually, dots with 'lighter' blend mode creates a laser beam effect.
+            const alpha = Math.max(0, 0.4 * (1 - age / 300));
+            const size = CONFIG.BALL_RADIUS * (1 - age / 300) * 0.6;
 
-            const alpha = Math.max(0, 1 - age / 400); // Fade out
-            const size = CONFIG.BALL_RADIUS * (0.8 + 0.5 * alpha); // Thick trails
-
-            ctx.fillStyle = `rgba(${colorBase}, ${alpha * 0.6})`;
+            ctx.fillStyle = color + alpha + ')';
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, size, 0, Math.PI * 2);
             ctx.fill();
         }
     }
-    ctx.restore();
 }
 
 // ── Draw Balls ──

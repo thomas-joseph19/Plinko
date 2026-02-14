@@ -48,6 +48,7 @@
 <body>
 
   <!-- Ambient background orbs -->
+  <div class="scanlines"></div> <!-- CRT Scanlines Filter -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -106,6 +107,7 @@
         <main class="board-area">
           <!-- Drop zone -->
           <div class="drop-zone" id="dropZone">
+            <div class="dropper-nozzle"></div> <!-- Visual Dropper -->
             <div class="dropper-indicators" id="dropperIndicators"></div>
             <span class="drop-label" id="dropLabel">AUTO-DROP ×1</span>
           </div>
@@ -327,14 +329,13 @@
       </div>
       <div class="settings-body">
         <div class="settings-group">
-          <!-- Reverted to Theme Selector as in Pixel UI -->
-          <div class="settings-label">Theme</div>
-          <div class="theme-options" role="group" aria-label="Appearance">
-            <button type="button" class="theme-btn active" data-theme="system" id="themeSystem">System</button>
-            <button type="button" class="theme-btn" data-theme="light" id="themeLight">☀️ Light</button>
-            <button type="button" class="theme-btn" data-theme="dark" id="themeDark">🌙 Dark</button>
+          <div class="settings-label">Background</div>
+          <div class="theme-options" role="group" aria-label="Background" style="flex-wrap: wrap; row-gap: 8px;">
+            <button type="button" class="theme-btn" data-bg-set="void">Void</button>
+            <button type="button" class="theme-btn" data-bg-set="nebula">Nebula</button>
+            <button type="button" class="theme-btn" data-bg-set="city">Neo Tokyo</button>
+            <button type="button" class="theme-btn active" data-bg-set="midnight">Midnight</button>
           </div>
-          <p class="settings-hint">System uses your device’s light/dark preference.</p>
         </div>
 
         <div class="settings-group">
@@ -373,7 +374,7 @@
             <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
             <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
           </div>
-          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
+          <p class="settings-hint">Version 1.2.0</p>
         </div>
       </div>
     </div>

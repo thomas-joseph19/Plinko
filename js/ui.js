@@ -133,10 +133,26 @@ function initSettings() {
         legalFrame.src = ''; // Clear for next time
     }
 
-    if (privacyLink) privacyLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/privacy.html', 'Privacy Policy'); });
-    if (termsLink) termsLink.addEventListener('click', (e) => { e.preventDefault(); openLegal('/terms.html', 'Terms of Service'); });
-    if (legalClose) legalClose.addEventListener('click', closeLegal);
-    if (legalOverlay) legalOverlay.addEventListener('click', (e) => { if (e.target === legalOverlay) closeLegal(); });
+    // Background Switcher
+    const bgBtns = document.querySelectorAll('[data-bg-set]');
+    const storedBg = localStorage.getItem('plinko_bg') || 'midnight';
+    document.body.setAttribute('data-bg', storedBg);
+
+    bgBtns.forEach(btn => {
+        if (btn.dataset.bgSet === storedBg) btn.classList.add('active');
+
+        btn.addEventListener('click', () => {
+            const bg = btn.dataset.bgSet;
+            document.body.setAttribute('data-bg', bg);
+            localStorage.setItem('plinko_bg', bg);
+
+            bgBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSettings);
+    if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSettings(); });
 }
 
 // ── Render Slot Tray ──
@@ -230,6 +246,11 @@ function createUpgradeCard(id, compact) {
         card.addEventListener('click', () => {
             if (purchaseUpgrade(id)) {
                 card.classList.add('purchased');
+                // Confetti visual feedback
+                if (window.spawnConfetti) {
+                    const rect = card.getBoundingClientRect();
+                    window.spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                }
                 setTimeout(() => card.classList.remove('purchased'), 400);
                 // Refresh UI
                 refreshUpgradeUI();
@@ -539,7 +560,8 @@ function initManualDrop() {
         });
     }
 
-    // Also allow touching/clicking on the board to drop
+    // Board click-to-drop DISABLED per user request
+    /*
     const boardEl = document.getElementById('plinkoBoard');
     if (boardEl) {
         let boardTouched = false;
@@ -565,6 +587,7 @@ function initManualDrop() {
             }
         });
     }
+    */
 }
 
 // ── Offline Earnings Toast ──

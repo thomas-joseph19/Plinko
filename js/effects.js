@@ -222,3 +222,36 @@ function particleBurst(x, y, color, count) {
         setTimeout(() => particle.remove(), 900);
     }
 }
+
+// ── Confetti Burst (UI Feedback) ──
+function spawnConfetti(x, y) {
+    const count = 16;
+    const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#FFFFFF', '#A8E6CF'];
+
+    for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Random direction
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 30 + Math.random() * 80;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        // Use Web Animations API
+        el.animate([
+            { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+            { transform: `translate(${tx}px, ${ty}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+        ], {
+            duration: 700 + Math.random() * 500,
+            easing: 'cubic-bezier(0, .9, .57, 1)',
+            fill: 'forwards'
+        });
+
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+    }
+}

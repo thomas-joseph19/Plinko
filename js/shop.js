@@ -98,6 +98,14 @@ function renderShopView() {
             if (window.AudioEngine && typeof window.AudioEngine.upgradeBuy === 'function') window.AudioEngine.upgradeBuy();
 
             gameState.gems -= item.cost;
+
+            // Confetti visual feedback
+            if (window.spawnConfetti) {
+                const rect = el.getBoundingClientRect();
+                window.spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            }
+            if (window.AudioEngine && typeof window.AudioEngine.upgradeBuy === 'function') window.AudioEngine.upgradeBuy();
+
             if (item.give === 'coins') {
                 gameState.coins += item.amount;
             } else if (item.give === 'storm') {

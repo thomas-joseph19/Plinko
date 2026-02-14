@@ -210,6 +210,10 @@ function handleCollisions(event) {
 
         if (slotBody && ballBody && !ballBody.scored) {
             ballBody.scored = true;
+            // Disable further collisions immediately to prevent double-counting or floor bounces
+            if (ballBody.collisionFilter) {
+                ballBody.collisionFilter.mask = 0;
+            }
             const slotIdx = slotBody.slotIndex;
             handleSlotHit(slotIdx, ballBody);
         }
@@ -311,6 +315,14 @@ function handleSlotHit(slotIndex, ballBody) {
 // ── Spawn a Ball ──
 function spawnBall(x, y, forceGolden) {
     if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return null;
+
+    // Visual Dropper Animation - Trigger only if spawned near center (manual or auto)
+    const nozzle = document.querySelector('.dropper-nozzle');
+    if (nozzle && (!x || Math.abs(x - boardWidth / 2) < 20)) {
+        nozzle.classList.remove('active');
+        void nozzle.offsetWidth; // trigger reflow
+        nozzle.classList.add('active');
+    }
 
     const isLucky = forceGolden || (Math.random() < getLuckyBallChance());
 
