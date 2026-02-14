@@ -462,8 +462,9 @@ function updatePhysics(delta) {
         const absDist = Math.abs(distFromCenter);
 
         if (absDist > 5) {
-            // Natural 25x Cubic Pull: Baseline for 0.1% odds but looks organic
-            const pullStrength = 0.00005 * Math.pow(absDist / centerX, 3);
+            // Enhanced Centering Bias: Stronger pull to ensure more balls land in middle bins
+            // Combination of Cubic (strong at edges) + Linear (constant nudge)
+            const pullStrength = (0.00015 * Math.pow(absDist / centerX, 3)) + (0.00005 * (absDist / centerX));
             const forceX = distFromCenter > 0 ? -pullStrength : pullStrength;
             Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
         }
