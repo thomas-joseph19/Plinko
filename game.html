@@ -14,12 +14,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PLINKO∞">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#050510">
+  <meta name="theme-color" content="#0a0a0d">
   <meta name="format-detection" content="telephone=no">
-
-  <!-- Google AdSense (Preserved from Local) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2818023938860764"
-    crossorigin="anonymous"></script>
 
   <!-- iOS Icons -->
   <link rel="apple-touch-icon" href="icons/icon.svg">
@@ -29,26 +25,16 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
 
-  <!-- Fonts & Styles (Restored Pixel/Inter Fonts) -->
+  <!-- Fonts & Styles -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-
-  <!-- Theme Script (Restored) -->
-  <script>
-    (function () {
-      var stored = localStorage.getItem('plinko_theme');
-      var theme = stored === 'light' ? 'light' : stored === 'dark' ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
 </head>
 
 <body>
 
   <!-- Ambient background orbs -->
-  <div class="scanlines"></div> <!-- CRT Scanlines Filter -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -107,7 +93,6 @@
         <main class="board-area">
           <!-- Drop zone -->
           <div class="drop-zone" id="dropZone">
-            <div class="dropper-nozzle"></div> <!-- Visual Dropper -->
             <div class="dropper-indicators" id="dropperIndicators"></div>
             <span class="drop-label" id="dropLabel">AUTO-DROP ×1</span>
           </div>
@@ -329,16 +314,6 @@
       </div>
       <div class="settings-body">
         <div class="settings-group">
-          <div class="settings-label">Background</div>
-          <div class="theme-options" role="group" aria-label="Background" style="flex-wrap: wrap; row-gap: 8px;">
-            <button type="button" class="theme-btn" data-bg-set="void">Void</button>
-            <button type="button" class="theme-btn" data-bg-set="nebula">Nebula</button>
-            <button type="button" class="theme-btn" data-bg-set="city">Neo Tokyo</button>
-            <button type="button" class="theme-btn active" data-bg-set="midnight">Midnight</button>
-          </div>
-        </div>
-
-        <div class="settings-group">
           <div class="settings-label">Sound & Feedback</div>
           <div class="settings-control">
             <div class="control-info">
@@ -374,7 +349,7 @@
             <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
             <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
           </div>
-          <p class="settings-hint">Version 1.2.0</p>
+          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
         </div>
       </div>
     </div>
@@ -382,9 +357,6 @@
 
   <!-- Matter.js physics engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
-
-  <!-- RevenueCat SDK (Preserved from Local) -->
-  <script src="https://js.revenuecat.com/v1/purchases.js"></script>
 
   <!-- Game modules -->
   <script src="js/config.js"></script>
