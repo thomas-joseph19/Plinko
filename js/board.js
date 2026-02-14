@@ -59,13 +59,13 @@ function rebuildBoard() {
     // Left wall with high friction to stop edge-riding
     walls.push(Matter.Bodies.rectangle(
         -CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight,
+        CONFIG.WALL_THICKNESS, boardHeight * 5,
         { isStatic: true, restitution: 0.1, friction: 0.8, render: { visible: false } }
     ));
     // Right wall with high friction to stop edge-riding
     walls.push(Matter.Bodies.rectangle(
         boardWidth + CONFIG.WALL_THICKNESS / 2, boardHeight / 2,
-        CONFIG.WALL_THICKNESS, boardHeight,
+        CONFIG.WALL_THICKNESS, boardHeight * 5,
         { isStatic: true, restitution: 0.1, friction: 0.8, render: { visible: false } }
     ));
     // Bottom floor
