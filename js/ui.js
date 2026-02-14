@@ -163,6 +163,14 @@ function renderSlotTray(rows) {
     const multipliers = CONFIG.SLOT_MULTIPLIERS[rows] || CONFIG.SLOT_MULTIPLIERS[10];
     tray.innerHTML = '';
 
+    // Align visual slots with the peg-defined bins
+    if (lastRowPegXCoords.length >= 2) {
+        const leftPeg = lastRowPegXCoords[0];
+        const rightPeg = lastRowPegXCoords[lastRowPegXCoords.length - 1];
+        tray.style.paddingLeft = leftPeg + 'px';
+        tray.style.paddingRight = (boardWidth - rightPeg) + 'px';
+    }
+
     const boost = getGlobalMultiplier(); // Includes slot boost + prestige
 
     multipliers.forEach((baseMult, i) => {
@@ -172,7 +180,6 @@ function renderSlotTray(rows) {
 
         const type = getSlotType(val);
         slot.className = 'slot ' + type;
-        if (i === -1) slot.classList.add('jackpot'); // disabled
 
         slot.innerHTML = `<span class="mult">${val >= 1000 ? formatCost(val) : formatNumber(val)}</span><span class="x">×</span>`;
         tray.appendChild(slot);
@@ -588,6 +595,9 @@ function initManualDrop() {
         });
     }
 
+    // Initialize bet selector
+    initBetSelector();
+
     // Board click-to-drop DISABLED per user request
     /*
     const boardEl = document.getElementById('plinkoBoard');
@@ -645,4 +655,80 @@ function showOfflineEarnings(coins, timeAway) {
     setTimeout(() => {
         if (toast) toast.style.display = 'none';
     }, 6000);
+}
+
+// ── Bet Selector ──
+function initBetSelector() {
+    const decreaseBtn = document.getElementById('betDecrease');
+    const increaseBtn = document.getElementById('betIncrease');
+    const betDisplay = document.getElementById('betAmountDisplay');
+
+    // Bet amounts that can be selected
+    const betAmounts = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+
+    function updateBetDisplay() {
+        if (betDisplay) {
+            betDisplay.textContent = formatNumber(gameState.currentBet);
+        }
+        // Update button states
+        if (decreaseBtn) {
+            const currentIndex = betAmounts.indexOf(gameState.currentBet);
+            decreaseBtn.disabled = currentIndex <= 0;
+        }
+        if (increaseBtn) {
+            const currentIndex = betAmounts.indexOf(gameState.currentBet);
+            increaseBtn.disabled = currentIndex >= betAmounts.length - 1;
+        }
+    }
+
+    if (decreaseBtn) {
+        decreaseBtn.addEventListener('click', () => {
+            const currentIndex = betAmounts.indexOf(gameState.currentBet);
+            if (currentIndex > 0) {
+                gameState.currentBet = betAmounts[currentIndex - 1];
+                updateBetDisplay();
+            }
+        });
+    }
+
+    if (increaseBtn) {
+        increaseBtn.addEventListener('click', () => {
+            const currentIndex = betAmounts.indexOf(gameState.currentBet);
+            if (currentIndex < betAmounts.length - 1) {
+                gameState.currentBet = betAmounts[currentIndex + 1];
+                updateBetDisplay();
+            }
+        });
+    }
+
+    // Initialize display
+    updateBetDisplay();
+}
+
+// Toast notification helper
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'error' ? 'var(--danger)' : 'var(--accent1)'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-family: var(--font-pixel);
+        font-size: 12px;
+        z-index: 10000;
+        animation: toastSlide 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Remove after 2 seconds
+    setTimeout(() => {
+        toast.style.animation = 'toastSlide 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }

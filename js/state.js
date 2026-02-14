@@ -13,6 +13,10 @@ function getDefaultState() {
         totalCoinsEarned: 0,
         totalCoinsAllTime: 0,
 
+        // Betting
+        currentBet: 1,
+        totalCoinsBet: 0,
+
         // Board
         boardRows: 10,
 

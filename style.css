@@ -1105,6 +1105,84 @@ body::after {
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
 }
 
+/* ═══════════ BET SELECTOR ═══════════ */
+.bet-selector {
+  position: absolute;
+  bottom: 76px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 30;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+  backdrop-filter: blur(10px);
+}
+
+.bet-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.bet-btn:hover {
+  transform: scale(1.1);
+}
+
+.bet-btn:active {
+  transform: scale(0.95);
+}
+
+.bet-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bet-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+}
+
+.bet-label {
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.bet-amount {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--gold);
+  font-family: var(--font-pixel);
+}
+
+/* Toast Animation */
+@keyframes toastSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 /* ═══════════ SIDE PANEL ═══════════ */
 .side-panel {
   grid-row: 2;

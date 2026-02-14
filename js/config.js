@@ -19,7 +19,7 @@ const CONFIG = {
   SLOT_HEIGHT: 48,
   BOARD_PADDING_TOP: 0.06,    // % of board height
   BOARD_PADDING_BOTTOM: 0.12, // % of board height (for slots)
-  BOARD_PADDING_SIDE: 0.08,   // % of board width
+  BOARD_PADDING_SIDE: 0.05,   // % of board width
 
   // ── Timing ──
   BASE_DROP_INTERVAL: 2000,    // ms between auto drops
@@ -34,8 +34,9 @@ const CONFIG = {
   SLOT_MULTIPLIERS: {
     // Custom 12-bin layout for 10 rows
     // Pegs end at 11 -> 12 bins
+    // ~1.1x EV with drastic spread: rare big wins vs frequent small losses
     10: [
-      25, 10, 4, 1.5, 0.4, 0.2, 0.2, 0.4, 1.5, 4, 10, 25
+      8, 4, 2, 1.5, 0.7, 0.5, 0.5, 0.7, 1.5, 2, 4, 8
     ],
   },
 
