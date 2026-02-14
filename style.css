@@ -2357,10 +2357,77 @@ body[data-bg]::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  /* 45% dark overlay */
+  background:
+    radial-gradient(circle at 50% 50%, transparent 20%, rgba(0, 0, 0, 0.6) 100%),
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
   z-index: -1;
   pointer-events: none;
+}
+
+/* 🎰 Slot Machine Glitz & Marquee 🎰 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 10px;
+  border: 4px double var(--accent1);
+  border-radius: var(--radius-lg);
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.5;
+  mask-image: linear-gradient(to bottom, black, transparent 20%, transparent 80%, black);
+}
+
+.marquee-lights {
+  position: fixed;
+  inset: 4px;
+  border: 2px solid transparent;
+  pointer-events: none;
+  z-index: 6;
+  background-image:
+    radial-gradient(circle, var(--gold) 2px, transparent 2px),
+    radial-gradient(circle, var(--gold) 2px, transparent 2px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  opacity: 0.6;
+  animation: marqueePulse 1.5s infinite steps(2);
+}
+
+@keyframes marqueePulse {
+  0% {
+    opacity: 0.3;
+    background-position: 0 0, 15px 15px;
+  }
+
+  50% {
+    opacity: 0.7;
+    background-position: 15px 15px, 0 0;
+  }
+
+  100% {
+    opacity: 0.3;
+    background-position: 0 0, 15px 15px;
+  }
+}
+
+.symbols-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3 %3Ctext x='10' y='30' font-size='20' opacity='0.05'%3E🍒%3C/text%3E%3Ctext x='60' y='70' font-size='20' opacity='0.05'%3E🎰%3C/text%3E%3Ctext x='40' y='20' font-size='20' opacity='0.05'%3E🔔%3C/text%3E%3Ctext x='80' y='40' font-size='20' opacity='0.05'%3E7️⃣%3C/text%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+  animation: backgroundDrift 60s linear infinite;
+}
+
+@keyframes backgroundDrift {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 1000px 1000px;
+  }
 }
 
 /* Default (Midnight -> Royale Lounge) */
