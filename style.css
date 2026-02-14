@@ -3,49 +3,42 @@
    ═══════════════════════════════════════════════ */
 
 :root {
-  /* Casino Royale palette — Classy & High Stakes */
-  --bg-deep: #0a0505;
-  --bg-mid: #1a0808;
-  --bg-panel: rgba(45, 10, 10, 0.85);
-  /* Deep Burgundy Velvet */
-  --bg-card: rgba(60, 15, 15, 0.7);
-  --border: rgba(212, 175, 55, 0.1);
-  /* Gold tint */
-  --border-light: rgba(212, 175, 55, 0.2);
+  /* Ultra-dark palette — high contrast */
+  --bg-deep: #050510;
+  --bg-mid: #0A0918;
+  --bg-panel: rgba(15, 13, 30, 0.7);
+  /* More transparent */
+  --bg-card: rgba(22, 20, 42, 0.6);
+  /* More transparent */
+  --border: rgba(255, 255, 255, 0.04);
+  --border-light: rgba(255, 255, 255, 0.08);
 
-  /* Casino accents */
-  --accent1: #D4AF37;
-  /* Royal Gold */
-  --accent2: #FF3B3B;
-  /* Poker Red */
-  --accent3: #C084FC;
-  /* Royal Purple */
-  --accent4: #2ECC71;
-  /* Table Felt Green */
-  --accent5: #FFD700;
-  /* Pure Gold */
+  /* Arcade accents – punchy & bright */
+  --accent1: #7C6CF0;
+  --accent2: #00E5FF;
+  --accent3: #FF6B81;
+  --accent4: #3EE87F;
+  --accent5: #FFB020;
 
   /* Gold system */
-  --gold: #FFD700;
-  --gold-glow: #FFF9C4;
-  --gold-dark: #8B6E02;
+  --gold: #FFD740;
+  --gold-glow: #FFEA80;
+  --gold-dark: #B8860B;
 
-  /* Text — Elegance */
+  /* Text – high contrast */
   --text-bright: #FFFFFF;
-  --text-mid: #E5C185;
-  /* Champagne */
-  --text-dim: #9B7E4F;
-  /* Bronze */
+  --text-mid: #A8A0D8;
+  --text-dim: #6860A0;
 
   /* Slot value colors */
-  --slot-high: #D4AF37;
-  --slot-mid: #FF3B3B;
-  --slot-low: #2ECC71;
+  --slot-high: #FFA502;
+  --slot-mid: #6C5CE7;
+  --slot-low: #2ED573;
 
   /* State colors */
-  --danger: #FF3B3B;
-  --success: #2ECC71;
-  --fever: #D4AF37;
+  --danger: #FF4757;
+  --success: #2ED573;
+  --fever: #FF6348;
 
   /* Layout */
   --hud-h: 56px;
@@ -133,7 +126,7 @@ body::before {
 .orb-1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.08), transparent 70%);
+  background: radial-gradient(circle, rgba(124, 108, 240, 0.08), transparent 70%);
   top: -150px;
   left: -150px;
   animation: none;
@@ -143,7 +136,7 @@ body::before {
 .orb-2 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255, 59, 59, 0.06), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.06), transparent 70%);
   bottom: -120px;
   right: -120px;
   animation: none;
@@ -153,7 +146,7 @@ body::before {
 .orb-3 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(46, 204, 113, 0.05), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 107, 129, 0.05), transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -188,6 +181,39 @@ body::before {
 
   100% {
     transform: translate(-45%, -55%) scale(1.15);
+  }
+}
+
+/* ─── Background Glimmer ─── */
+.bg-sparkles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.bg-sparkle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px white, 0 0 8px var(--gold);
+  animation: bgSparkleFade 3s infinite ease-in-out;
+}
+
+@keyframes bgSparkleFade {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -788,18 +814,18 @@ body::before {
 
 @keyframes btnGlow {
   0% {
-    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4), 0 0 30px rgba(255, 59, 59, 0.15);
+    box-shadow: 0 0 12px rgba(124, 108, 240, 0.4), 0 0 30px rgba(0, 229, 255, 0.15);
   }
 
   100% {
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 50px rgba(255, 59, 59, 0.3);
+    box-shadow: 0 0 20px rgba(124, 108, 240, 0.6), 0 0 50px rgba(0, 229, 255, 0.3);
   }
 }
 
 .manual-drop-btn:hover {
   transform: scale(1.15);
   animation: none;
-  box-shadow: 0 0 25px rgba(212, 175, 55, 0.7), 0 0 60px rgba(255, 59, 59, 0.4);
+  box-shadow: 0 0 25px rgba(124, 108, 240, 0.7), 0 0 60px rgba(0, 229, 255, 0.4);
 }
 
 .manual-drop-btn:active {
@@ -930,9 +956,9 @@ body::before {
 }
 
 .event-card.event-active {
-  border-color: var(--accent1);
-  background: rgba(212, 175, 55, 0.05);
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+  border-color: var(--accent2);
+  background: rgba(0, 229, 255, 0.05);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
 }
 
 .event-card.event-active::before {
@@ -1012,7 +1038,7 @@ body::before {
 }
 
 .event-status.active {
-  color: var(--accent1);
+  color: var(--accent2);
   animation: pulseOpacity 1s infinite alternate;
 }
 
@@ -1667,8 +1693,8 @@ body::before {
 }
 
 .tab.active {
-  color: var(--accent1);
-  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.4));
+  color: var(--accent2);
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.3));
 }
 
 .tab.active .tab-icon {
@@ -1684,7 +1710,7 @@ body::before {
   height: 3px;
   background: linear-gradient(90deg, var(--accent1), var(--accent2));
   border-radius: 0 0 3px 3px;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 25px rgba(255, 59, 59, 0.2);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4), 0 0 25px rgba(124, 108, 240, 0.2);
 }
 
 .tab .badge {
@@ -2058,7 +2084,7 @@ body::after {
 }
 
 body {
-  background: linear-gradient(-45deg, #0a0505, #1a0808, #2d0a0a, #1a0808);
+  background: linear-gradient(-45deg, #050510, #0A0918, #110e24, #080814);
   background-size: 400% 400%;
   animation: aurora 30s ease infinite;
 }
@@ -2349,118 +2375,72 @@ body[data-bg] {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
+  image-rendering: pixelated;
+  /* Corrected */
   position: relative;
 }
 
-/* Moderate Darkening Overlay for UI readability with image backgrounds */
+/* Darkening Overlay for Subtlety */
 body[data-bg]::after {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at 50% 50%, transparent 20%, rgba(0, 0, 0, 0.6) 100%),
-    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  background: rgba(0, 0, 0, 0.65);
+  /* 65% dark overlay */
   z-index: -1;
   pointer-events: none;
 }
 
-/* 🎰 Slot Machine Glitz & Marquee 🎰 */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 10px;
-  border: 4px double var(--accent1);
-  border-radius: var(--radius-lg);
-  pointer-events: none;
-  z-index: 5;
-  opacity: 0.5;
-  mask-image: linear-gradient(to bottom, black, transparent 20%, transparent 80%, black);
-}
-
-.marquee-lights {
-  position: fixed;
-  inset: 4px;
-  border: 2px solid transparent;
-  pointer-events: none;
-  z-index: 6;
+/* Royal Casino (Emerald & Gold) */
+body[data-bg="royal"] {
+  background-color: #061a14;
   background-image:
-    radial-gradient(circle, var(--gold) 2px, transparent 2px),
-    radial-gradient(circle, var(--gold) 2px, transparent 2px);
-  background-size: 30px 30px;
-  background-position: 0 0, 15px 15px;
-  opacity: 0.6;
-  animation: marqueePulse 1.5s infinite steps(2);
+    radial-gradient(circle at 50% 50%, rgba(10, 61, 46, 0.4) 0%, transparent 70%),
+    linear-gradient(45deg, rgba(255, 215, 64, 0.02) 25%, transparent 25%, transparent 50%, rgba(255, 215, 64, 0.02) 50%, rgba(255, 215, 64, 0.02) 75%, transparent 75%, transparent);
+  background-size: 100% 100%, 60px 60px;
 }
 
-@keyframes marqueePulse {
-  0% {
-    opacity: 0.3;
-    background-position: 0 0, 15px 15px;
-  }
-
-  50% {
-    opacity: 0.7;
-    background-position: 15px 15px, 0 0;
-  }
-
-  100% {
-    opacity: 0.3;
-    background-position: 0 0, 15px 15px;
-  }
+body[data-bg="royal"] .orb-1 {
+  background: radial-gradient(circle, rgba(255, 215, 64, 0.15), transparent 70%);
 }
 
-.symbols-overlay {
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3 %3Ctext x='10' y='30' font-size='20' opacity='0.05'%3E🍒%3C/text%3E%3Ctext x='60' y='70' font-size='20' opacity='0.05'%3E🎰%3C/text%3E%3Ctext x='40' y='20' font-size='20' opacity='0.05'%3E🔔%3C/text%3E%3Ctext x='80' y='40' font-size='20' opacity='0.05'%3E7️⃣%3C/text%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.3;
-  animation: backgroundDrift 60s linear infinite;
+body[data-bg="royal"] .orb-2 {
+  background: radial-gradient(circle, rgba(46, 213, 115, 0.12), transparent 70%);
 }
 
-@keyframes backgroundDrift {
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: 1000px 1000px;
-  }
+body[data-bg="royal"] .orb-3 {
+  background: radial-gradient(circle, rgba(124, 108, 240, 0.1), transparent 70%);
 }
 
-/* Default (Midnight -> Royale Lounge) */
+/* Default (Midnight) */
 body,
 body[data-bg="midnight"] {
-  background-color: #2b0505;
-  background-image: url('backgrounds/Screenshot 2026-02-13 234148.png');
-  background-size: cover;
-  background-position: center;
+  background-color: #020204;
+  background-image: url('images/bg_space_pixel_1771035715112.png');
 }
 
-/* Void (Dark Minimal -> The Vault) */
+/* Void (Dark Minimal) */
 body[data-bg="void"] {
-  background-color: #0f0f0f;
-  background-image: url('backgrounds/Screenshot 2026-02-13 234154.png');
-  background-size: cover;
-  background-position: center;
+  background-color: #030305;
+  background-image: url('images/bg_space_pixel_1771035384527.png');
 }
 
-/* Nebula (Purplish -> Velvet VIP) */
+/* Nebula (Purplish) */
 body[data-bg="nebula"] {
-  background-color: #3d0000;
-  background-image: url('backgrounds/Screenshot 2026-02-13 234216.png');
-  background-size: cover;
-  background-position: center;
+  background-color: #080410;
+  background-image: url('images/bg_space_pixel_1771035683589.png');
 }
 
-/* Neo Tokyo (City -> Emerald Table) */
+/* Neo Tokyo (City) */
 body[data-bg="city"] {
-  background-color: #0a3d21;
-  background-image: url('backgrounds/Screenshot 2026-02-13 234236.png');
-  background-size: cover;
-  background-position: center;
+  background-color: #0a0a1a;
+  background-image: url('images/bg_city_pixel_1771035356322.png');
+}
+
+/* Midnight (Dark Detailed) */
+body[data-bg="midnight"] {
+  background-color: #020204;
+  background-image: url('images/bg_space_pixel_1771035715112.png');
 }
 
 /* ═══════════ PIXEL DROPPER ═══════════ */
@@ -2491,10 +2471,10 @@ body[data-bg="city"] {
   left: 6px;
   width: 12px;
   height: 4px;
-  background: var(--gold);
+  background: #00E5FF;
   /* Glowing tip */
-  opacity: 0.8;
-  box-shadow: 0 0 10px var(--gold);
+  opacity: 0.6;
+  box-shadow: 0 0 8px #00E5FF;
 }
 
 /* Springy animation when dropping */
