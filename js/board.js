@@ -358,9 +358,13 @@ function spawnBall(x, y, forceGolden, betAmount) {
 
     // Check if player has enough coins to place this bet
     if (gameState.coins < actualBet) {
-        // Not enough coins - show feedback
-        if (typeof showToast === 'function') {
-            showToast('Not enough coins!', 'error');
+        // Not enough coins - show feedback with throttling (once every 10s)
+        const now = Date.now();
+        if (now - (runtimeState.lastToastTime || 0) > 10000) {
+            if (typeof showToast === 'function') {
+                showToast('Not enough coins!', 'error');
+            }
+            runtimeState.lastToastTime = now;
         }
         return null;
     }

@@ -316,6 +316,20 @@
 
   </div>
 
+  <!-- Tutorial Overlay -->
+  <div class="tutorial-overlay" id="tutorialOverlay" aria-hidden="true">
+    <div class="tutorial-modal">
+      <div id="tutorialContent">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="tutorial-footer">
+        <button class="tutorial-btn secondary" id="tutorialPrev" style="visibility: hidden;">Back</button>
+        <div class="tutorial-dots" id="tutorialDots"></div>
+        <button class="tutorial-btn primary" id="tutorialNext">Next</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings Modal -->
   <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
     <div class="settings-modal" id="settingsModal" role="dialog" aria-labelledby="settingsTitle">
@@ -324,7 +338,7 @@
         <button type="button" class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
       </div>
       <div class="settings-body">
-        <div class="settings-group">\n          <div class="settings-label">Sound & Feedback</div>
+        <div class="settings-group">\n <div class="settings-label">Sound & Feedback</div>
           <div class="settings-control">
             <div class="control-info">
               <span class="control-name">Audio Effects</span>
@@ -378,6 +392,7 @@
   <script src="js/renderer.js"></script>
   <script src="js/effects.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/tutorial.js"></script>
   <script src="js/debug.js"></script>
   <script src="js/daily.js"></script>
   <script src="js/shop.js"></script>
