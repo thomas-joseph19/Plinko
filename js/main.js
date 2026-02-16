@@ -197,11 +197,36 @@ function calculateOfflineEarnings() {
     const maxMs = CONFIG.MAX_OFFLINE_HOURS * 3600000;
     const clampedElapsed = Math.min(elapsed, maxMs);
     const offlineRate = getOfflineRate();
-    const earned = offlineRate * (clampedElapsed / 1000);
+    const baseEarned = offlineRate * (clampedElapsed / 1000);
 
-    if (earned > 0) {
+    // Introduce variance: range from -20% to +120% of the base offline rate
+    // This allows for potential "losses" while away as requested
+    const randomFactor = (Math.random() * 1.4) - 0.2;
+    let earned = Math.round(baseEarned * randomFactor);
+
+    // Caps based on current balance at logoff
+    const balanceAtLogoff = gameState.coins;
+    const cap = balanceAtLogoff * 0.1;
+
+    // Apply 10% cap to both earnings and losses
+    if (earned > cap) earned = Math.floor(cap);
+    if (earned < -cap) earned = -Math.floor(cap);
+
+    if (earned !== 0) {
+        // Apply the outcome
         gameState.coins += earned;
-        gameState.totalCoinsEarned += earned;
+
+        // Ensure balance never drops below zero
+        if (gameState.coins < 0) {
+            earned -= gameState.coins; // Adjust 'earned' value for display accuracy
+            gameState.coins = 0;
+        }
+
+        // Add to total earned if positive
+        if (earned > 0) {
+            gameState.totalCoinsEarned += earned;
+        }
+
         showOfflineEarnings(earned, clampedElapsed);
     }
 }
