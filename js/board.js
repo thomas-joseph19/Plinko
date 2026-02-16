@@ -278,9 +278,15 @@ function handleSlotHit(slotIndex, ballBody) {
     // Global multiplier
     const globalMult = getGlobalMultiplier();
 
+    // Calculate actual multiplier with center cap
+    let finalMult = mult * globalMult;
+    if (slotIndex === 5 || slotIndex === 6) {
+        finalMult = Math.min(finalMult, 0.75);
+    }
+
     // Calculate winnings based on bet amount
     const betAmount = ballBody.betAmount || 1;
-    const winnings = Math.round(betAmount * mult * globalMult);
+    const winnings = Math.round(betAmount * finalMult);
 
     // Award winnings
     gameState.coins += winnings;

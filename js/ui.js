@@ -147,6 +147,11 @@ function initSettings() {
         legalFrame.src = ''; // Clear for next time
     }
 
+    if (privacyLink) privacyLink.addEventListener('click', () => openLegal('public/privacy.html', 'Privacy Policy'));
+    if (termsLink) termsLink.addEventListener('click', () => openLegal('public/terms.html', 'Terms of Service'));
+    if (legalClose) legalClose.addEventListener('click', closeLegal);
+    if (legalOverlay) legalOverlay.addEventListener('click', (e) => { if (e.target === legalOverlay) closeLegal(); });
+
     // Background Switcher
     const bgBtns = document.querySelectorAll('[data-bg-set]');
     const storedBg = localStorage.getItem('plinko_bg') || 'midnight';
@@ -190,7 +195,12 @@ function renderSlotTray(rows) {
     multipliers.forEach((baseMult, i) => {
         const slot = document.createElement('div');
         // Calculate actual displayed value
-        const val = +(baseMult * boost).toFixed(2);
+        let val = +(baseMult * boost).toFixed(2);
+
+        // Hard cap center bins at 0.75
+        if (i === 5 || i === 6) {
+            val = Math.min(val, 0.75);
+        }
 
         const type = getSlotType(val);
         slot.className = 'slot ' + type;

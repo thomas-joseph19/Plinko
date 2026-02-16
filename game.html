@@ -372,11 +372,26 @@
         <div class="settings-group">
           <div class="settings-label">Information</div>
           <div class="legal-links">
-            <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
-            <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
+            <button type="button" class="legal-link" id="privacyLink">Privacy Policy</button>
+            <button type="button" class="legal-link" id="termsLink">Terms of Service</button>
           </div>
-          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
+          <p class="settings-hint">Support: <a href="mailto:Plinkosupport@proton.me"
+              style="color:var(--gold); text-decoration:none;">Plinkosupport@proton.me</a></p>
+          <p class="settings-hint">Version 1.2.0</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legal Overlay -->
+  <div class="legal-overlay" id="legalOverlay" aria-hidden="true">
+    <div class="legal-modal">
+      <div class="legal-header">
+        <h2 class="legal-title" id="legalTitle">Legal</h2>
+        <button type="button" class="legal-close" id="legalClose">✕</button>
+      </div>
+      <div class="legal-body">
+        <iframe id="legalFrame" src=""></iframe>
       </div>
     </div>
   </div>
