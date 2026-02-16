@@ -73,6 +73,12 @@ function initSettings() {
                     if (window.AudioEngine.ctx?.state === 'suspended') {
                         window.AudioEngine.ctx.resume();
                     }
+                    window.AudioEngine.setVolume(gameState.settings.volume ?? 0.5);
+                } else {
+                    // Mute immediately
+                    if (window.AudioEngine.masterGain) {
+                        window.AudioEngine.masterGain.gain.setValueAtTime(0, window.AudioEngine.ctx?.currentTime || 0);
+                    }
                 }
             }
             saveGame();

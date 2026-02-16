@@ -54,7 +54,7 @@ const AudioEngine = {
 
     // ── Ultra-short "Tick" (Mechanical Arcade Switch) ──
     playClick(pitch = 800, vol = 0.1) {
-        if (!this.ctx) return;
+        if (!this.ctx || !this.enabled) return;
 
         // Prevent sound overlap overload
         // If too many sounds playing, skip this one
@@ -88,7 +88,7 @@ const AudioEngine = {
 
     // ── Musical Tone (Rare Events) ──
     playChime(freq, vol = 0.3) {
-        if (!this.ctx) return;
+        if (!this.ctx || !this.enabled) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
 
@@ -134,6 +134,7 @@ const AudioEngine = {
     },
 
     slotHit(isJackpot, tier) {
+        if (!this.enabled) return;
         if (isJackpot) {
             // Jackpot: Fanfare
             [440, 554, 659, 880, 1108, 1318].forEach((f, i) => {
@@ -168,7 +169,7 @@ const AudioEngine = {
 
     drop() {
         // Subtle low thud
-        if (!this.ctx) return;
+        if (!this.ctx || !this.enabled) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         const now = this.ctx.currentTime;
@@ -187,6 +188,7 @@ const AudioEngine = {
     },
 
     upgradeBuy() {
+        if (!this.enabled) return;
         // Quick subtle "cha-ching" or rise
         this.playChime(880, 0.15);
         setTimeout(() => this.playChime(1760, 0.1), 50);
@@ -194,7 +196,7 @@ const AudioEngine = {
 
     prestige() {
         // Deep reset sound
-        if (!this.ctx) return;
+        if (!this.ctx || !this.enabled) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
