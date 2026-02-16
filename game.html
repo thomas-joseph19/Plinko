@@ -53,19 +53,6 @@
   <!-- Fever Mode Overlay -->
   <div class="fever-overlay" id="feverOverlay"></div>
 
-  <button id="debugMoneyBtn"
-    style="position: fixed; top: 80px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
-    +100k 💰
-  </button>
-  <button id="debugCooldownBtn"
-    style="position: fixed; top: 110px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
-    Reset 🕐
-  </button>
-  <button id="debugResetDailyChallengesBtn"
-    style="position: fixed; top: 140px; left: 10px; z-index: 9999; font-size: 10px; padding: 4px 8px; background: #f59e0b; color: white; border: none; border-radius: 4px; opacity: 0.7; cursor: pointer;">
-    Reset daily challenges
-  </button>
-
   <div class="app" id="app">
 
     <!-- ═══════════ HUD BAR ═══════════ -->
@@ -316,6 +303,20 @@
 
   </div>
 
+  <!-- Tutorial Overlay -->
+  <div class="tutorial-overlay" id="tutorialOverlay" aria-hidden="true">
+    <div class="tutorial-modal">
+      <div id="tutorialContent">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="tutorial-footer">
+        <button class="tutorial-btn secondary" id="tutorialPrev" style="visibility: hidden;">Back</button>
+        <div class="tutorial-dots" id="tutorialDots"></div>
+        <button class="tutorial-btn primary" id="tutorialNext">Next</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings Modal -->
   <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
     <div class="settings-modal" id="settingsModal" role="dialog" aria-labelledby="settingsTitle">
@@ -324,7 +325,8 @@
         <button type="button" class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
       </div>
       <div class="settings-body">
-        <div class="settings-group">\n          <div class="settings-label">Sound & Feedback</div>
+        <div class="settings-group">
+          <div class="settings-label">Sound & Feedback</div>
           <div class="settings-control">
             <div class="control-info">
               <span class="control-name">Audio Effects</span>
@@ -348,6 +350,20 @@
             </div>
             <label class="switch">
               <input type="checkbox" id="animationToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Gameplay</div>
+          <div class="settings-control">
+            <div class="control-info">
+              <span class="control-name">Auto Drop</span>
+              <span class="control-desc">Balls drop automatically over time</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="autoDropToggle">
               <span class="slider"></span>
             </label>
           </div>
@@ -378,7 +394,7 @@
   <script src="js/renderer.js"></script>
   <script src="js/effects.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/debug.js"></script>
+  <script src="js/tutorial.js"></script>
   <script src="js/daily.js"></script>
   <script src="js/shop.js"></script>
   <script src="js/audio.js"></script>

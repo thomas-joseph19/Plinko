@@ -43,6 +43,7 @@ function boot() {
     initTabs();
     initPrestigeButton();
     initManualDrop();
+    if (typeof initTutorial === 'function') initTutorial();
 
     // Hard Reset Handler
     const hardResetBtn = document.getElementById('hardResetBtn');

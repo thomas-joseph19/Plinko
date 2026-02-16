@@ -89,7 +89,7 @@
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0,0,0,0.2);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2);
   transform: scale(0.95);
   transition: transform 0.2s ease;
 }
@@ -356,15 +356,20 @@ body::after {
   background-image:
     radial-gradient(ellipse 120% 80% at 20% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
     radial-gradient(ellipse 100% 60% at 80% 90%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
-    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 100%),
-    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.02) 0%, transparent 100%);
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
   pointer-events: none;
   z-index: 0;
 }
 
 @keyframes starDrift {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-20px); }
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-20px);
+  }
 }
 
 /* ─── Ambient orbs — warm gold glow only ─── */
@@ -536,7 +541,7 @@ body::after {
   font-weight: 700;
   letter-spacing: 0.5px;
   transition: all 0.25s;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .currency-chip .icon {
@@ -763,7 +768,7 @@ body::after {
   box-shadow:
     inset 0 0 100px rgba(0, 0, 0, 0.7),
     inset 0 2px 0 rgba(255, 255, 255, 0.03),
-    0 0 0 1px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.5),
     0 8px 32px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s, border-color 0.5s;
 }
@@ -959,7 +964,7 @@ body::after {
   font-weight: 900;
   letter-spacing: 4px;
   color: #1a1812;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), 0 0 80px rgba(212, 175, 55, 0.2);
   z-index: 20;
   display: none;
@@ -1077,8 +1082,8 @@ body::after {
   border-radius: 50%;
   background: linear-gradient(145deg, #d4af37, #b8860b);
   box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.2),
-    inset 0 -2px 0 rgba(0,0,0,0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
     0 0 28px rgba(212, 175, 55, 0.35),
     0 6px 20px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -1095,14 +1100,14 @@ body::after {
 .manual-drop-btn:hover {
   transform: scale(1.08);
   box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
     0 0 40px rgba(212, 175, 55, 0.45),
     0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .manual-drop-btn:active {
   transform: scale(0.95);
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ═══════════ BET SELECTOR ═══════════ */
@@ -1177,6 +1182,7 @@ body::after {
     opacity: 0;
     transform: translateX(-50%) translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -1658,17 +1664,55 @@ body::after {
 }
 
 .daily-day.available {
-  border-color: rgba(251, 191, 36, 0.5);
-  animation: dailyPulse 1.5s ease-in-out infinite alternate;
+  border-color: var(--accent1);
+  background: rgba(124, 108, 240, 0.1);
+  box-shadow: 0 0 15px rgba(124, 108, 240, 0.2);
+  cursor: pointer;
+  animation: dailyPulse 2s ease-in-out infinite;
+  z-index: 2;
 }
 
-@keyframes dailyPulse {
+.daily-day.available:active {
+  transform: scale(0.92);
+  background: rgba(124, 108, 240, 0.2);
+}
+
+.daily-claim-prompt {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--gold);
+  color: #000;
+  font-size: 8px;
+  font-weight: 900;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  animation: claimBadgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
+  z-index: 5;
+}
+
+@keyframes claimBadgePop {
   from {
-    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
+    transform: scale(1) rotate(-5deg);
   }
 
   to {
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+    transform: scale(1.2) rotate(5deg);
+  }
+}
+
+@keyframes dailyPulse {
+
+  0%,
+  100% {
+    border-color: var(--accent1);
+    box-shadow: 0 0 10px rgba(124, 108, 240, 0.2);
+  }
+
+  50% {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(255, 215, 64, 0.3);
   }
 }
 
@@ -1883,6 +1927,56 @@ body::after {
   to {
     opacity: 0.8;
     transform: scale(0.98);
+  }
+}
+
+.challenge-card.challenge-completed {
+  background: rgba(124, 108, 240, 0.15);
+  border: 1px solid var(--accent1);
+  box-shadow: 0 0 15px rgba(124, 108, 240, 0.2);
+  cursor: pointer;
+  animation: challengePulse 2s ease-in-out infinite;
+}
+
+.challenge-card.challenge-completed:active {
+  transform: scale(0.98);
+}
+
+.challenge-card.challenge-claimed {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.claim-prompt {
+  color: var(--gold);
+  font-weight: 800;
+  margin-left: 4px;
+  animation: claimFlash 1s infinite alternate;
+}
+
+@keyframes challengePulse {
+
+  0%,
+  100% {
+    border-color: var(--accent1);
+    box-shadow: 0 0 10px rgba(124, 108, 240, 0.2);
+  }
+
+  50% {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(255, 215, 64, 0.3);
+  }
+}
+
+@keyframes claimFlash {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 1;
+    text-shadow: 0 0 8px var(--gold);
   }
 }
 
@@ -2128,6 +2222,7 @@ body::after {
     opacity: 0;
     transform: translateX(-50%) translateY(-20px) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
@@ -2139,9 +2234,11 @@ body::after {
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.2);
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -2158,10 +2255,12 @@ body::after {
     transform: scale(1);
     box-shadow: 0 0 0 rgba(52, 211, 153, 0);
   }
+
   40% {
     transform: scale(1.08);
     box-shadow: 0 0 24px rgba(52, 211, 153, 0.5);
   }
+
   100% {
     transform: scale(1);
     box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
@@ -2177,9 +2276,11 @@ body::after {
   0% {
     box-shadow: 0 0 0 rgba(52, 211, 153, 0);
   }
+
   50% {
     box-shadow: 0 0 20px rgba(52, 211, 153, 0.4);
   }
+
   100% {
     box-shadow: 0 0 0 rgba(52, 211, 153, 0);
   }
@@ -2200,6 +2301,7 @@ body::after {
   from {
     box-shadow: 0 0 0 rgba(52, 211, 153, 0);
   }
+
   to {
     box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
   }
@@ -2260,6 +2362,7 @@ body::after {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -2269,6 +2372,7 @@ body::after {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -2279,6 +2383,7 @@ body::after {
     opacity: 0;
     transform: scale(0.6);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -2290,6 +2395,7 @@ body::after {
     opacity: 1;
     transform: scale(1);
   }
+
   to {
     opacity: 0;
     transform: scale(1.05);
@@ -2301,9 +2407,11 @@ body::after {
     transform: scale(0);
     opacity: 0;
   }
+
   60% {
     transform: scale(1.15);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -2677,4 +2785,190 @@ body::after {
   .plinko-board {
     min-height: 180px;
   }
+}
+
+/* ═══════════════════════════════════════════════
+   TUTORIAL OVERLAY
+   ═══════════════════════════════════════════════ */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s ease;
+  padding: 10px 10px 80px 10px;
+}
+
+.tutorial-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tutorial-overlay.dimmed {
+  background: radial-gradient(circle at center, transparent 40%, rgba(7, 6, 15, 0.45) 100%);
+}
+
+.tutorial-highlight {
+  /* Inherit existing position (absolute/relative/static) to prevent layout break */
+  z-index: 10002 !important;
+  box-shadow: 0 0 0 3px var(--accent1), 0 8px 16px rgba(0, 0, 0, 0.4) !important;
+  pointer-events: none;
+  animation: tutorialPulse 1.5s infinite alternate !important;
+}
+
+@keyframes tutorialPulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.02);
+  }
+}
+
+.tutorial-modal {
+  box-sizing: border-box;
+  background: rgba(18, 17, 24, 0.98);
+  border: 1px solid var(--accent1);
+  border-radius: 12px;
+  width: 95%;
+  /* Slightly wider to be safe */
+  max-width: 280px;
+  padding: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+  transform: translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10001;
+  overflow: hidden;
+}
+
+.tutorial-overlay.open .tutorial-modal {
+  transform: translateY(0);
+}
+
+.tutorial-step-content {
+  text-align: center;
+  animation: fadeInStep 0.3s ease;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tutorial-icon {
+  font-size: 42px;
+  /* Smaller icon */
+  margin-bottom: 12px;
+  display: block;
+}
+
+.tutorial-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  /* Smaller title */
+  font-weight: 900;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tutorial-text {
+  font-size: 12px;
+  /* Smaller text */
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.tutorial-footer {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  /* Wider side columns */
+  align-items: center;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.tutorial-dots {
+  grid-column: 2;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.tutorial-btn {
+  grid-row: 1;
+}
+
+#tutorialPrev {
+  grid-column: 1;
+}
+
+#tutorialNext {
+  grid-column: 3;
+}
+
+.tutorial-btn {
+  white-space: nowrap;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tutorial-btn.primary {
+  background: var(--accent1);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+}
+
+.tutorial-btn.primary:hover {
+  background: #d1a3ff;
+  transform: translateY(-2px);
+}
+
+.tutorial-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-mid);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+
+.tutorial-dot {
+  width: 6px;
+  /* Reduced from 8px */
+  height: 6px;
+  /* Reduced from 8px */
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+}
+
+.tutorial-dot.active {
+  background: var(--accent1);
+  transform: scale(1.2);
+  box-shadow: 0 0 10px var(--accent1);
 }

@@ -56,7 +56,9 @@ function getDefaultState() {
         settings: {
             audioEnabled: true,
             animationsEnabled: true,
+            autoDropEnabled: true,
             volume: 0.5,
+            tutorialSeen: false,
         },
 
         // Runtime (not saved)
@@ -212,7 +214,7 @@ function getBallsPerSecond() {
     return ((1000 / interval) * droppers * ballsPerDrop);
 }
 
-// ── Runtime State (not saved) ──
+// Runtime (not saved) ──
 const runtimeState = {
     feverActive: false,
     feverTimer: null,
@@ -223,4 +225,5 @@ const runtimeState = {
     coinPopQueue: [],
     recentCps: [],
     smoothCps: 0,
+    lastToastTime: 0, // Track last error toast time
 };
