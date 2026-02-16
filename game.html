@@ -104,11 +104,12 @@
           <!-- Bet Amount Selector -->
           <div class="bet-selector" id="betSelector">
             <button class="bet-btn" id="betDecrease" title="Decrease bet">−</button>
-            <div class="bet-display">
+            <div class="bet-display" id="betDisplay" title="Click to enter custom bet">
               <span class="bet-label">BET</span>
               <span class="bet-amount" id="betAmountDisplay">1</span>
             </div>
             <button class="bet-btn" id="betIncrease" title="Increase bet">+</button>
+            <button class="bet-btn max" id="betMax" title="Bet everything">MAX</button>
           </div>
 
           <!-- Floating manual drop button -->
@@ -367,63 +368,77 @@
               <span class="slider"></span>
             </label>
           </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-label">Information</div>
-          <div class="legal-links">
-            <button type="button" class="legal-link" id="privacyLink">Privacy Policy</button>
-            <button type="button" class="legal-link" id="termsLink">Terms of Service</button>
+          <div class="settings-group">
+            <div class="settings-label">Developer Tools</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button id="debugMoneyBtn"
+                style="padding: 8px; background: #ef4444; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">+100K
+                Coins</button>
+              <button id="debugGemsBtn"
+                style="padding: 8px; background: #a855f7; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">+100
+                Gems</button>
+              <button id="debugCooldownBtn"
+                style="grid-column: span 2; padding: 8px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">Reset
+                Cooldowns</button>
+            </div>
           </div>
-          <p class="settings-hint">Support: <a href="mailto:Plinkosupport@proton.me"
-              style="color:var(--gold); text-decoration:none;">Plinkosupport@proton.me</a></p>
-          <p class="settings-hint">Version 1.2.0</p>
+
+          <div class="settings-group">
+            <div class="settings-label">Information</div>
+            <div class="legal-links">
+              <button type="button" class="legal-link" id="privacyLink">Privacy Policy</button>
+              <button type="button" class="legal-link" id="termsLink">Terms of Service</button>
+            </div>
+            <p class="settings-hint">Support: <a href="mailto:Plinkosupport@proton.me"
+                style="color:var(--gold); text-decoration:none;">Plinkosupport@proton.me</a></p>
+            <p class="settings-hint">Version 1.2.0</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Legal Overlay -->
-  <div class="legal-overlay" id="legalOverlay" aria-hidden="true">
-    <div class="legal-modal">
-      <div class="legal-header">
-        <h2 class="legal-title" id="legalTitle">Legal</h2>
-        <button type="button" class="legal-close" id="legalClose">✕</button>
-      </div>
-      <div class="legal-body">
-        <iframe id="legalFrame" src=""></iframe>
+    <!-- Legal Overlay -->
+    <div class="legal-overlay" id="legalOverlay" aria-hidden="true">
+      <div class="legal-modal">
+        <div class="legal-header">
+          <h2 class="legal-title" id="legalTitle">Legal</h2>
+          <button type="button" class="legal-close" id="legalClose">✕</button>
+        </div>
+        <div class="legal-body">
+          <iframe id="legalFrame" src=""></iframe>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Matter.js physics engine -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+    <!-- Matter.js physics engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
 
-  <!-- Game modules -->
-  <script src="js/config.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/upgrades.js"></script>
-  <script src="js/prestige.js"></script>
-  <script src="js/events.js"></script>
-  <script src="js/board.js"></script>
-  <script src="js/renderer.js"></script>
-  <script src="js/effects.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/tutorial.js"></script>
-  <script src="js/daily.js"></script>
-  <script src="js/shop.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/monetization.js"></script>
-  <script src="js/main.js"></script>
+    <!-- Game modules -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/upgrades.js"></script>
+    <script src="js/prestige.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/daily.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/monetization.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/main.js"></script>
 
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').then(() => {
-        console.log('Service Worker registered');
-      }).catch(err => console.warn('SW registration failed:', err));
-    }
-  </script>
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(() => {
+          console.log('Service Worker registered');
+        }).catch(err => console.warn('SW registration failed:', err));
+      }
+    </script>
 </body>
 
 </html>

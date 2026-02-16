@@ -197,8 +197,8 @@ function renderSlotTray(rows) {
         // Calculate actual displayed value
         let val = +(baseMult * boost).toFixed(2);
 
-        // Hard cap center bins at 0.75
-        if (i === 5 || i === 6) {
+        // Hard cap bins originally < 1 at 0.75
+        if (baseMult < 1) {
             val = Math.min(val, 0.75);
         }
 
@@ -654,7 +654,7 @@ function initManualDrop() {
 
 // ── Offline Earnings Toast ──
 function showOfflineEarnings(coins, timeAway) {
-    if (coins <= 0) return;
+    if (coins === 0) return;
 
     const toast = document.getElementById('offlineToast');
     const msg = document.getElementById('offlineMsg');
@@ -666,7 +666,13 @@ function showOfflineEarnings(coins, timeAway) {
     const mins = Math.floor((timeAway % 3600000) / 60000);
     const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
-    msg.innerHTML = `Earned <strong style="color:var(--gold)">+${formatNumber(Math.floor(coins))} coins</strong> while away (${timeStr})`;
+    const isLoss = coins < 0;
+    const absCoins = Math.abs(coins);
+    const verb = isLoss ? 'Lost' : 'Earned';
+    const color = isLoss ? 'var(--danger)' : 'var(--gold)';
+    const sign = isLoss ? '-' : '+';
+
+    msg.innerHTML = `${verb} <strong style="color:${color}">${sign}${formatNumber(Math.floor(absCoins))} coins</strong> while away (${timeStr})`;
     toast.style.display = 'flex';
 
     if (closeBtn) {
@@ -685,31 +691,38 @@ function showOfflineEarnings(coins, timeAway) {
 function initBetSelector() {
     const decreaseBtn = document.getElementById('betDecrease');
     const increaseBtn = document.getElementById('betIncrease');
-    const betDisplay = document.getElementById('betAmountDisplay');
-
-    // Bet amounts that can be selected
-    const betAmounts = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+    const maxBtn = document.getElementById('betMax');
+    const betDisplay = document.getElementById('betDisplay');
+    const betAmountText = document.getElementById('betAmountDisplay');
 
     function updateBetDisplay() {
-        if (betDisplay) {
-            betDisplay.textContent = formatNumber(gameState.currentBet);
+        if (betAmountText) {
+            betAmountText.textContent = formatNumber(gameState.currentBet);
         }
         // Update button states
         if (decreaseBtn) {
-            const currentIndex = betAmounts.indexOf(gameState.currentBet);
-            decreaseBtn.disabled = currentIndex <= 0;
-        }
-        if (increaseBtn) {
-            const currentIndex = betAmounts.indexOf(gameState.currentBet);
-            increaseBtn.disabled = currentIndex >= betAmounts.length - 1;
+            decreaseBtn.disabled = gameState.currentBet <= 1;
         }
     }
 
     if (decreaseBtn) {
         decreaseBtn.addEventListener('click', () => {
-            const currentIndex = betAmounts.indexOf(gameState.currentBet);
-            if (currentIndex > 0) {
-                gameState.currentBet = betAmounts[currentIndex - 1];
+            if (gameState.currentBet > 1) {
+                // If it's a large number, decrease by a significant amount (10%)
+                if (gameState.currentBet > 100) {
+                    gameState.currentBet = Math.max(1, Math.floor(gameState.currentBet / 2));
+                } else {
+                    // Standard small increments
+                    const steps = [1, 5, 10, 25, 50, 100];
+                    const idx = steps.findIndex(s => s >= gameState.currentBet);
+                    if (idx > 0) {
+                        gameState.currentBet = steps[idx - 1];
+                    } else if (idx === -1) {
+                        gameState.currentBet = 100;
+                    } else {
+                        gameState.currentBet = 1;
+                    }
+                }
                 updateBetDisplay();
             }
         });
@@ -717,10 +730,44 @@ function initBetSelector() {
 
     if (increaseBtn) {
         increaseBtn.addEventListener('click', () => {
-            const currentIndex = betAmounts.indexOf(gameState.currentBet);
-            if (currentIndex < betAmounts.length - 1) {
-                gameState.currentBet = betAmounts[currentIndex + 1];
+            // Cap at current coins
+            if (gameState.currentBet < gameState.coins) {
+                if (gameState.currentBet >= 100) {
+                    gameState.currentBet = Math.min(Math.floor(gameState.coins), gameState.currentBet * 2);
+                } else {
+                    const steps = [1, 5, 10, 25, 50, 100];
+                    const idx = steps.findIndex(s => s > gameState.currentBet);
+                    if (idx !== -1) {
+                        gameState.currentBet = steps[idx];
+                    } else {
+                        gameState.currentBet = 200; // Start doubling from 100
+                    }
+                }
                 updateBetDisplay();
+            }
+        });
+    }
+
+    if (maxBtn) {
+        maxBtn.addEventListener('click', () => {
+            if (gameState.coins >= 1) {
+                gameState.currentBet = Math.floor(gameState.coins);
+                updateBetDisplay();
+            }
+        });
+    }
+
+    if (betDisplay) {
+        betDisplay.style.cursor = 'pointer';
+        betDisplay.addEventListener('click', () => {
+            const input = prompt('Enter bet amount (Min: 1, Max: ' + formatNumber(Math.floor(gameState.coins)) + '):', gameState.currentBet);
+            if (input !== null) {
+                const val = parseInt(input.replace(/,/g, ''));
+                if (!isNaN(val) && val >= 1) {
+                    gameState.currentBet = Math.min(val, Math.floor(gameState.coins || 1));
+                    if (gameState.currentBet < 1) gameState.currentBet = 1;
+                    updateBetDisplay();
+                }
             }
         });
     }

@@ -7,10 +7,10 @@ const SHOP_ITEMS = [
     { id: 'coin_med', icon: '💰', name: 'Coin Pack M', desc: '25,000 Coins', price: '💎 40', cost: 40, type: 'gems', give: 'coins', amount: 25000 },
     { id: 'coin_lg', icon: '🏦', name: 'Coin Pack L', desc: '100,000 Coins', price: '💎 120', cost: 120, type: 'gems', give: 'coins', amount: 100000 },
     { id: 'bin_doubler', icon: '🎰', name: 'Bin Doubler', desc: 'Permanently double all bin values', price: '💎 100', cost: 100, type: 'gems', give: 'upgrade' },
-    { id: 'ball_rain', icon: '🌧️', name: 'Ball Rain', desc: '1,000 balls with edge gravity', price: '💎 10', cost: 10, type: 'gems', give: 'rain' },
+    { id: 'ball_rain', icon: '🌧️', name: 'Ball Rain', desc: '1,000 balls drop sequentially', price: '💎 50', cost: 50, type: 'gems', give: 'rain' },
     { id: 'drop_doubler', icon: '⚡', name: 'Drop Doubler', desc: 'Permanently double ball drop rate', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade' },
     { id: 'event_extender', icon: '⏱️', name: 'Event Extender', desc: 'All events last +15s (Max 5m)', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade' },
-    { id: 'ball_storm', icon: '🌪️', name: 'Ball Storm', desc: 'Drop 50 balls instantly!', price: '💎 15', cost: 15, type: 'gems', give: 'storm', amount: 50 },
+    { id: 'ball_storm', icon: '🌪️', name: 'Ball Storm', desc: '50 balls drop sequentially (Bet: 10)', price: '💎 15', cost: 15, type: 'gems', give: 'storm', amount: 50 },
     { id: 'lucky_pack', icon: '🍀', name: 'Lucky Pack', desc: '10 guaranteed golden balls', price: '💎 20', cost: 20, type: 'gems', give: 'lucky', amount: 10 },
     { id: 'fever_now', icon: '🔥', name: 'Instant Fever', desc: 'Trigger Fever Mode now!', price: '💎 25', cost: 25, type: 'gems', give: 'fever', amount: 1 },
 ];
@@ -109,9 +109,7 @@ function renderShopView() {
             if (item.give === 'coins') {
                 gameState.coins += item.amount;
             } else if (item.give === 'storm') {
-                for (let i = 0; i < item.amount; i++) {
-                    setTimeout(() => spawnBall(null, 15), i * 40);
-                }
+                if (typeof triggerBallStorm === 'function') triggerBallStorm();
             } else if (item.give === 'lucky') {
                 for (let i = 0; i < item.amount; i++) {
                     setTimeout(() => spawnBall(null, 15, true), i * 100);

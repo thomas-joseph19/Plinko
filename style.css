@@ -1260,6 +1260,19 @@ body::after {
   font-family: var(--font-pixel);
 }
 
+.bet-btn.max {
+  width: auto;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+}
+
+.bet-display:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
 /* Toast Animation */
 @keyframes toastSlide {
   from {
