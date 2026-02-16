@@ -56,6 +56,7 @@ function getDefaultState() {
         settings: {
             audioEnabled: true,
             animationsEnabled: true,
+            autoDropEnabled: true,
             volume: 0.5,
             tutorialSeen: false,
         },

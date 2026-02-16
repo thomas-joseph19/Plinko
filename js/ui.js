@@ -13,6 +13,7 @@ function initSettings() {
     const audioToggle = document.getElementById('audioToggle');
     const volumeSlider = document.getElementById('volumeSlider');
     const animationToggle = document.getElementById('animationToggle');
+    const autoDropToggle = document.getElementById('autoDropToggle');
 
     function openSettings(e) {
         if (e) {
@@ -33,6 +34,7 @@ function initSettings() {
             if (volumeValue) volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
         }
         if (animationToggle) animationToggle.checked = gameState.settings.animationsEnabled;
+        if (autoDropToggle) autoDropToggle.checked = gameState.settings.autoDropEnabled !== false;
     }
 
     function closeSettings() {
@@ -101,6 +103,18 @@ function initSettings() {
     if (animationToggle) {
         animationToggle.addEventListener('change', () => {
             gameState.settings.animationsEnabled = animationToggle.checked;
+            saveGame();
+        });
+    }
+
+    if (autoDropToggle) {
+        autoDropToggle.addEventListener('change', () => {
+            gameState.settings.autoDropEnabled = autoDropToggle.checked;
+            if (gameState.settings.autoDropEnabled) {
+                if (typeof startAutoDroppers === 'function') startAutoDroppers();
+            } else {
+                if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
+            }
             saveGame();
         });
     }

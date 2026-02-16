@@ -460,6 +460,7 @@ let dropTimers = [];
 
 function startAutoDroppers() {
     stopAutoDroppers();
+    if (!gameState.settings.autoDropEnabled) return;
 
     const dropperCount = getDropperCount();
     const interval = getDropInterval();
