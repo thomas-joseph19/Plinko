@@ -689,73 +689,72 @@ body::after {
   position: relative;
 }
 
-/* ─── Pixel Art Dropper ─── */
+/* ─── Pixel Art Dropper (Robust) ─── */
+.drop-zone {
+  /* Ensure header stack is highest */
+  position: relative;
+  z-index: 50;
+  /* Other styles inherited: flex, gap, etc. */
+}
+
 .dropper-nozzle {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 32px;
-  height: 32px;
-  z-index: 20;
+  height: 44px;
+  /* Taller to hang down */
   pointer-events: none;
-  image-rendering: pixelated;
-  transition: left 0.1s linear;
-  /* Responsive movement */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: left 0.08s linear;
+  /* Slightly faster tracking */
 }
 
-/* Pixel Art Structure using pseudo-elements */
-.dropper-nozzle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 4px;
-  /* Center the pipe */
+/* Gray Pipe Body */
+.dropper-pipe {
   width: 24px;
-  height: 24px;
-  background: #333;
-  /* Pixel borders and details */
-  box-shadow:
-    inset 4px 0 0 #555,
-    /* Highlight */
-    inset -4px 0 0 #111,
-    /* Shadow */
-    0 0 0 2px #000;
-  /* Outline */
+  height: 32px;
+  background-color: #444;
+  border: 4px solid #222;
+  /* Thick pixel border */
+  border-bottom: none;
+  box-shadow: inset 4px 0 0 rgba(255, 255, 255, 0.1);
 }
 
-.dropper-nozzle::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
+/* Golden Tip */
+.dropper-tip {
   width: 32px;
-  height: 8px;
-  background: var(--gold);
-  /* Gold tip details */
-  box-shadow:
-    inset 0 4px 0 rgba(255, 255, 255, 0.4),
-    /* Shine */
-    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
-    /* Shadow */
-    0 4px 0 #000;
-  /* Bottom Outline */
+  height: 12px;
+  background-color: var(--gold);
+  border: 4px solid #222;
+  /* Thick pixel border */
+  border-top: none;
+  margin-top: -4px;
+  /* Connect seamlessly */
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+  /* Tip above pipe */
 }
 
-/* Firing Animation - Quick pixel bounce */
+/* Firing Animation - Quick pixel jolt */
 .dropper-nozzle.active {
-  animation: pixelRecoil 0.15s steps(2, end);
+  animation: pixelSnap 0.15s steps(2, end);
 }
 
-@keyframes pixelRecoil {
+@keyframes pixelSnap {
   0% {
     transform: translateX(-50%) translateY(0);
   }
 
   50% {
-    transform: translateX(-50%) translateY(-4px);
+    transform: translateX(-50%) translateY(-6px);
   }
 
+  /* Kick up */
   100% {
     transform: translateX(-50%) translateY(0);
   }
