@@ -213,20 +213,28 @@ function renderShopView() {
             noAdsBtn.addEventListener('click', () => window.Monetization.purchaseNoAds());
             specialGrid.appendChild(noAdsBtn);
         }
+        // Scale ad reward with progression: 1% of lifetime earnings, capped 500–50K
+        const cleanSteps = [500, 1000, 2500, 5000, 10000, 25000, 50000];
+        const rawReward = Math.max(500, Math.min(50000, Math.floor((gameState.totalCoinsEarned + gameState.totalCoinsAllTime) * 0.01)));
+        const adReward = cleanSteps.reduce((best, s) => s <= rawReward ? s : best, 500);
+        const adRewardText = adReward >= 1000 ? `${(adReward / 1000)}K` : String(adReward);
+
         const watchAdBtn = document.createElement('div');
         watchAdBtn.className = 'shop-item ad-item';
         watchAdBtn.innerHTML = `
             <div class="shop-item-icon">🎁</div>
             <div class="shop-item-name">Watch Ad</div>
-            <div class="shop-item-desc">+500 Coins</div>
+            <div class="shop-item-desc">+${adRewardText} Coins</div>
             <div class="shop-item-price">FREE</div>
         `;
         watchAdBtn.addEventListener('click', () => {
+            // Recalculate at click time in case stats changed
+            const reward = cleanSteps.reduce((best, s) => s <= Math.max(500, Math.min(50000, Math.floor((gameState.totalCoinsEarned + gameState.totalCoinsAllTime) * 0.01))) ? s : best, 500);
             window.Monetization.showRewardedAd(() => {
-                gameState.coins += 500;
+                gameState.coins += reward;
                 if (typeof updateStatsPanel === 'function') updateStatsPanel();
                 if (typeof saveGame === 'function') saveGame();
-                if (typeof showToast === 'function') showToast('🎁 +500 Coins!', 'info');
+                if (typeof showToast === 'function') showToast(`🎁 +${reward >= 1000 ? (reward / 1000) + 'K' : reward} Coins!`, 'info');
             }, () => {
                 if (typeof showToast === 'function') showToast('Ad cancelled', 'error');
             });
