@@ -1448,6 +1448,133 @@ body::after {
   font-family: var(--font-pixel);
 }
 
+/* ── Bet Unlock Animation ── */
+@keyframes betUnlockPulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  70% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bet-unlock-animate {
+  animation: betUnlockPulse 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), 0 0 40px rgba(212, 175, 55, 0.2);
+}
+
+/* ── Unlock Modal ── */
+.unlock-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: shopConfirmIn 0.25s ease;
+}
+
+.unlock-modal {
+  background: linear-gradient(180deg, #1e1d2a, #13121c);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 55, 0.1);
+  animation: shopDialogPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.unlock-modal-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.unlock-modal-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.unlock-modal-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-bright);
+  margin: 0 0 12px;
+}
+
+.unlock-modal-text {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.unlock-modal-text strong {
+  color: var(--gold);
+}
+
+.unlock-modal-tips {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 14px 0 18px;
+  text-align: left;
+}
+
+.unlock-tip {
+  font-size: 12px;
+  color: var(--text-mid);
+  padding: 4px 0;
+  line-height: 1.5;
+}
+
+.unlock-modal-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.unlock-modal-btn:hover {
+  background: rgba(212, 175, 55, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+}
+
 /* Toast Animation */
 @keyframes toastSlide {
   from {

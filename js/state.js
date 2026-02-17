@@ -8,7 +8,7 @@ const SAVE_KEY = 'plinko_infinity_save';
 function getDefaultState() {
     return {
         // Currencies
-        coins: 100,
+        coins: 1000,
         gems: 0,
         totalCoinsEarned: 0,
         totalCoinsAllTime: 0,
@@ -64,6 +64,7 @@ function getDefaultState() {
             autoDropEnabled: true,
             volume: 0.5,
             tutorialSeen: false,
+            bettingUnlocked: false,
         },
 
         // Runtime (not saved)

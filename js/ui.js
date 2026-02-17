@@ -410,6 +410,9 @@ function updateStatsPanel() {
     // Clamp bet to coins (if coins dropped below current bet)
     if (typeof window.updateBetDisplay === 'function') window.updateBetDisplay();
 
+    // ── Betting Unlock Check ──
+    checkBettingUnlock();
+
     // Prestige teaser (both old and new)
     const tokens = calculatePrestigeTokens();
     ['prestigeTeaserSub', 'prestigeTeaserSub2'].forEach(id => {
@@ -801,8 +804,78 @@ function initBetSelector() {
 
     // Initialize display
     updateBetDisplay();
+
+    // Hide bet selector if not yet unlocked
+    const betSel = document.getElementById('betSelector');
+    if (betSel && !gameState.settings.bettingUnlocked) {
+        betSel.style.display = 'none';
+    }
 }
 
+// ── Betting Unlock System ──
+const BETTING_UNLOCK_THRESHOLD = 10000;
+let _bettingUnlockShown = false;
+
+function checkBettingUnlock() {
+    if (gameState.settings.bettingUnlocked) return;
+    if (_bettingUnlockShown) return;
+    if (gameState.totalCoinsEarned >= BETTING_UNLOCK_THRESHOLD) {
+        _bettingUnlockShown = true;
+        gameState.settings.bettingUnlocked = true;
+
+        // Reveal bet selector with animation
+        const betSel = document.getElementById('betSelector');
+        if (betSel) {
+            betSel.style.display = '';
+            betSel.classList.add('bet-unlock-animate');
+            setTimeout(() => betSel.classList.remove('bet-unlock-animate'), 1500);
+        }
+
+        // Confetti burst
+        if (typeof spawnConfetti === 'function') {
+            spawnConfetti(window.innerWidth / 2, window.innerHeight / 2);
+        }
+
+        // Show unlock modal
+        showBettingUnlockModal();
+
+        if (typeof saveGame === 'function') saveGame();
+    }
+}
+
+function showBettingUnlockModal() {
+    const existing = document.querySelector('.unlock-modal-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'unlock-modal-overlay';
+    overlay.innerHTML = `
+        <div class="unlock-modal">
+            <div class="unlock-modal-icon">🎲</div>
+            <div class="unlock-modal-badge">NEW FEATURE</div>
+            <h2 class="unlock-modal-title">Betting Unlocked!</h2>
+            <p class="unlock-modal-text">
+                You've earned <strong>10,000 coins</strong> — nice work!
+            </p>
+            <p class="unlock-modal-text">
+                You can now <strong>change your bet amount</strong> using the selector above the board. Higher bets mean bigger wins — but also bigger losses!
+            </p>
+            <div class="unlock-modal-tips">
+                <div class="unlock-tip">➖ ➕ Tap to adjust bet</div>
+                <div class="unlock-tip">🎯 Tap the number to type a custom bet</div>
+                <div class="unlock-tip">⚠️ Bet is capped at your coin balance</div>
+            </div>
+            <button class="unlock-modal-btn" id="unlockModalClose">Got it!</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+    document.getElementById('unlockModalClose').addEventListener('click', () => overlay.remove());
+}
 // Toast notification helper
 function showToast(message, type = 'info') {
     // Create toast element
