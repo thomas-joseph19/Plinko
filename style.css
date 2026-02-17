@@ -689,67 +689,139 @@ body::after {
   position: relative;
 }
 
-/* Dropper Nozzle */
+/* ─── Dropper Cannon (Redesigned) ─── */
 .dropper-nozzle {
   position: absolute;
-  top: -4px;
+  top: -25px;
+  /* Hover above board */
   left: 50%;
+  /* Default center, overridden by JS */
   transform: translateX(-50%);
-  width: 32px;
-  height: 38px;
-  z-index: 10;
+  width: 40px;
+  height: 50px;
+  z-index: 20;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: left 0.1s ease-out;
+  /* Smooth slide to spawn position */
 }
 
+/* Cannon Body */
 .dropper-pipe {
-  width: 14px;
-  height: 20px;
-  background: linear-gradient(90deg, #1a1a1a, #333 40%, #1a1a1a);
-  border: 1px solid #444;
+  width: 24px;
+  height: 32px;
+  background: linear-gradient(180deg, #111, #222 40%, #111);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  position: relative;
 }
 
+/* Gold Band Detail */
+.dropper-pipe::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: linear-gradient(90deg, #b8860b, var(--gold), #b8860b);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+/* Emitter Tip */
 .dropper-tip {
-  width: 28px;
-  height: 18px;
-  background: linear-gradient(180deg, var(--gold) 0%, #b8860b 100%);
-  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  width: 36px;
+  height: 14px;
+  background: linear-gradient(180deg, #333, #000);
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow: visible;
 }
 
+/* Ball Preview (Inside Cannon) */
 .dropper-ball-preview {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background: radial-gradient(circle at 30% 30%, #fff, var(--gold));
   border-radius: 50%;
-  box-shadow: 0 0 5px var(--gold);
-  opacity: 0.8;
+  box-shadow: 0 0 8px var(--gold);
+  margin-top: -6px;
+  /* Hide slightly inside tip */
+  opacity: 0;
+  /* Hidden until "reloaded" state, effectively handled by animation */
+  transform: scale(0);
+}
+
+/* ── Firing Animation ── */
+.dropper-nozzle.active .dropper-pipe {
+  animation: cannonRecoil 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .dropper-nozzle.active .dropper-ball-preview {
-  animation: dropShoot 0.15s forwards;
+  /* Shoot ball out */
+  animation: ballShoot 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-@keyframes dropShoot {
+/* Muzzle Flash */
+.dropper-nozzle.active .dropper-tip::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+  animation: muzzleFlash 0.1s ease-out;
+  pointer-events: none;
+}
+
+@keyframes cannonRecoil {
+  0% {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: translateY(-6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes ballShoot {
   0% {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
 
-  50% {
-    transform: translateY(10px) scale(0.8);
+  20% {
     opacity: 1;
   }
 
   100% {
-    transform: translateY(20px) scale(0.5);
+    transform: translateY(40px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes muzzleFlash {
+  0% {
+    transform: translateX(-50%) scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-50%) scale(1.5);
     opacity: 0;
   }
 }
