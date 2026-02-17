@@ -6,15 +6,17 @@ import Constants from 'expo-constants';
 import Purchases from 'react-native-purchases';
 
 // ─── CONFIGURATION ───
-// TODO: Replace this with your actual Vercel/Netlify URL after deploying
-const PROD_URL = 'https://your-plinko-game.vercel.app/game.html';
+// Offline Mode: We bundle the game into a single JS string to avoid external hosting
+import bundledGameHtml from './dist/game_bundled.js';
 
 const debuggerHost = Constants.expoConfig?.hostUri;
 const localIp = debuggerHost ? debuggerHost.split(':')[0] : 'localhost';
 const devUrl = `http://${localIp}:5173/game.html`;
 
-// Use Dev URL if running locally, otherwise Prod URL
-const gameUrl = __DEV__ ? devUrl : PROD_URL;
+// Use Dev URL if running locally (npm run dev), otherwise use Bundled HTML (Offline Mode)
+const webViewSource = __DEV__
+    ? { uri: devUrl }
+    : { html: bundledGameHtml, baseUrl: '' };
 
 // RevenueCat Config
 const RC_API_KEYS = {
@@ -90,7 +92,7 @@ export default function App() {
             <View style={styles.container}>
                 <WebView
                     ref={webViewRef}
-                    source={{ uri: gameUrl }}
+                    source={webViewSource}
                     style={styles.webview}
                     onMessage={handleMessage}
                     allowsBackForwardNavigationGestures
@@ -100,6 +102,7 @@ export default function App() {
                     mediaPlaybackRequiresUserAction={false}
                     scrollEnabled={false}
                     bounces={false}
+                    originWhitelist={['*']}
                 />
             </View>
         </SafeAreaView>
