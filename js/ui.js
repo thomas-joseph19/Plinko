@@ -404,9 +404,11 @@ function updateStatsPanel() {
     setTextIfChanged('statRows2', rowsText);
     setTextIfChanged('statPrestige', prestigeText);
     setTextIfChanged('statPrestige2', prestigeText);
-    // Currency displays
     setTextIfChanged('coinDisplay', formatNumber(Math.floor(gameState.coins)));
     setTextIfChanged('gemDisplay', formatNumber(gameState.gems));
+
+    // Clamp bet to coins (if coins dropped below current bet)
+    if (typeof window.updateBetDisplay === 'function') window.updateBetDisplay();
 
     // Prestige teaser (both old and new)
     const tokens = calculatePrestigeTokens();
@@ -712,14 +714,23 @@ function initBetSelector() {
     const betAmountText = document.getElementById('betAmountDisplay');
 
     function updateBetDisplay() {
+        // Clamp bet: if coins dropped below bet, reduce bet
+        if (gameState.currentBet > Math.max(1, Math.floor(gameState.coins)) && gameState.coins > 0) {
+            gameState.currentBet = Math.max(1, Math.floor(gameState.coins));
+        }
+        if (gameState.coins <= 0 && gameState.currentBet > 1) {
+            gameState.currentBet = 1;
+        }
         if (betAmountText) {
             betAmountText.textContent = formatNumber(gameState.currentBet);
         }
-        // Update button states
         if (decreaseBtn) {
             decreaseBtn.disabled = gameState.currentBet <= 1;
         }
     }
+
+    // Expose globally so prestige/other systems can trigger it
+    window.updateBetDisplay = updateBetDisplay;
 
     if (decreaseBtn) {
         decreaseBtn.addEventListener('click', () => {
