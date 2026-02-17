@@ -689,10 +689,69 @@ body::after {
   position: relative;
 }
 
-.dropper-indicators {
+/* Dropper Nozzle */
+.dropper-nozzle {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 48px;
+  z-index: 10;
+  pointer-events: none;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
   align-items: center;
+}
+
+.dropper-pipe {
+  width: 14px;
+  height: 20px;
+  background: linear-gradient(90deg, #1a1a1a, #333 40%, #1a1a1a);
+  border: 1px solid #444;
+  border-bottom: none;
+}
+
+.dropper-tip {
+  width: 28px;
+  height: 18px;
+  background: linear-gradient(180deg, var(--gold) 0%, #b8860b 100%);
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dropper-ball-preview {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--gold));
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--gold);
+  opacity: 0.8;
+}
+
+.dropper-nozzle.active .dropper-ball-preview {
+  animation: dropShoot 0.15s forwards;
+}
+
+@keyframes dropShoot {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(10px) scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(20px) scale(0.5);
+    opacity: 0;
+  }
 }
 
 .drop-indicator {

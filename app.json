@@ -15,9 +15,13 @@
             "**/*"
         ],
         "ios": {
-            "supportsTablet": true
+            "supportsTablet": true,
+            "bundleIdentifier": "com.plinko.infinity",
+            "buildNumber": "1.0.0"
         },
         "android": {
+            "package": "com.plinko.infinity",
+            "versionCode": 1,
             "adaptiveIcon": {
                 "foregroundImage": "./icons/icon.svg",
                 "backgroundColor": "#14102a"

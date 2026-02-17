@@ -5,9 +5,16 @@ import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
 import Purchases from 'react-native-purchases';
 
-const debuggerHost = Constants.expoConfig?.hostUri || 'localhost:5173';
-const localIp = debuggerHost.split(':')[0];
-const gameUrl = `http://${localIp}:5173/game.html`;
+// ─── CONFIGURATION ───
+// TODO: Replace this with your actual Vercel/Netlify URL after deploying
+const PROD_URL = 'https://your-plinko-game.vercel.app/game.html';
+
+const debuggerHost = Constants.expoConfig?.hostUri;
+const localIp = debuggerHost ? debuggerHost.split(':')[0] : 'localhost';
+const devUrl = `http://${localIp}:5173/game.html`;
+
+// Use Dev URL if running locally, otherwise Prod URL
+const gameUrl = __DEV__ ? devUrl : PROD_URL;
 
 // RevenueCat Config
 const RC_API_KEYS = {
