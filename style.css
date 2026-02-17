@@ -692,11 +692,11 @@ body::after {
 /* Dropper Nozzle */
 .dropper-nozzle {
   position: absolute;
-  top: -2px;
+  top: -4px;
   left: 50%;
   transform: translateX(-50%);
   width: 32px;
-  height: 48px;
+  height: 38px;
   z-index: 10;
   pointer-events: none;
   display: flex;
@@ -754,54 +754,7 @@ body::after {
   }
 }
 
-.drop-indicator {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), var(--accent3));
-  box-shadow: 0 0 10px var(--glow-g);
-  cursor: pointer;
-  transition: transform 0.15s;
-  animation: dropPulse 2s ease-in-out infinite;
-}
-
-.drop-indicator:nth-child(2) {
-  animation-delay: 0.4s;
-}
-
-.drop-indicator:nth-child(3) {
-  animation-delay: 0.8s;
-}
-
-.drop-indicator:nth-child(4) {
-  animation-delay: 1.2s;
-}
-
-.drop-indicator:nth-child(5) {
-  animation-delay: 1.6s;
-}
-
-@keyframes dropPulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-  }
-}
-
-.drop-indicator.firing {
-  animation: none !important;
-  transform: scale(1.5);
-  opacity: 1;
-  box-shadow: 0 0 18px var(--glow-g);
-  transition: transform 0.08s, box-shadow 0.08s;
-}
+/* Old orbs removed (replaced by nozzle) */
 
 .drop-label {
   font-size: 10px;

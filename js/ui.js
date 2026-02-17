@@ -237,11 +237,9 @@ function renderDroppers() {
     const count = getDropperCount();
     container.innerHTML = '';
 
-    for (let i = 0; i < count; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'drop-indicator';
-        container.appendChild(dot);
-    }
+    // Old orb indicators removed in favor of single nozzle animation
+    container.innerHTML = '';
+    // We only update the text label now
 
     if (label) {
         const bps = getBallsPerSecond().toFixed(1);
