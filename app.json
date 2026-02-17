@@ -1,34 +1,42 @@
 {
-    "expo": {
-        "name": "Plinko Infinity",
-        "slug": "plinko-infinity",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./icons/icon.svg",
-        "userInterfaceStyle": "dark",
-        "splash": {
-            "image": "./icons/icon.svg",
-            "resizeMode": "contain",
-            "backgroundColor": "#14102a"
-        },
-        "assetBundlePatterns": [
-            "**/*"
-        ],
-        "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.plinko.infinity",
-            "buildNumber": "1.0.0"
-        },
-        "android": {
-            "package": "com.plinko.infinity",
-            "versionCode": 1,
-            "adaptiveIcon": {
-                "foregroundImage": "./icons/icon.svg",
-                "backgroundColor": "#14102a"
-            }
-        },
-        "web": {
-            "favicon": "./icons/icon.svg"
-        }
+  "expo": {
+    "name": "Plinko Infinity",
+    "slug": "plinko-infinity",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icons/icon.svg",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./icons/icon.svg",
+      "resizeMode": "contain",
+      "backgroundColor": "#14102a"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sevens.plinko.infinity",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.sevens.plinko.infinity",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./icons/icon.svg",
+        "backgroundColor": "#14102a"
+      }
+    },
+    "web": {
+      "favicon": "./icons/icon.svg"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c87f2f2e-d3a6-420b-afdf-ff8c79904813"
+      }
     }
+  }
 }
