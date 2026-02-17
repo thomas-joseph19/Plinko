@@ -218,13 +218,15 @@ function renderShopView() {
         watchAdBtn.innerHTML = `
             <div class="shop-item-icon">🎁</div>
             <div class="shop-item-name">Watch Ad</div>
-            <div class="shop-item-desc">+50 Balls free</div>
+            <div class="shop-item-desc">+500 Coins</div>
             <div class="shop-item-price">FREE</div>
         `;
         watchAdBtn.addEventListener('click', () => {
             window.Monetization.showRewardedAd(() => {
-                for (let i = 0; i < 50; i++) setTimeout(() => spawnBall(null, 15, false, null, true), i * 50);
-                if (typeof showToast === 'function') showToast('🎁 +50 Balls delivered!', 'info');
+                gameState.coins += 500;
+                if (typeof updateStatsPanel === 'function') updateStatsPanel();
+                if (typeof saveGame === 'function') saveGame();
+                if (typeof showToast === 'function') showToast('🎁 +500 Coins!', 'info');
             }, () => {
                 if (typeof showToast === 'function') showToast('Ad cancelled', 'error');
             });
