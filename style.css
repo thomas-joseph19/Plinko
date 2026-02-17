@@ -483,7 +483,7 @@ body::after {
   height: 100dvh;
   display: grid;
   /* HUD height: safe area + base size (64px) */
-  grid-template-rows: calc(var(--sat) + 64px) 1fr var(--tab-h) auto;
+  grid-template-rows: calc(var(--sat) + 64px) 1fr var(--tab-h);
   grid-template-columns: 1fr;
   width: 100%;
   margin: 0 auto;
@@ -2309,56 +2309,223 @@ body::after {
   }
 }
 
-/* ─── Shop section ─── */
+/* ─── Shop — Column layout, minimal scroll ─── */
+.shop-view .panel-scroll {
+  padding-bottom: 20px;
+}
+
+.shop-view .panel-header {
+  margin-bottom: 12px;
+}
+
+.shop-view .panel-title {
+  color: var(--text-bright);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+  font-size: 1.25rem;
+}
+
+.shop-view .panel-subtitle {
+  color: var(--text-mid);
+  font-size: 0.75rem;
+}
+
+.shop-view #shopItems {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.shop-section {
+  margin: 0;
+}
+
+.shop-section .category-label {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.shop-section .shop-label-special {
+  color: var(--accent2);
+}
+
 .shop-category {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+/* 2 cols: Special (No Ads + Watch Ad) */
+.shop-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* 4 cols: Gem Shop items */
+.shop-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* 3 cols: Buy Gems packs */
+.shop-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .shop-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .shop-item {
-  background: var(--bg-panel);
+  background: linear-gradient(165deg, var(--bg-card) 0%, var(--bg-panel) 100%);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 12px;
+  padding: 10px 8px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  min-height: 0;
+}
+
+.shop-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--accent3));
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  border-radius: 12px 0 0 12px;
 }
 
 .shop-item:hover {
-  border-color: rgba(192, 132, 252, 0.4);
+  border-color: rgba(212, 175, 55, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3), 0 0 16px var(--glow-v);
+}
+
+.shop-item:hover::before {
+  opacity: 1;
+}
+
+.shop-item:active {
+  transform: translateY(0);
+}
+
+.shop-item-unaffordable {
+  opacity: 0.5;
+  filter: grayscale(0.65);
+  pointer-events: none;
+  cursor: default;
+}
+
+.shop-item-unaffordable .shop-item-price {
+  color: var(--text-dim);
 }
 
 .shop-item-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: rgba(212, 175, 55, 0.14);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.22);
 }
 
 .shop-item-name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-bright);
   margin-bottom: 2px;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
 }
 
 .shop-item-desc {
-  font-size: 10px;
-  color: var(--text-dim);
+  font-size: 9px;
+  color: var(--text-mid);
   margin-bottom: 8px;
   line-height: 1.3;
+  min-height: 2.4em;
 }
 
 .shop-item-price {
   font-family: 'Orbitron', monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  color: var(--accent1);
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.16);
+  padding: 4px 10px;
+  border-radius: 14px;
+  display: inline-block;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+}
+
+/* Premium / No Ads */
+.shop-item.premium-item,
+.shop-item.remove-ads-btn {
+  background: linear-gradient(165deg, rgba(212, 175, 55, 0.1) 0%, var(--bg-card) 50%);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.shop-item.premium-item::before,
+.shop-item.remove-ads-btn::before {
+  opacity: 1;
+  width: 4px;
+}
+
+.shop-item.premium-item .shop-item-icon,
+.shop-item.remove-ads-btn .shop-item-icon {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+/* Free / Ad */
+.shop-item.ad-item {
+  border-color: rgba(92, 184, 92, 0.35);
+}
+
+.shop-item.ad-item::before {
+  background: linear-gradient(180deg, var(--success), #4a8a5a);
+  opacity: 0.9;
+}
+
+.shop-item.ad-item .shop-item-price {
+  color: var(--success);
+  background: rgba(92, 184, 92, 0.18);
+  border-color: rgba(92, 184, 92, 0.35);
+}
+
+/* Responsive: fewer columns on narrow screens */
+@media (max-width: 420px) {
+  .shop-grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 360px) {
+  .shop-grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .shop-grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ═══════════ TAB BAR — premium nav ═══════════ */
@@ -3012,11 +3179,6 @@ body::after {
     min-height: 44px;
   }
 
-  /* Shop grid single column on small phones */
-  .shop-grid {
-    grid-template-columns: 1fr;
-  }
-
   /* Daily grid 4 columns on mobile */
   .daily-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -3300,121 +3462,4 @@ body::after {
   background: var(--accent1);
   transform: scale(1.2);
   box-shadow: 0 0 10px var(--accent1);
-}
-
-/* ═══════════ AD BANNER ═══════════ */
-.ad-banner {
-  grid-column: 1 / -1;
-  background: #0d0c12;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  height: 0;
-  z-index: 100 !important;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.ad-banner.active {
-  height: 60px;
-  opacity: 1;
-  border-top: 1px solid var(--border);
-}
-
-/* ═══════════ AD OVERLAY (Simulated Interstitial/Rewarded) ═══════════ */
-.ad-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: adFadeIn 0.3s ease;
-}
-
-@keyframes adFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.ad-content {
-  background: linear-gradient(180deg, #1c1b26, #12121a);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  border-radius: 16px;
-  padding: 28px 24px;
-  max-width: 320px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6);
-}
-
-.ad-content h2 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--gold);
-  margin-bottom: 16px;
-  letter-spacing: 1px;
-}
-
-.ad-placeholder {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 32px 16px;
-  margin-bottom: 16px;
-  color: var(--text-dim);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.ad-placeholder small {
-  color: var(--text-dim);
-  opacity: 0.6;
-}
-
-.ad-timer {
-  font-family: 'Orbitron', monospace;
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--gold);
-  margin-bottom: 16px;
-  text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
-}
-
-.ad-close-btn {
-  width: 100%;
-  padding: 12px 20px;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 10px;
-  background: rgba(212, 175, 55, 0.08);
-  color: var(--text-mid);
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: not-allowed;
-  transition: all 0.2s;
-}
-
-.ad-close-btn:not(:disabled) {
-  cursor: pointer;
-  color: var(--gold);
-  border-color: rgba(212, 175, 55, 0.5);
-  background: rgba(212, 175, 55, 0.15);
-}
-
-.ad-close-btn:not(:disabled):hover {
-  background: rgba(212, 175, 55, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
 }

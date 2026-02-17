@@ -20,54 +20,43 @@ function renderShopView() {
     if (!container) return;
     container.innerHTML = '';
 
-    // ── Premium Section (No Ads) ──
-    if (window.Monetization && !window.Monetization.isPremium) {
-        const premiumSection = document.createElement('div');
-        premiumSection.className = 'shop-section';
-        premiumSection.innerHTML = '<div class="category-label" style="color:var(--accent2)">🌟 Premium</div>';
-
-        const noAdsBtn = document.createElement('div');
-        noAdsBtn.className = 'shop-item premium-item remove-ads-btn';
-        noAdsBtn.innerHTML = `
-            <div class="shop-item-icon">🚫</div>
-            <div class="shop-item-name">No Ads Bundle</div>
-            <div class="shop-item-desc">Remove forced ads & support dev!</div>
-            <div class="shop-item-price">$2.99</div>
-        `;
-        noAdsBtn.addEventListener('click', () => {
-            window.Monetization.purchaseNoAds();
-        });
-        premiumSection.appendChild(noAdsBtn);
-        container.appendChild(premiumSection);
-    }
-
-    // ── Free Stuff (Ads) ──
+    // ── Special: Premium + Free in one row (2 columns) ──
     if (window.Monetization) {
-        const adSection = document.createElement('div');
-        adSection.className = 'shop-section';
-        adSection.innerHTML = '<div class="category-label" style="color:var(--accent1)">📺 Free Stuff</div>';
+        const specialSection = document.createElement('div');
+        specialSection.className = 'shop-section';
+        specialSection.innerHTML = '<div class="category-label shop-label-special">⭐ Special</div>';
+        const specialGrid = document.createElement('div');
+        specialGrid.className = 'shop-grid shop-grid-2';
 
+        if (!window.Monetization.isPremium) {
+            const noAdsBtn = document.createElement('div');
+            noAdsBtn.className = 'shop-item premium-item remove-ads-btn';
+            noAdsBtn.innerHTML = `
+                <div class="shop-item-icon">🚫</div>
+                <div class="shop-item-name">No Ads</div>
+                <div class="shop-item-desc">Remove ads & support dev</div>
+                <div class="shop-item-price">$2.99</div>
+            `;
+            noAdsBtn.addEventListener('click', () => window.Monetization.purchaseNoAds());
+            specialGrid.appendChild(noAdsBtn);
+        }
         const watchAdBtn = document.createElement('div');
         watchAdBtn.className = 'shop-item ad-item';
         watchAdBtn.innerHTML = `
             <div class="shop-item-icon">🎁</div>
             <div class="shop-item-name">Watch Ad</div>
-            <div class="shop-item-desc">Get +50 Balls instantly</div>
+            <div class="shop-item-desc">+50 Balls free</div>
             <div class="shop-item-price">FREE</div>
         `;
         watchAdBtn.addEventListener('click', () => {
             window.Monetization.showRewardedAd(() => {
-                // Reward: 50 balls
-                for (let i = 0; i < 50; i++) {
-                    setTimeout(() => spawnBall(null, 15), i * 50);
-                }
+                for (let i = 0; i < 50; i++) setTimeout(() => spawnBall(null, 15), i * 50);
                 alert('Reward: +50 Balls delivered!');
-            }, () => {
-                alert('Ad cancelled - no reward.');
-            });
+            }, () => alert('Ad cancelled - no reward.'));
         });
-        adSection.appendChild(watchAdBtn);
-        container.appendChild(adSection);
+        specialGrid.appendChild(watchAdBtn);
+        specialSection.appendChild(specialGrid);
+        container.appendChild(specialSection);
     }
 
     // ── Gem Shop ──
@@ -76,15 +65,15 @@ function renderShopView() {
     gemSection.innerHTML = '<div class="category-label">💎 Gem Shop</div>';
 
     const grid = document.createElement('div');
-    grid.className = 'shop-grid';
+    grid.className = 'shop-grid shop-grid-4';
 
     for (const item of SHOP_ITEMS) {
         // ... (existing item logic)
         const el = document.createElement('div');
         el.className = 'shop-item';
         const affordable = gameState.gems >= item.cost;
-        // Make unavailable items dimmer
-        const style = affordable ? '' : 'opacity: 0.5; filter: grayscale(1); pointer-events: none;';
+        if (!affordable) el.classList.add('shop-item-unaffordable');
+        const style = affordable ? '' : '';
 
         el.innerHTML = `
       <div class="shop-item-icon">${item.icon}</div>
@@ -146,7 +135,7 @@ function renderShopView() {
     buyGemsSection.innerHTML = '<div class="category-label" style="color:var(--accent2)">💎 Buy Gems</div>';
 
     const buyGemsGrid = document.createElement('div');
-    buyGemsGrid.className = 'shop-grid';
+    buyGemsGrid.className = 'shop-grid shop-grid-3';
 
     const GEM_PACKS = [
         { amount: 10, price: '2.99' },
