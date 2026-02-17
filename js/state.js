@@ -173,9 +173,9 @@ function getGlobalMultiplier() {
     // Slot boost
     mult *= getSlotBoostMultiplier();
 
-    // Gem Bin Doubler
+    // Gem Bin Boost: +25% per level (1.25^level), max 5 levels = ~3.05×
     if (gameState.upgrades.gemBinMultiplier) {
-        mult *= Math.pow(2, gameState.upgrades.gemBinMultiplier);
+        mult *= Math.pow(1.25, gameState.upgrades.gemBinMultiplier);
     }
 
     // Frenzy Mode (weekly reward)
@@ -237,6 +237,7 @@ const runtimeState = {
     frenzyTimer: null,
     frenzyBallValue: 0,
     frenzyCountdownInterval: null,
+    ballCapOverride: 0,
     consecutiveHighHits: 0,
     lastSlotHit: -1,
     jackpotSlot: -1,
