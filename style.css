@@ -2520,9 +2520,19 @@ body::after {
   border: 1px solid rgba(0, 229, 255, 0.25);
   border-radius: 8px;
   padding: 2px 8px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: inline-block;
   letter-spacing: 0.5px;
+}
+
+.shop-item-effect {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+  opacity: 0.85;
 }
 
 .shop-item-maxed {
@@ -2613,8 +2623,17 @@ body::after {
   font-family: 'Orbitron', monospace;
   font-size: 10px;
   color: var(--accent2);
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   letter-spacing: 0.5px;
+}
+
+.shop-confirm-effect {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
 }
 
 .shop-confirm-cost {

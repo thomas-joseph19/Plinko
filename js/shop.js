@@ -6,32 +6,53 @@ const SHOP_ITEMS = [
     { id: 'coin_small', icon: '🪙', name: 'Coin Pack S', desc: '5,000 Coins', price: '💎 10', cost: 10, type: 'gems', give: 'coins', amount: 5000 },
     { id: 'coin_med', icon: '💰', name: 'Coin Pack M', desc: '25,000 Coins', price: '💎 40', cost: 40, type: 'gems', give: 'coins', amount: 25000 },
     { id: 'coin_lg', icon: '🏦', name: 'Coin Pack L', desc: '100,000 Coins', price: '💎 120', cost: 120, type: 'gems', give: 'coins', amount: 100000 },
-    { id: 'bin_doubler', icon: '🎰', name: 'Bin Boost', desc: '+25% bin values (stacks up to 5×)', price: '💎 100', cost: 100, type: 'gems', give: 'upgrade', maxLevel: 5 },
-    { id: 'ball_rain', icon: '🌧️', name: 'Ball Rain', desc: '200 free balls rain down fast', price: '💎 50', cost: 50, type: 'gems', give: 'rain' },
-    { id: 'drop_doubler', icon: '⚡', name: 'Drop Boost', desc: '+50% drop rate (stacks up to 5×)', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade', maxLevel: 5 },
-    { id: 'event_extender', icon: '⏱️', name: 'Event Extender', desc: 'All events last +15s (max 5 purchases)', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade', maxLevel: 5 },
-    { id: 'ball_storm', icon: '🌪️', name: 'Ball Storm', desc: '50 balls drop instantly (Bet: 10)', price: '💎 15', cost: 15, type: 'gems', give: 'storm', amount: 50 },
+    { id: 'bin_doubler', icon: '🎰', name: 'Bin Boost', desc: '+10% bin payout per level', price: '💎 100', cost: 100, type: 'gems', give: 'upgrade', maxLevel: 5 },
+    { id: 'drop_doubler', icon: '⚡', name: 'Drop Boost', desc: '+25% drop speed per level', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade', maxLevel: 5 },
+    { id: 'event_extender', icon: '⏱️', name: 'Event Extender', desc: '+15s to all event durations', price: '💎 20', cost: 20, type: 'gems', give: 'upgrade', maxLevel: 5 },
+    { id: 'ball_storm', icon: '🌪️', name: 'Ball Storm', desc: '50 free balls at your bet', price: '💎 15', cost: 15, type: 'gems', give: 'storm', amount: 50 },
     { id: 'lucky_pack', icon: '🍀', name: 'Lucky Pack', desc: '10 guaranteed golden balls', price: '💎 20', cost: 20, type: 'gems', give: 'lucky', amount: 10 },
     { id: 'fever_now', icon: '🔥', name: 'Instant Fever', desc: 'Trigger Fever Mode now!', price: '💎 25', cost: 25, type: 'gems', give: 'fever', amount: 1 },
 ];
 
+// ── Get upgrade effect description ──
+function getUpgradeEffectText(itemId, level) {
+    if (itemId === 'bin_doubler') {
+        const mult = Math.pow(1.10, level);
+        return level === 0 ? '1.00× (base)' : `${mult.toFixed(2)}× payout`;
+    }
+    if (itemId === 'drop_doubler') {
+        const mult = Math.pow(1.25, level);
+        return level === 0 ? '1.00× (base)' : `${mult.toFixed(2)}× speed`;
+    }
+    if (itemId === 'event_extender') {
+        const bonus = level * 15;
+        return level === 0 ? '+0s (base)' : `+${bonus}s duration`;
+    }
+    return '';
+}
+
 // ── Confirmation Dialog ──
 function showShopConfirm(item, onConfirm) {
-    // Remove any existing dialog
     const existing = document.querySelector('.shop-confirm-overlay');
     if (existing) existing.remove();
 
     const overlay = document.createElement('div');
     overlay.className = 'shop-confirm-overlay';
 
-    // Build level info for upgrades
+    // Build level + effect info for upgrades
     let levelInfo = '';
     if (item.give === 'upgrade' && item.maxLevel) {
         const current = getUpgradeLevel(item.id);
+        const currentEffect = getUpgradeEffectText(item.id, current);
+        const nextEffect = getUpgradeEffectText(item.id, current + 1);
         if (current >= item.maxLevel) {
-            levelInfo = `<div class="shop-confirm-level">Already maxed! (${current}/${item.maxLevel})</div>`;
+            levelInfo = `
+                <div class="shop-confirm-level">Already maxed! (${current}/${item.maxLevel})</div>
+                <div class="shop-confirm-effect">${currentEffect}</div>`;
         } else {
-            levelInfo = `<div class="shop-confirm-level">Level ${current} → ${current + 1} / ${item.maxLevel}</div>`;
+            levelInfo = `
+                <div class="shop-confirm-level">Level ${current} → ${current + 1} / ${item.maxLevel}</div>
+                <div class="shop-confirm-effect">${currentEffect} → ${nextEffect}</div>`;
         }
     }
 
@@ -52,7 +73,6 @@ function showShopConfirm(item, onConfirm) {
 
     document.body.appendChild(overlay);
 
-    // Close on overlay click
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) overlay.remove();
     });
@@ -68,9 +88,10 @@ function showShopConfirm(item, onConfirm) {
 function getUpgradeLevel(itemId) {
     if (itemId === 'bin_doubler') return gameState.upgrades.gemBinMultiplier || 0;
     if (itemId === 'drop_doubler') {
-        // Convert multiplier back to level: 1.5^level
+        // Convert multiplier back to level: 1.25^level
         const mult = gameState.upgrades.gemDropRateMultiplier || 1;
-        return Math.round(Math.log(mult) / Math.log(1.5));
+        if (mult <= 1) return 0;
+        return Math.round(Math.log(mult) / Math.log(1.25));
     }
     if (itemId === 'event_extender') return Math.floor((gameState.upgrades.gemEventDurationBonus || 0) / 15);
     return 0;
@@ -112,12 +133,12 @@ function executePurchase(item, el) {
         if (typeof showToast === 'function') showToast(`+${typeof formatNumber === 'function' ? formatNumber(item.amount) : item.amount} Coins!`, 'info');
 
     } else if (item.give === 'storm') {
-        // Ball Storm: 50 free balls dropped at bet=10
+        // Ball Storm: 50 free balls
         const count = item.amount || 50;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
-                if (typeof spawnBall === 'function') spawnBall(null, 15, false, 10, true);
-            }, i * 60);
+                if (typeof spawnBall === 'function') spawnBall(null, 15, false, gameState.currentBet || 1, true);
+            }, i * 80);
         }
         if (typeof showToast === 'function') showToast(`🌪️ ${count} balls incoming!`, 'info');
 
@@ -126,7 +147,7 @@ function executePurchase(item, el) {
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
                 if (typeof spawnBall === 'function') spawnBall(null, 15, true, null, true);
-            }, i * 100);
+            }, i * 150);
         }
         if (typeof showToast === 'function') showToast(`🍀 ${count} golden balls!`, 'info');
 
@@ -136,33 +157,29 @@ function executePurchase(item, el) {
             if (typeof showToast === 'function') showToast('🔥 Fever activated!', 'info');
         }
 
-    } else if (item.give === 'rain') {
-        if (typeof triggerBallRain === 'function') {
-            triggerBallRain();
-            if (typeof showToast === 'function') showToast('🌧️ Ball rain!', 'info');
-        }
-
     } else if (item.give === 'upgrade') {
         if (item.id === 'bin_doubler') {
-            // +25% per level (1.25^level), max 5 levels = ~3.05× multiplier
+            // +10% per level (1.10^level), max 5 = 1.61× total
             gameState.upgrades.gemBinMultiplier = (gameState.upgrades.gemBinMultiplier || 0) + 1;
-            if (typeof renderSlotTray === 'function') renderSlotTray(getBoardRows());
+            if (typeof renderSlotTray === 'function' && typeof getBoardRows === 'function') renderSlotTray(getBoardRows());
             const newLevel = gameState.upgrades.gemBinMultiplier;
-            const totalMult = Math.pow(1.25, newLevel).toFixed(2);
-            if (typeof showToast === 'function') showToast(`🎰 Bin Boost Lv${newLevel}! (${totalMult}× bins)`, 'info');
+            const effect = getUpgradeEffectText('bin_doubler', newLevel);
+            if (typeof showToast === 'function') showToast(`🎰 Bin Boost Lv${newLevel}! (${effect})`, 'info');
 
         } else if (item.id === 'drop_doubler') {
-            // +50% per level (1.5^level), max 5 levels = ~7.6× rate
-            gameState.upgrades.gemDropRateMultiplier = (gameState.upgrades.gemDropRateMultiplier || 1) * 1.5;
+            // +25% per level (1.25^level), max 5 = ~3.05× speed
+            gameState.upgrades.gemDropRateMultiplier = (gameState.upgrades.gemDropRateMultiplier || 1) * 1.25;
             if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
             if (typeof startAutoDroppers === 'function') startAutoDroppers();
             const newLevel = getUpgradeLevel('drop_doubler');
-            if (typeof showToast === 'function') showToast(`⚡ Drop Boost Lv${newLevel}!`, 'info');
+            const effect = getUpgradeEffectText('drop_doubler', newLevel);
+            if (typeof showToast === 'function') showToast(`⚡ Drop Boost Lv${newLevel}! (${effect})`, 'info');
 
         } else if (item.id === 'event_extender') {
             gameState.upgrades.gemEventDurationBonus = (gameState.upgrades.gemEventDurationBonus || 0) + 15;
             const newLevel = getUpgradeLevel('event_extender');
-            if (typeof showToast === 'function') showToast(`⏱️ Events +${newLevel * 15}s!`, 'info');
+            const effect = getUpgradeEffectText('event_extender', newLevel);
+            if (typeof showToast === 'function') showToast(`⏱️ Event Extender Lv${newLevel}! (${effect})`, 'info');
         }
     }
 
@@ -206,7 +223,7 @@ function renderShopView() {
         `;
         watchAdBtn.addEventListener('click', () => {
             window.Monetization.showRewardedAd(() => {
-                for (let i = 0; i < 50; i++) setTimeout(() => spawnBall(null, 15), i * 50);
+                for (let i = 0; i < 50; i++) setTimeout(() => spawnBall(null, 15, false, null, true), i * 50);
                 if (typeof showToast === 'function') showToast('🎁 +50 Balls delivered!', 'info');
             }, () => {
                 if (typeof showToast === 'function') showToast('Ad cancelled', 'error');
@@ -231,13 +248,17 @@ function renderShopView() {
         const affordable = gameState.gems >= item.cost;
         if (!affordable) el.classList.add('shop-item-unaffordable');
 
-        // Check if maxed
+        // Check if maxed + build level/effect indicator
         let isMaxed = false;
         let levelTag = '';
         if (item.give === 'upgrade' && item.maxLevel) {
             const level = getUpgradeLevel(item.id);
             isMaxed = level >= item.maxLevel;
-            levelTag = `<div class="shop-item-level">${isMaxed ? 'MAX' : `Lv ${level}/${item.maxLevel}`}</div>`;
+            const effectText = getUpgradeEffectText(item.id, level);
+            levelTag = `
+                <div class="shop-item-level">${isMaxed ? '✅ MAX' : `Lv ${level}/${item.maxLevel}`}</div>
+                <div class="shop-item-effect">${effectText}</div>
+            `;
             if (isMaxed) el.classList.add('shop-item-maxed');
         }
 
