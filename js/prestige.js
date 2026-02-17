@@ -69,7 +69,7 @@ function performPrestige() {
     gameState.totalPrestigeCount++;
     gameState.gems += CONFIG.GEM_PRESTIGE_BONUS;
 
-    // Reset progress (keep prestige upgrades)
+    // Reset progress (keep prestige upgrades, settings, gem upgrades)
     const savedPrestige = { ...gameState.prestigeUpgrades };
     const savedTokens = gameState.prestigeTokens;
     const savedLevel = gameState.prestigeLevel;
@@ -81,6 +81,11 @@ function performPrestige() {
     const savedHighCombo = gameState.highestCombo;
     const savedDaily = gameState.dailyStreak;
     const savedLastDaily = gameState.lastDailyClaim;
+    const savedSettings = { ...gameState.settings };
+    const savedFrenzyTokens = gameState.frenzyTokens || 0;
+    const savedGemBin = gameState.upgrades.gemBinMultiplier || 0;
+    const savedGemDrop = gameState.upgrades.gemDropRateMultiplier || 1;
+    const savedGemEvent = gameState.upgrades.gemEventDurationBonus || 0;
 
     // Reset to defaults
     const fresh = getDefaultState();
@@ -98,13 +103,20 @@ function performPrestige() {
     gameState.highestCombo = savedHighCombo;
     gameState.dailyStreak = savedDaily;
     gameState.lastDailyClaim = savedLastDaily;
+    gameState.settings = savedSettings;
+    gameState.frenzyTokens = savedFrenzyTokens;
+
+    // Restore gem shop upgrades (paid with premium currency, shouldn't reset)
+    gameState.upgrades.gemBinMultiplier = savedGemBin;
+    gameState.upgrades.gemDropRateMultiplier = savedGemDrop;
+    gameState.upgrades.gemEventDurationBonus = savedGemEvent;
 
     // Prestige bonus: start with ball rate levels
     if (savedPrestige.startBalls) {
         gameState.upgrades.ballRate = Math.min(savedPrestige.startBalls, UPGRADES.ballRate.maxLevel);
     }
 
-    // Starting coins fixed to 0 even on prestige
+    // Starting coins: 0 on prestige (you earned prestige tokens instead)
     gameState.coins = 0;
 
     saveGame();
