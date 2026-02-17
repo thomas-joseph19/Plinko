@@ -805,11 +805,6 @@ function initBetSelector() {
     // Initialize display
     updateBetDisplay();
 
-    // Hide bet selector if not yet unlocked
-    const betSel = document.getElementById('betSelector');
-    if (betSel && !gameState.settings.bettingUnlocked) {
-        betSel.style.display = 'none';
-    }
 }
 
 // ── Betting Unlock System ──
@@ -817,7 +812,7 @@ const BETTING_UNLOCK_THRESHOLD = 10000;
 let _bettingUnlockShown = false;
 
 function checkBettingUnlock() {
-    if (gameState.settings.bettingUnlocked) return;
+    return; // Betting is available for all users
     if (_bettingUnlockShown) return;
     if (gameState.totalCoinsEarned >= BETTING_UNLOCK_THRESHOLD) {
         _bettingUnlockShown = true;
