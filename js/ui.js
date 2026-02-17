@@ -211,7 +211,19 @@ function renderSlotTray(rows) {
         const type = getSlotType(val);
         slot.className = 'slot ' + type;
 
-        slot.innerHTML = `<span class="mult">${val >= 1000 ? formatCost(val) : formatNumber(val)}</span><span class="x">×</span>`;
+        // Format: clean number + ×  (e.g., "8×", "0.5×", "1.2K×")
+        let displayVal;
+        if (val >= 1000) {
+            displayVal = formatCost(val);
+        } else if (val >= 10 && val === Math.floor(val)) {
+            displayVal = String(Math.floor(val));
+        } else if (val >= 1 && val === Math.floor(val)) {
+            displayVal = String(Math.floor(val));
+        } else {
+            displayVal = val.toFixed(1);
+        }
+
+        slot.innerHTML = `<span class="mult">${displayVal}</span><span class="x">×</span>`;
         tray.appendChild(slot);
     });
 }

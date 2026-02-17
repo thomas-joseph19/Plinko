@@ -822,14 +822,14 @@ body::after {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 52px;
+  height: 58px;
   display: flex;
   align-items: stretch;
-  border-top: 2px solid rgba(212, 175, 55, 0.2);
+  border-top: 2px solid rgba(212, 175, 55, 0.25);
   z-index: 5;
-  background: linear-gradient(180deg, rgba(12, 11, 18, 0.95), rgba(8, 8, 12, 0.98));
+  background: linear-gradient(180deg, rgba(12, 11, 18, 0.97), rgba(8, 8, 12, 0.99));
   backdrop-filter: blur(12px);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.03);
 }
 
 .slot {
@@ -845,7 +845,7 @@ body::after {
   cursor: default;
   position: relative;
   transition: all 0.2s;
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   overflow: hidden;
 }
 
@@ -854,38 +854,45 @@ body::after {
 }
 
 .slot .mult {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 900;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .slot .x {
-  font-size: 7px;
-  opacity: 0.7;
+  font-size: 8px;
+  opacity: 0.6;
+  margin-top: 1px;
 }
 
 /* 100x+ — jackpot tier */
 .slot.tier-5 {
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.06));
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.08));
   color: #f4e4bc;
-  box-shadow: inset 0 2px 8px rgba(212, 175, 55, 0.2);
+  box-shadow: inset 0 2px 8px rgba(212, 175, 55, 0.25);
+  border-top: 2px solid rgba(212, 175, 55, 0.6);
 }
 
 /* 25x - 99x */
 .slot.tier-4 {
-  background: linear-gradient(180deg, rgba(232, 197, 71, 0.2), rgba(232, 197, 71, 0.04));
+  background: linear-gradient(180deg, rgba(232, 197, 71, 0.25), rgba(232, 197, 71, 0.05));
   color: #e8c547;
+  border-top: 2px solid rgba(232, 197, 71, 0.4);
 }
 
 /* 10x - 24x */
 .slot.tier-3 {
-  background: linear-gradient(180deg, rgba(201, 162, 39, 0.15), rgba(201, 162, 39, 0.03));
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.18), rgba(201, 162, 39, 0.04));
   color: #c9a227;
+  border-top: 2px solid rgba(201, 162, 39, 0.3);
 }
 
 /* 3x - 9x */
 .slot.tier-2 {
-  background: linear-gradient(180deg, rgba(184, 176, 160, 0.12), rgba(184, 176, 160, 0.02));
-  color: #b8b0a0;
+  background: linear-gradient(180deg, rgba(184, 176, 160, 0.14), rgba(184, 176, 160, 0.03));
+  color: #c8c0b0;
+  border-top: 2px solid rgba(184, 176, 160, 0.2);
 }
 
 /* 1.0x - 2.9x */
@@ -897,7 +904,7 @@ body::after {
 /* < 1.0x (if any) */
 .slot.tier-0 {
   background: rgba(255, 255, 255, 0.02);
-  color: #6b6560;
+  color: #706a60;
 }
 
 /* Slot hit flash */
