@@ -55,6 +55,11 @@ const CONFIG = {
   // ── Gems ──
   GEM_DAILY_BASE: 5,
   GEM_PRESTIGE_BONUS: 10,
+
+  // ── Frenzy ──
+  FRENZY_PAYOUT_MULTIPLIER: 2,
+  FRENZY_DROP_MULTIPLIER: 3,
+  WEEKLY_STREAK_DAYS: 7,
 };
 
 // Slot type classification

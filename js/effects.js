@@ -160,42 +160,159 @@ function triggerFever() {
 }
 
 // ── Frenzy Mode (weekly login reward) ──
+// Shows animated randomizer → then starts frenzy with free balls + countdown timer
 function triggerFrenzy() {
     if (typeof runtimeState === 'undefined' || typeof gameState === 'undefined') return;
     if (runtimeState.frenzyActive) return;
     if (!gameState.frenzyTokens || gameState.frenzyTokens < 1) return;
 
     gameState.frenzyTokens -= 1;
-    runtimeState.frenzyActive = true;
     if (typeof saveGame === 'function') saveGame();
 
-    const duration = (typeof CONFIG !== 'undefined' && CONFIG.FRENZY_DURATION != null) ? CONFIG.FRENZY_DURATION : 45000;
+    // ── Calculate ranges ──
+    // Duration: 10-45 seconds
+    const minDuration = 10;
+    const maxDuration = 45;
 
+    // Ball value: if coins >= 100k, range is 100 to 1% of balance. Otherwise 100-1000.
+    const minValue = 100;
+    let maxValue = 1000;
+    if (gameState.coins >= 100000) {
+        maxValue = Math.max(1000, Math.floor(gameState.coins * 0.01));
+    }
+
+    // ── Show Randomizer Overlay ──
+    const overlay = document.getElementById('frenzyRandomizer');
+    const durationEl = document.getElementById('frenzyDurationValue');
+    const valueEl = document.getElementById('frenzyValueValue');
+    const statusEl = document.getElementById('frenzyRandomizerStatus');
+
+    if (!overlay || !durationEl || !valueEl) {
+        // Fallback: just start frenzy directly
+        startFrenzyPhase(25000, 500);
+        return;
+    }
+
+    overlay.style.display = 'flex';
+    statusEl.textContent = 'Randomizing...';
+
+    // ── Animated Randomizer (slot-machine style) ──
+    let spinCount = 0;
+    const totalSpins = 30; // ~1.5 seconds of spinning
+    const spinInterval = 50; // ms per tick
+
+    const spinTimer = setInterval(() => {
+        spinCount++;
+        // Random display values (visual only)
+        const randDur = Math.floor(Math.random() * (maxDuration - minDuration + 1)) + minDuration;
+        const randVal = Math.floor(Math.random() * (maxValue - minValue + 1) / 50) * 50 + minValue;
+        durationEl.textContent = randDur;
+        valueEl.textContent = typeof formatNumber === 'function' ? formatNumber(randVal) : randVal;
+
+        // Slow down near the end
+        if (spinCount >= totalSpins) {
+            clearInterval(spinTimer);
+
+            // ── Final Results ──
+            const finalDuration = Math.floor(Math.random() * (maxDuration - minDuration + 1)) + minDuration;
+            const finalValue = Math.floor(Math.random() * (maxValue - minValue + 1) / 50) * 50 + minValue;
+
+            durationEl.textContent = finalDuration;
+            valueEl.textContent = typeof formatNumber === 'function' ? formatNumber(finalValue) : finalValue;
+            statusEl.textContent = '🎉 LOCKED IN!';
+
+            // Add "locked" animation
+            durationEl.classList.add('locked');
+            valueEl.classList.add('locked');
+
+            // After a beat, close overlay and start frenzy
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                durationEl.classList.remove('locked');
+                valueEl.classList.remove('locked');
+                startFrenzyPhase(finalDuration * 1000, finalValue);
+            }, 1200);
+        }
+    }, spinInterval);
+}
+
+// ── Actual Frenzy Execution ──
+function startFrenzyPhase(durationMs, ballValue) {
+    runtimeState.frenzyActive = true;
+    runtimeState.frenzyBallValue = ballValue; // Store for use in spawnBall override
+
+    // Banner flash
     const banner = document.getElementById('frenzyBanner');
     if (banner) {
         banner.classList.add('show');
         setTimeout(() => banner.classList.remove('show'), 2500);
     }
 
+    // Board glow
     const board = document.getElementById('plinkoBoard');
     if (board) board.classList.add('frenzy-active');
 
-    const overlay = document.getElementById('frenzyOverlay');
-    if (overlay) overlay.classList.add('active');
+    // Restart droppers with frenzy speed
+    if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
+    if (typeof startAutoDroppers === 'function') startAutoDroppers();
+
+    // ── Countdown Timer ──
+    const timerEl = document.getElementById('frenzyTimer');
+    const timerText = document.getElementById('frenzyTimerText');
+    if (timerEl) timerEl.style.display = 'flex';
+
+    const endTime = Date.now() + durationMs;
+    runtimeState.frenzyCountdownInterval = setInterval(() => {
+        const remaining = Math.max(0, endTime - Date.now());
+        const secs = Math.ceil(remaining / 1000);
+        if (timerText) timerText.textContent = secs + 's';
+
+        if (remaining <= 0) {
+            clearInterval(runtimeState.frenzyCountdownInterval);
+            runtimeState.frenzyCountdownInterval = null;
+            endFrenzy();
+        }
+    }, 100);
+
+    // ── Safety timeout ──
+    if (runtimeState.frenzyTimer) clearTimeout(runtimeState.frenzyTimer);
+    runtimeState.frenzyTimer = setTimeout(() => {
+        if (runtimeState.frenzyActive) endFrenzy();
+    }, durationMs + 500);
+
+    if (typeof saveGame === 'function') saveGame();
+}
+
+function endFrenzy() {
+    runtimeState.frenzyActive = false;
+    runtimeState.frenzyBallValue = 0;
+
+    const board = document.getElementById('plinkoBoard');
+    if (board) board.classList.remove('frenzy-active');
+
+    const timerEl = document.getElementById('frenzyTimer');
+    if (timerEl) timerEl.style.display = 'none';
+
+    if (runtimeState.frenzyCountdownInterval) {
+        clearInterval(runtimeState.frenzyCountdownInterval);
+        runtimeState.frenzyCountdownInterval = null;
+    }
+
+    if (runtimeState.frenzyTimer) {
+        clearTimeout(runtimeState.frenzyTimer);
+        runtimeState.frenzyTimer = null;
+    }
 
     if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
     if (typeof startAutoDroppers === 'function') startAutoDroppers();
 
-    if (runtimeState.frenzyTimer) clearTimeout(runtimeState.frenzyTimer);
-    runtimeState.frenzyTimer = setTimeout(() => {
-        runtimeState.frenzyActive = false;
-        if (board) board.classList.remove('frenzy-active');
-        if (overlay) overlay.classList.remove('active');
-        if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
-        if (typeof startAutoDroppers === 'function') startAutoDroppers();
-        runtimeState.frenzyTimer = null;
-    }, duration);
+    // Show "Frenzy Over" toast
+    if (typeof showToast === 'function') showToast('⚡ Frenzy Over!', 'info');
+
+    // Re-render daily view to update token count
+    if (typeof renderDailyView === 'function') renderDailyView();
 }
+
 if (typeof window !== 'undefined') window.triggerFrenzy = triggerFrenzy;
 
 // ── Screen Shake (for big wins) ──

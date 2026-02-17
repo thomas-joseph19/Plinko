@@ -354,24 +354,28 @@ function spawnBall(x, y, forceGolden, betAmount) {
     if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return null;
 
     // Use provided bet amount or fall back to current bet from game state
-    const actualBet = betAmount || gameState.currentBet || 1;
+    const isFrenzy = typeof runtimeState !== 'undefined' && runtimeState.frenzyActive && runtimeState.frenzyBallValue > 0;
+    const actualBet = isFrenzy ? runtimeState.frenzyBallValue : (betAmount || gameState.currentBet || 1);
 
-    // Check if player has enough coins to place this bet
-    if (gameState.coins < actualBet) {
-        // Not enough coins - show feedback with throttling (once every 10s)
-        const now = Date.now();
-        if (now - (runtimeState.lastToastTime || 0) > 10000) {
-            if (typeof showToast === 'function') {
-                showToast('Not enough coins!', 'error');
+    // During frenzy, balls are FREE. Otherwise check coins.
+    if (!isFrenzy) {
+        // Check if player has enough coins to place this bet
+        if (gameState.coins < actualBet) {
+            // Not enough coins - show feedback with throttling (once every 10s)
+            const now = Date.now();
+            if (now - (runtimeState.lastToastTime || 0) > 10000) {
+                if (typeof showToast === 'function') {
+                    showToast('Not enough coins!', 'error');
+                }
+                runtimeState.lastToastTime = now;
             }
-            runtimeState.lastToastTime = now;
+            return null;
         }
-        return null;
-    }
 
-    // Deduct bet amount
-    gameState.coins -= actualBet;
-    gameState.totalCoinsBet += actualBet;
+        // Deduct bet amount (not during frenzy)
+        gameState.coins -= actualBet;
+        gameState.totalCoinsBet += actualBet;
+    }
 
     // Visual Dropper Animation - Trigger only if spawned near center (manual or auto)
     const nozzle = document.querySelector('.dropper-nozzle');

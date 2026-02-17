@@ -235,6 +235,8 @@ const runtimeState = {
     feverTimer: null,
     frenzyActive: false,
     frenzyTimer: null,
+    frenzyBallValue: 0,
+    frenzyCountdownInterval: null,
     consecutiveHighHits: 0,
     lastSlotHit: -1,
     jackpotSlot: -1,

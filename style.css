@@ -1039,10 +1039,6 @@ body::after {
   animation: feverPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.4) forwards;
 }
 
-.plinko-board.frenzy-active {
-  box-shadow: 0 0 60px rgba(168, 85, 247, 0.4), inset 0 0 40px rgba(249, 115, 22, 0.1);
-}
-
 .frenzy-overlay {
   position: fixed;
   inset: 0;
@@ -1062,8 +1058,230 @@ body::after {
   from {
     background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.06), transparent 70%);
   }
+
   to {
     background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.12), transparent 70%);
+  }
+}
+
+/* ─── Frenzy Board Glow Animation ─── */
+.plinko-board.frenzy-active {
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.4), inset 0 0 40px rgba(249, 115, 22, 0.1);
+  animation: frenzyBoardGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes frenzyBoardGlow {
+  from {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.3), inset 0 0 30px rgba(249, 115, 22, 0.05);
+  }
+
+  to {
+    box-shadow: 0 0 80px rgba(168, 85, 247, 0.6), inset 0 0 50px rgba(249, 115, 22, 0.15);
+  }
+}
+
+/* ─── Frenzy Countdown Timer ─── */
+.frenzy-timer {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(249, 115, 22, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 24px;
+  padding: 6px 14px;
+  z-index: 25;
+  animation: frenzyTimerPulse 1s ease-in-out infinite alternate;
+}
+
+.frenzy-timer-icon {
+  font-size: 14px;
+  animation: frenzyBolt 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes frenzyBolt {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.frenzy-timer-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  min-width: 35px;
+  text-align: center;
+}
+
+@keyframes frenzyTimerPulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.05);
+  }
+}
+
+/* ─── Frenzy Randomizer Overlay ─── */
+.frenzy-randomizer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: frenzyOverlayIn 0.4s ease;
+}
+
+@keyframes frenzyOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.frenzy-randomizer-content {
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+}
+
+.frenzy-randomizer-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, #a855f7, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 28px;
+  animation: frenzyTitlePulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes frenzyTitlePulse {
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  to {
+    transform: scale(1.04);
+    filter: brightness(1.2);
+  }
+}
+
+.frenzy-randomizer-slot {
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.1), rgba(249, 115, 22, 0.08));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.frenzy-randomizer-slot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.05), transparent);
+  animation: slotShimmer 1.5s linear infinite;
+}
+
+@keyframes slotShimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.frenzy-slot-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(168, 85, 247, 0.7);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.frenzy-slot-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  transition: all 0.05s;
+  line-height: 1.2;
+}
+
+.frenzy-slot-value.locked {
+  color: #f97316;
+  text-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+  animation: slotLocked 0.3s ease;
+}
+
+@keyframes slotLocked {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.frenzy-slot-unit {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+.frenzy-randomizer-status {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(168, 85, 247, 0.8);
+  margin-top: 20px;
+  letter-spacing: 2px;
+  animation: statusBlink 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes statusBlink {
+  from {
+    opacity: 0.6;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 

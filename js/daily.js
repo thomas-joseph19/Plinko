@@ -290,7 +290,7 @@ function renderDailyView() {
     weeklySection.innerHTML = `
         <div class="category-label">⚡ Frenzy Mode — Weekly Reward</div>
         <div class="weekly-streak-card">
-            <div class="weekly-streak-text">45 seconds of 3× faster drops and 2× slot payouts. Log in 7 days in a row to earn more.</div>
+            <div class="weekly-streak-text">Randomized 10-45s of 3× faster drops + FREE high-value balls (100-1K+ coins each). Log in 7 days in a row to earn more.</div>
             <div class="weekly-streak-progress"><span class="weekly-streak-count">${streak}/${required}</span> days this week</div>
             ${tokens > 0 && !frenzyActive ? `
                 <button type="button" class="frenzy-activate-btn" id="frenzyActivateBtn">

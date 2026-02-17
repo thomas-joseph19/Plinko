@@ -98,6 +98,12 @@
             <div class="fever-banner" id="feverBanner">🔥 FEVER MODE 🔥</div>
             <div class="frenzy-banner" id="frenzyBanner">⚡ FRENZY MODE ⚡</div>
 
+            <!-- Frenzy Countdown Timer (floating on board) -->
+            <div class="frenzy-timer" id="frenzyTimer" style="display:none;">
+              <span class="frenzy-timer-icon">⚡</span>
+              <span class="frenzy-timer-text" id="frenzyTimerText">0s</span>
+            </div>
+
             <!-- Event banner -->
             <div class="fever-banner" id="eventBanner"
               style="background: linear-gradient(135deg, rgba(56,189,248,0.95), rgba(99,102,241,0.95));">⚡ EVENT ACTIVE
@@ -105,6 +111,24 @@
 
             <!-- Slot tray rendered by JS -->
             <div class="slot-tray" id="slotTray"></div>
+          </div>
+
+          <!-- Frenzy Randomizer Overlay (fullscreen, shown before frenzy starts) -->
+          <div class="frenzy-randomizer-overlay" id="frenzyRandomizer" style="display:none;">
+            <div class="frenzy-randomizer-content">
+              <div class="frenzy-randomizer-title">⚡ FRENZY MODE ⚡</div>
+              <div class="frenzy-randomizer-slot" id="frenzySlotDuration">
+                <div class="frenzy-slot-label">DURATION</div>
+                <div class="frenzy-slot-value" id="frenzyDurationValue">--</div>
+                <div class="frenzy-slot-unit">seconds</div>
+              </div>
+              <div class="frenzy-randomizer-slot" id="frenzySlotValue">
+                <div class="frenzy-slot-label">BALL VALUE</div>
+                <div class="frenzy-slot-value" id="frenzyValueValue">--</div>
+                <div class="frenzy-slot-unit">coins each</div>
+              </div>
+              <div class="frenzy-randomizer-status" id="frenzyRandomizerStatus">Randomizing...</div>
+            </div>
           </div>
 
           <!-- Bet Amount Selector -->
