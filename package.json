@@ -8,7 +8,8 @@
     "dev": "vite --host",
     "expo": "npx expo start",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node build-html.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "^6.1.2",
