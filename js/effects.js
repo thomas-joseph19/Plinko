@@ -159,6 +159,45 @@ function triggerFever() {
     }, duration);
 }
 
+// ── Frenzy Mode (weekly login reward) ──
+function triggerFrenzy() {
+    if (typeof runtimeState === 'undefined' || typeof gameState === 'undefined') return;
+    if (runtimeState.frenzyActive) return;
+    if (!gameState.frenzyTokens || gameState.frenzyTokens < 1) return;
+
+    gameState.frenzyTokens -= 1;
+    runtimeState.frenzyActive = true;
+    if (typeof saveGame === 'function') saveGame();
+
+    const duration = (typeof CONFIG !== 'undefined' && CONFIG.FRENZY_DURATION != null) ? CONFIG.FRENZY_DURATION : 45000;
+
+    const banner = document.getElementById('frenzyBanner');
+    if (banner) {
+        banner.classList.add('show');
+        setTimeout(() => banner.classList.remove('show'), 2500);
+    }
+
+    const board = document.getElementById('plinkoBoard');
+    if (board) board.classList.add('frenzy-active');
+
+    const overlay = document.getElementById('frenzyOverlay');
+    if (overlay) overlay.classList.add('active');
+
+    if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
+    if (typeof startAutoDroppers === 'function') startAutoDroppers();
+
+    if (runtimeState.frenzyTimer) clearTimeout(runtimeState.frenzyTimer);
+    runtimeState.frenzyTimer = setTimeout(() => {
+        runtimeState.frenzyActive = false;
+        if (board) board.classList.remove('frenzy-active');
+        if (overlay) overlay.classList.remove('active');
+        if (typeof stopAutoDroppers === 'function') stopAutoDroppers();
+        if (typeof startAutoDroppers === 'function') startAutoDroppers();
+        runtimeState.frenzyTimer = null;
+    }, duration);
+}
+if (typeof window !== 'undefined') window.triggerFrenzy = triggerFrenzy;
+
 // ── Screen Shake (for big wins) ──
 function screenShake(intensity) {
     const app = document.getElementById('app');

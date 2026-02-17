@@ -71,6 +71,38 @@ function getTodayDateKey() {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+function getYesterdayDateKey() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+// Call once per game load. Updates weekly streak and grants frenzy token at 7 days.
+function processWeeklyLogin() {
+    const today = getTodayDateKey();
+    if (gameState.lastLoginDateKey === today) return; // Already counted today
+
+    const yesterday = getYesterdayDateKey();
+    const last = gameState.lastLoginDateKey;
+    let streak = gameState.weeklyLoginStreak || 0;
+
+    if (last === yesterday) {
+        streak += 1;
+    } else {
+        streak = 1; // Missed a day or first time
+    }
+
+    const required = (typeof CONFIG !== 'undefined' && CONFIG.WEEKLY_STREAK_DAYS) ? CONFIG.WEEKLY_STREAK_DAYS : 7;
+    if (streak >= required) {
+        gameState.frenzyTokens = (gameState.frenzyTokens || 0) + 1;
+        streak = 0; // Reset so they can earn again next week
+    }
+
+    gameState.weeklyLoginStreak = streak;
+    gameState.lastLoginDateKey = today;
+    saveGame();
+}
+
 function ensureDailyChallengeState() {
     const today = getTodayDateKey();
     if (gameState.lastDailyChallengeDate !== today) {
@@ -239,6 +271,48 @@ function renderDailyView() {
 
     const badge = document.getElementById('dailyBadge');
     if (badge) badge.style.display = (available || hasUnclaimedChallenges()) ? '' : 'none';
+
+    // Weekly Streak & Frenzy Mode (ensure section exists so it's always visible)
+    let weeklySection = document.getElementById('weeklyFrenzySection');
+    if (!weeklySection) {
+        weeklySection = document.createElement('div');
+        weeklySection.id = 'weeklyFrenzySection';
+        weeklySection.className = 'weekly-frenzy-section';
+        const dailyGrid = document.getElementById('dailyGrid');
+        if (dailyGrid && dailyGrid.parentNode) {
+            dailyGrid.parentNode.insertBefore(weeklySection, dailyGrid);
+        }
+    }
+    const required = (typeof CONFIG !== 'undefined' && CONFIG.WEEKLY_STREAK_DAYS) ? CONFIG.WEEKLY_STREAK_DAYS : 7;
+    const streak = gameState.weeklyLoginStreak || 0;
+    const tokens = gameState.frenzyTokens || 0;
+    const frenzyActive = typeof runtimeState !== 'undefined' && runtimeState.frenzyActive;
+    weeklySection.innerHTML = `
+        <div class="category-label">⚡ Frenzy Mode — Weekly Reward</div>
+        <div class="weekly-streak-card">
+            <div class="weekly-streak-text">45 seconds of 3× faster drops and 2× slot payouts. Log in 7 days in a row to earn more.</div>
+            <div class="weekly-streak-progress"><span class="weekly-streak-count">${streak}/${required}</span> days this week</div>
+            ${tokens > 0 && !frenzyActive ? `
+                <button type="button" class="frenzy-activate-btn" id="frenzyActivateBtn">
+                    ⚡ Activate Frenzy (${tokens} left)
+                </button>
+            ` : frenzyActive ? '<div class="frenzy-active-label">Frenzy active on board!</div>' : '<div class="frenzy-locked-label">Earn more by logging in 7 days in a row</div>'}
+        </div>
+    `;
+    const btn = document.getElementById('frenzyActivateBtn');
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            var fn = typeof window.triggerFrenzy === 'function' ? window.triggerFrenzy : (typeof triggerFrenzy === 'function' ? triggerFrenzy : null);
+            if (!fn) return;
+            fn();
+            var boardTab = document.querySelector('.tab[data-view="boardView"]');
+            if (boardTab) boardTab.click();
+            renderDailyView();
+            if (typeof updateStatsPanel === 'function') updateStatsPanel();
+        });
+    }
 
     // Daily challenges (3 per day from pool of 50)
     const container = document.getElementById('dailyChallenges');

@@ -278,16 +278,9 @@ function handleSlotHit(slotIndex, ballBody) {
     // Global multiplier
     const globalMult = getGlobalMultiplier();
 
-    // Calculate actual multiplier with 0.75 cap for bins originally < 1
-    let finalMult = mult * globalMult;
-    const baseMult = multipliers[slotIndex] || 1;
-    if (baseMult < 1) {
-        finalMult = Math.min(finalMult, 0.75);
-    }
-
     // Calculate winnings based on bet amount
     const betAmount = ballBody.betAmount || 1;
-    const winnings = Math.round(betAmount * finalMult);
+    const winnings = Math.round(betAmount * mult * globalMult);
 
     // Award winnings
     gameState.coins += winnings;
@@ -357,31 +350,28 @@ function handleSlotHit(slotIndex, ballBody) {
 }
 
 // ── Spawn a Ball ──
-function spawnBall(x, y, forceGolden, betAmount, forceFree = false) {
+function spawnBall(x, y, forceGolden, betAmount) {
     if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return null;
 
     // Use provided bet amount or fall back to current bet from game state
     const actualBet = betAmount || gameState.currentBet || 1;
 
-    // Skip payment and checks if it's forced free (e.g., from Gem Upgrades)
-    if (!forceFree) {
-        // Check if player has enough coins to place this bet
-        if (gameState.coins < actualBet) {
-            // Not enough coins - show feedback with throttling (once every 10s)
-            const now = Date.now();
-            if (now - (runtimeState.lastToastTime || 0) > 10000) {
-                if (typeof showToast === 'function') {
-                    showToast('Not enough coins!', 'error');
-                }
-                runtimeState.lastToastTime = now;
+    // Check if player has enough coins to place this bet
+    if (gameState.coins < actualBet) {
+        // Not enough coins - show feedback with throttling (once every 10s)
+        const now = Date.now();
+        if (now - (runtimeState.lastToastTime || 0) > 10000) {
+            if (typeof showToast === 'function') {
+                showToast('Not enough coins!', 'error');
             }
-            return null;
+            runtimeState.lastToastTime = now;
         }
-
-        // Deduct bet amount
-        gameState.coins -= actualBet;
-        gameState.totalCoinsBet += actualBet;
+        return null;
     }
+
+    // Deduct bet amount
+    gameState.coins -= actualBet;
+    gameState.totalCoinsBet += actualBet;
 
     // Visual Dropper Animation - Trigger only if spawned near center (manual or auto)
     const nozzle = document.querySelector('.dropper-nozzle');
@@ -393,16 +383,15 @@ function spawnBall(x, y, forceGolden, betAmount, forceFree = false) {
 
     const isLucky = forceGolden || (Math.random() < getLuckyBallChance());
 
-    // Use random drop position if Peg Cascade is active and no X provided
-    const isCascade = typeof isEventActive === 'function' && isEventActive('peg_cascade');
-    const dropX = (x !== null && x !== undefined) ? x :
-        (isCascade ? 40 + Math.random() * (boardWidth - 80) : boardWidth / 2 + (Math.random() - 0.5) * 0.1);
-    const dropY = y || 15;
-
     // Audio: Drop
     if (window.AudioEngine) {
         window.AudioEngine.drop();
     }
+
+    // Sub-pixel jitter (0.1px) is invisible but prevents "perfect" physics paths
+    // without it, every ball would follow the exact same left/right path
+    const dropX = x || boardWidth / 2 + (Math.random() - 0.5) * 0.1;
+    const dropY = y || 15;
 
     const ball = Matter.Bodies.circle(dropX, dropY, CONFIG.BALL_RADIUS, {
         restitution: CONFIG.BALL_RESTITUTION,
@@ -471,7 +460,7 @@ let dropTimers = [];
 
 function startAutoDroppers() {
     stopAutoDroppers();
-    if (!gameState.settings.autoDropEnabled) return;
+    if (!gameState.settings.autoDropEnabled && !(typeof runtimeState !== 'undefined' && runtimeState.frenzyActive)) return;
 
     const dropperCount = getDropperCount();
     const interval = getDropInterval();
@@ -505,10 +494,6 @@ function stopAutoDroppers() {
 }
 
 function getDropperX(index, total) {
-    // If Peg Cascade is active, drop from random positions across the top
-    if (typeof isEventActive === 'function' && isEventActive('peg_cascade')) {
-        return 40 + Math.random() * (boardWidth - 80);
-    }
     // ALWAYS return the exact center, regardless of how many droppers are active
     return boardWidth / 2;
 }
@@ -529,27 +514,29 @@ function updatePhysics(delta) {
         Matter.Engine.update(engine, delta);
     }
 
-    // Centering Bias: Nudges balls toward center
-    // Skip this during Peg Cascade to allow balls to spread across the board
-    const skipBias = typeof isEventActive === 'function' && isEventActive('peg_cascade');
-
+    // Centering Bias: Nudges balls toward center to achieve requested probabilities
+    // (1k bin = 0.0001%, 100 bin = 0.1%, 25 bin = 1%)
     const centerX = boardWidth / 2;
     for (const ball of balls) {
-        if (!skipBias) {
-            const distFromCenter = ball.position.x - centerX;
-            const absDist = Math.abs(distFromCenter);
+        const distFromCenter = ball.position.x - centerX;
+        const absDist = Math.abs(distFromCenter);
 
-            if (absDist > 5) {
-                // Enhanced Centering Bias: Stronger pull to ensure more balls land in middle bins
-                // Combination of Cubic (strong at edges) + Linear (constant nudge)
-                const pullStrength = (0.00015 * Math.pow(absDist / centerX, 3)) + (0.00005 * (absDist / centerX));
-                const forceX = distFromCenter > 0 ? -pullStrength : pullStrength;
-                Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
-            }
+        if (absDist > 5) {
+            // Enhanced Centering Bias: Stronger pull to ensure more balls land in middle bins
+            // Combination of Cubic (strong at edges) + Linear (constant nudge)
+            const pullStrength = (0.00015 * Math.pow(absDist / centerX, 3)) + (0.00005 * (absDist / centerX));
+            const forceX = distFromCenter > 0 ? -pullStrength : pullStrength;
+            Matter.Body.applyForce(ball, ball.position, { x: forceX, y: 0 });
         }
 
         // Apply event-specific forces
         if (typeof applyEdgeSingularity === 'function') applyEdgeSingularity(ball);
+
+        // Gem Rain: extra edge gravity
+        if (ball.isRainBall) {
+            const side = ball.position.x < boardWidth / 2 ? -1 : 1;
+            Matter.Body.applyForce(ball, ball.position, { x: 0.0003 * side, y: 0 });
+        }
 
         // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
@@ -567,41 +554,21 @@ function updatePhysics(delta) {
 // ── Gem Upgrades: Ball Rain ──
 function triggerBallRain() {
     const count = 1000;
-    const interval = 80; // ms between each ball spawn to prevent physics lag
+    const batchSize = 25;
+    const interval = 50; // ms between batches
 
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
-            // Check if we hit the global cap to prevent crashes
             if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD + 1000) return;
 
-            // Drop precisely from the center as requested
-            const x = boardWidth / 2;
-
-            // Spawn ball with a fixed bet of 5 as requested, and make it FREE
-            const ball = spawnBall(x, 15, false, 5, true);
+            const x = 20 + Math.random() * (boardWidth - 40);
+            const ball = spawnBall(x, 15);
 
             if (ball) {
+                const side = x < boardWidth / 2 ? -1 : 1;
+                Matter.Body.applyForce(ball, ball.position, { x: 0.002 * side, y: 0 });
                 ball.isRainBall = true;
-                // No extra forces — let gravity and pegs determine the path from the center
             }
-        }, i * interval);
-    }
-}
-// ── Gem Upgrades: Ball Storm ──
-function triggerBallStorm() {
-    const count = 50;
-    const interval = 50; // ms
-
-    for (let i = 0; i < count; i++) {
-        setTimeout(() => {
-            if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD + 100) return;
-
-            const x = boardWidth / 2;
-            const ball = spawnBall(x, 15, false, 10, true);
-
-            if (ball) {
-                ball.isStormBall = true;
-            }
-        }, i * interval);
+        }, Math.floor(i / batchSize) * interval);
     }
 }

@@ -56,6 +56,7 @@
 
   <!-- Fever Mode Overlay -->
   <div class="fever-overlay" id="feverOverlay"></div>
+  <div class="frenzy-overlay" id="frenzyOverlay"></div>
 
   <div class="app" id="app">
 
@@ -95,6 +96,7 @@
 
             <!-- Fever banner -->
             <div class="fever-banner" id="feverBanner">🔥 FEVER MODE 🔥</div>
+            <div class="frenzy-banner" id="frenzyBanner">⚡ FRENZY MODE ⚡</div>
 
             <!-- Event banner -->
             <div class="fever-banner" id="eventBanner"
@@ -108,12 +110,11 @@
           <!-- Bet Amount Selector -->
           <div class="bet-selector" id="betSelector">
             <button class="bet-btn" id="betDecrease" title="Decrease bet">−</button>
-            <div class="bet-display" id="betDisplay" title="Click to enter custom bet">
+            <div class="bet-display">
               <span class="bet-label">BET</span>
               <span class="bet-amount" id="betAmountDisplay">1</span>
             </div>
             <button class="bet-btn" id="betIncrease" title="Increase bet">+</button>
-            <button class="bet-btn max" id="betMax" title="Bet everything">MAX</button>
           </div>
 
           <!-- Floating manual drop button -->
@@ -198,6 +199,8 @@
             <h2 class="panel-title">🎁 Daily Rewards</h2>
             <p class="panel-subtitle">Log in every day for escalating rewards</p>
           </div>
+          <!-- Frenzy Mode: first so it's always visible -->
+          <div class="weekly-frenzy-section" id="weeklyFrenzySection"></div>
           <div class="daily-grid" id="dailyGrid"></div>
           <div class="challenge-section">
             <div class="category-label">🎯 Daily Challenges</div>
@@ -374,77 +377,48 @@
               <span class="slider"></span>
             </label>
           </div>
-          <div class="settings-group">
-            <div class="settings-label">Developer Tools</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <button id="debugMoneyBtn"
-                style="padding: 8px; background: #ef4444; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">+100K
-                Coins</button>
-              <button id="debugGemsBtn"
-                style="padding: 8px; background: #a855f7; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">+100
-                Gems</button>
-              <button id="debugCooldownBtn"
-                style="grid-column: span 2; padding: 8px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 700; cursor: pointer;">Reset
-                Cooldowns</button>
-            </div>
-          </div>
+        </div>
 
-          <div class="settings-group">
-            <div class="settings-label">Information</div>
-            <div class="legal-links">
-              <button type="button" class="legal-link" id="privacyLink">Privacy Policy</button>
-              <button type="button" class="legal-link" id="termsLink">Terms of Service</button>
-            </div>
-            <p class="settings-hint">Support: <a href="mailto:Plinkosupport@proton.me"
-                style="color:var(--gold); text-decoration:none;">Plinkosupport@proton.me</a></p>
-            <p class="settings-hint">Version 1.2.0</p>
+        <div class="settings-group">
+          <div class="settings-label">Information</div>
+          <div class="legal-links">
+            <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
+            <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
           </div>
+          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Legal Overlay -->
-    <div class="legal-overlay" id="legalOverlay" aria-hidden="true">
-      <div class="legal-modal">
-        <div class="legal-header">
-          <h2 class="legal-title" id="legalTitle">Legal</h2>
-          <button type="button" class="legal-close" id="legalClose">✕</button>
-        </div>
-        <div class="legal-body">
-          <iframe id="legalFrame" src=""></iframe>
-        </div>
-      </div>
-    </div>
+  <!-- Matter.js physics engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
 
-    <!-- Matter.js physics engine -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+  <!-- Game modules -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/upgrades.js"></script>
+  <script src="js/prestige.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/daily.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/monetization.js"></script>
+  <script src="js/main.js"></script>
 
-    <!-- Game modules -->
-    <script src="js/config.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/upgrades.js"></script>
-    <script src="js/prestige.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/board.js"></script>
-    <script src="js/renderer.js"></script>
-    <script src="js/effects.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/tutorial.js"></script>
-    <script src="js/daily.js"></script>
-    <script src="js/shop.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/monetization.js"></script>
-    <script src="js/debug.js"></script>
-    <script src="js/main.js"></script>
-
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => {
-          console.log('Service Worker registered');
-        }).catch(err => console.warn('SW registration failed:', err));
-      }
-    </script>
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        console.log('Service Worker registered');
+      }).catch(err => console.warn('SW registration failed:', err));
+    }
+  </script>
 </body>
 
 </html>

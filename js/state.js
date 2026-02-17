@@ -52,6 +52,11 @@ function getDefaultState() {
         dailyChallengesClaimed: {},
         challengeProgress: {},
 
+        // Weekly (Frenzy reward)
+        weeklyLoginStreak: 0,
+        lastLoginDateKey: null,
+        frenzyTokens: 1,
+
         // Settings
         settings: {
             audioEnabled: true,
@@ -102,6 +107,9 @@ function loadGame() {
         gameState.dailyChallengeProgress = saved.dailyChallengeProgress || {};
         gameState.dailyChallengesClaimed = saved.dailyChallengesClaimed || {};
         gameState.lastDailyChallengeDate = saved.lastDailyChallengeDate || null;
+        gameState.weeklyLoginStreak = saved.weeklyLoginStreak ?? 0;
+        gameState.lastLoginDateKey = saved.lastLoginDateKey ?? null;
+        gameState.frenzyTokens = saved.frenzyTokens !== undefined ? saved.frenzyTokens : 1;
         gameState.settings = { ...defaults.settings, ...(saved.settings || {}) };
         return true;
     } catch (e) {
@@ -122,7 +130,9 @@ function getDropInterval() {
     const base = CONFIG.BASE_DROP_INTERVAL;
     const level = gameState.upgrades.ballRate || 0;
     const gemMult = gameState.upgrades.gemDropRateMultiplier || 1;
-    const interval = (base * Math.pow(0.75, level)) / gemMult;
+    let interval = (base * Math.pow(0.75, level)) / gemMult;
+    if (runtimeState.feverActive) interval /= CONFIG.FEVER_MULTIPLIER;
+    if (runtimeState.frenzyActive) interval /= (CONFIG.FRENZY_DROP_MULTIPLIER || 3);
     return Math.max(CONFIG.MIN_DROP_INTERVAL, interval);
 }
 
@@ -166,6 +176,11 @@ function getGlobalMultiplier() {
     // Gem Bin Doubler
     if (gameState.upgrades.gemBinMultiplier) {
         mult *= Math.pow(2, gameState.upgrades.gemBinMultiplier);
+    }
+
+    // Frenzy Mode (weekly reward)
+    if (runtimeState.frenzyActive && CONFIG.FRENZY_PAYOUT_MULTIPLIER) {
+        mult *= CONFIG.FRENZY_PAYOUT_MULTIPLIER;
     }
 
     return mult;
@@ -218,6 +233,8 @@ function getBallsPerSecond() {
 const runtimeState = {
     feverActive: false,
     feverTimer: null,
+    frenzyActive: false,
+    frenzyTimer: null,
     consecutiveHighHits: 0,
     lastSlotHit: -1,
     jackpotSlot: -1,
