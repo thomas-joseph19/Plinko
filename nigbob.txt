@@ -1,1 +1,75 @@
-nigbob
+- - - - -   Beginning of Undergraduate Record   - - - - -
+                   Fall 2025  Bloomington
+Program  : Pre - Business Undergraduate
+Course              Title                            Hrs Grd
+BUS-K     201       INTRO BUS IS & DECISIONS         3.00 B+
+BUS-T     175       KELLEY COMPASS 1                 1.50 A-
+ECON-B    251       FUND OF ECON FOR BUSINESS I      3.00 B+
+MUS-P     110       BEGIN PIANO CLASS 1 NONMUS MAJ   3.00 A-
+THTR-T    100       INTRODUCTION TO THEATRE          3.00 A
+BUS-X     155       TOPICS IN BUSINESS               1.00 S
+     Course Topic(s): PATHWAYS TO CAREERS IN BUS
+
+Test Credit Applied Toward Pre - Business Undergraduate Program Bloomington
+Course              Title                            Hrs Grd
+CMLT-C    205       COMPARATIVE LITERARY ANALYSIS    4.00 T
+
+CSCI-C    102       GREAT IDEAS IN COMPUTING         3.00 T
+
+CSCI-UN   100       CSCI UNDISTRIBUTED-100 LEVEL     8.00 T
+
+ENG-W     131       READING, WRITING, & INQUIRY I    3.00 T
+  Attention:  No Academic Program Credit (Repeat/Equiv.)
+
+ENG-W     131       READING, WRITING, & INQUIRY I    4.00 T
+  Attention:  Academic Program Credit Counted (Repeat/Equiv.)
+
+ENG-W     131EX     SEM 1 ENG COMPOSITION BY EXAM    0.00 T
+
+GEOG-G    110       HUMAN GEOG IN CHANGING WORLD     3.00 T
+
+HISP-S    200       SECOND-YEAR SPANISH I            3.00 T
+
+HISP-S    250       SECOND-YEAR SPANISH II           3.00 T
+
+HIST-H    103       EUROPE:RENAISSANCE TO NAPOLEON   3.00 T
+
+HIST-H    104       EUROPE: NAPOLEON TO THE PRES     3.00 T
+
+HIST-H    105       AMERICAN HISTORY I               3.00 T
+
+HIST-H    106       AMERICAN HISTORY II              3.00 T
+
+HIST-UN   100       HIST UNDISTRIBUTED-100 LEVEL     3.00 T
+
+MATH-UN   100       MATH UNDISTRIBUTED-100 LEVEL     3.00 T
+
+PHYS-UN   100       PHYS UNDISTRIBUTED-100 LEVEL     3.00 T
+
+PHYS-UN   100       PHYS UNDISTRIBUTED-100 LEVEL     3.00 T
+
+PSY-P     101       INTRODUCTORY PSYCHOLOGY 1        3.00 T
+
+                           Test Credit Hrs:   55.00
+
+Semester:   GPA Hours:        13.50  GPA Points:    48.450
+            Hours Earned:     69.50  GPA:            3.589
+Cumulative: GPA Hours:        13.50  GPA Points:    48.450
+            Hours Earned:     69.50  GPA:            3.589
+
+                  Spring 2026  Bloomington
+Program  : Pre - Business Undergraduate
+Course              Title                            Hrs Grd
+BUS-C     104       BUSINESS PRESENTATIONS           3.00 NR
+BUS-F     100       INTRO TO FINANCIAL &RE CAREERS   3.00 NR
+MATH-B    110       MATH FOR BUS & PUBLIC AFFAIRS    3.00 NR
+MATH-M    211       CALCULUS I                       4.00 NR
+BUS-A     100       INTRO TO ACCOUNTING PRINCIPLES   1.00 NR
+Semester:   GPA Hours:         0.00  GPA Points:     0.000
+            Hours Earned:      0.00  GPA:            0.000
+Cumulative: GPA Hours:        13.50  GPA Points:    48.450
+            Hours Earned:     69.50  GPA:            3.589
+ 
+Student Undergraduate Program Summary
+GPA Hours:      13.50  Transfer/Test Hours Passed:    55.00
+Hours Earned:   69.50  Points:          48.450  GPA:  3.589

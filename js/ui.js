@@ -575,15 +575,25 @@ function initPrestigeButton() {
             if (!canPrestige()) return;
             const tokens = calculatePrestigeTokens();
             if (confirm(`Prestige Reset?\n\nYou'll earn ${tokens} Prestige Token(s).\nYour coins and upgrades will reset, but prestige bonuses are permanent.\n\nContinue?`)) {
-                performPrestige();
-                rebuildBoard();
-                stopAutoDroppers();
-                startAutoDroppers();
-                renderDroppers();
-                refreshUpgradeUI();
-                renderPrestigeView();
-                updateStatsPanel();
-                particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#c084fc', 30);
+                if (window.Monetization) {
+                    window.Monetization.showAd(() => {
+                        doPrestigeReset();
+                    });
+                } else {
+                    doPrestigeReset();
+                }
+
+                function doPrestigeReset() {
+                    performPrestige();
+                    rebuildBoard();
+                    stopAutoDroppers();
+                    startAutoDroppers();
+                    renderDroppers();
+                    refreshUpgradeUI();
+                    renderPrestigeView();
+                    updateStatsPanel();
+                    particleBurst(window.innerWidth / 2, window.innerHeight / 2, '#c084fc', 30);
+                }
             }
         });
     }

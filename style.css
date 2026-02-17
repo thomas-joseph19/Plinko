@@ -567,7 +567,7 @@ body::after {
   height: 100dvh;
   display: grid;
   /* HUD height: safe area + base size (64px) */
-  grid-template-rows: calc(var(--sat) + 64px) 1fr var(--tab-h);
+  grid-template-rows: calc(var(--sat) + 64px) 1fr var(--tab-h) auto;
   grid-template-columns: 1fr;
   width: 100%;
   margin: 0 auto;
@@ -3068,4 +3068,121 @@ body::after {
   background: var(--accent1);
   transform: scale(1.2);
   box-shadow: 0 0 10px var(--accent1);
+}
+
+/* ═══════════ AD BANNER ═══════════ */
+.ad-banner {
+  grid-column: 1 / -1;
+  background: #0d0c12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 0;
+  z-index: 100 !important;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ad-banner.active {
+  height: 60px;
+  opacity: 1;
+  border-top: 1px solid var(--border);
+}
+
+/* ═══════════ AD OVERLAY (Simulated Interstitial/Rewarded) ═══════════ */
+.ad-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: adFadeIn 0.3s ease;
+}
+
+@keyframes adFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.ad-content {
+  background: linear-gradient(180deg, #1c1b26, #12121a);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 16px;
+  padding: 28px 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6);
+}
+
+.ad-content h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.ad-placeholder {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 32px 16px;
+  margin-bottom: 16px;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ad-placeholder small {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.ad-timer {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 16px;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.ad-close-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--text-mid);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.ad-close-btn:not(:disabled) {
+  cursor: pointer;
+  color: var(--gold);
+  border-color: rgba(212, 175, 55, 0.5);
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.ad-close-btn:not(:disabled):hover {
+  background: rgba(212, 175, 55, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
 }

@@ -5,10 +5,17 @@
 const Monetization = {
     // Configuration
     REVENUECAT_API_KEY: 'test_FecausrHExPmUXyZUWXPFeFoDNM', // Provided key
+    ADSENSE_PUB_ID: 'ca-pub-2818023938860764',
+    ADMOB_BANNER_ID_IOS: 'ca-app-pub-2818023938860764/6854620013',
+    ADMOB_INTERSTITIAL_ID_IOS: 'ca-app-pub-2818023938860764/5541538346',
+    ADMOB_REWARDED_ID_IOS: 'ca-app-pub-2818023938860764/3280937594',
     ENTITLEMENT_ID: 'premium',
 
     // State
     isPremium: false,
+    lastAdTime: 0,
+    adTimer: null,
+    INTERSTITIAL_INTERVAL: 120000, // 2 minutes
 
     // RevenueCat Instance
     rc: null,
@@ -18,8 +25,13 @@ const Monetization = {
         const saved = localStorage.getItem('plinko_premium');
         if (saved === 'true') {
             this.isPremium = true;
-            this.updateUI();
         }
+
+        // Always update UI (shows/hides banner, etc.)
+        this.updateUI();
+
+        // Start intermittent ad timer
+        this.startIntermittentAds();
 
         // 1. Try RevenueCat SDK (Web Mode)
         if (window.Purchases && typeof window.Purchases.configure === 'function') {
@@ -71,6 +83,19 @@ const Monetization = {
         });
 
         console.log('Monetization: Bridge Initialized');
+    },
+
+    startIntermittentAds() {
+        if (this.adTimer) clearInterval(this.adTimer);
+        this.adTimer = setInterval(() => {
+            const now = Date.now();
+            if (!this.isPremium && now - this.lastAdTime > this.INTERSTITIAL_INTERVAL) {
+                // Only show if user is active/tab is focused?
+                if (document.visibilityState === 'visible') {
+                    this.showAd();
+                }
+            }
+        }, 10000); // Check every 10s
     },
 
     handleCustomerInfo(info) {
@@ -184,6 +209,32 @@ const Monetization = {
             }
         });
 
+        const banner = document.getElementById('adBanner');
+        if (banner) {
+            if (this.isPremium) {
+                banner.classList.remove('active');
+                banner.style.display = 'none';
+
+                // Hide native banner if applicable
+                if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'HIDE_BANNER' }));
+                }
+            } else {
+                banner.classList.add('active');
+                banner.style.display = 'flex';
+
+                // Trigger native banner if applicable
+                if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'SHOW_BANNER',
+                        adUnitId: this.ADMOB_BANNER_ID_IOS,
+                        position: 'bottom'
+                    }));
+                }
+                // Else: we rely on AdSense Auto Ads for web
+            }
+        }
+
         // Refresh shop UI if open
         if (typeof renderShopView === 'function') renderShopView();
     },
@@ -197,12 +248,59 @@ const Monetization = {
             return;
         }
 
+        this.lastAdTime = Date.now();
         console.log('Monetization: Showing Interstitial Ad...');
+
+        // 1. Try Native Bridge (iOS App)
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'SHOW_INTERSTITIAL',
+                adUnitId: this.ADMOB_INTERSTITIAL_ID_IOS
+            }));
+
+            // Assume success or wait for callback? 
+            // For simplicity in hybrid, we often just let the native view take over.
+            // But we should probably pause game/sounds.
+            if (onComplete) onComplete(true);
+            return;
+        }
+
+        // 2. Fallback to Web Simulator (or AdSense Auto Ads if they trigger)
         this.createAdOverlay('Interstitial Ad', onComplete);
     },
 
     showRewardedAd(onReward, onCancel) {
         console.log('Monetization: Showing Rewarded Ad...');
+
+        // 1. Try Native Bridge (iOS App)
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'SHOW_REWARDED',
+                adUnitId: this.ADMOB_REWARDED_ID_IOS
+            }));
+
+            // Register a one-time listener for the reward callback from native
+            // This is a simplified approach; a robust one would handle event IDs.
+            const rewardListener = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'REWARDED_AD_COMPLETE') {
+                        if (data.rewarded) {
+                            if (onReward) onReward();
+                        } else {
+                            if (onCancel) onCancel();
+                        }
+                        window.removeEventListener('message', rewardListener);
+                    }
+                } catch (e) { }
+            };
+            window.addEventListener('message', rewardListener);
+            return;
+        }
+
+        // 2. Standard Web Fallback (Simulator)
+        // Standard AdSense (pub-only) cannot trigger a real rewarded video easily.
+        // We use the simulator to ensure the user gets the functional reward.
         this.createAdOverlay('Rewarded Ad (Watch for +50 Balls!)', (success) => {
             if (success) {
                 if (onReward) onReward();
@@ -242,7 +340,7 @@ const Monetization = {
 
             if (timeLeft <= 0) {
                 clearInterval(interval);
-                timerEl.textContent = 'Reward Granted';
+                timerEl.textContent = isRewarded ? 'Reward Granted' : 'Ad Completed';
                 closeBtn.disabled = false;
                 closeBtn.textContent = 'Close (X)';
 
