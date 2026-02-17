@@ -349,36 +349,37 @@ function handleSlotHit(slotIndex, ballBody) {
     }, 200);
 }
 
+// ── Affordable bet for N balls (so total cost <= coins) ──
+function getAffordableBetForBalls(numBalls) {
+    const coins = gameState.coins || 0;
+    const currentBet = gameState.currentBet || 1;
+    const maxPerBall = Math.floor(coins / Math.max(1, numBalls));
+    return Math.min(currentBet, Math.max(1, maxPerBall));
+}
+
 // ── Spawn a Ball ──
-// isFree: if true, skip coin check/deduction (used by shop items, rain, etc.)
-function spawnBall(x, y, forceGolden, betAmount, isFree) {
-    // Allow temporary cap override for rain/storm events
-    const maxBalls = runtimeState.ballCapOverride || CONFIG.MAX_BALLS_ON_BOARD;
-    if (runtimeState.activeBalls >= maxBalls) return null;
+function spawnBall(x, y, forceGolden, betAmount) {
+    if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return null;
 
     // Use provided bet amount or fall back to current bet from game state
-    const isFrenzy = typeof runtimeState !== 'undefined' && runtimeState.frenzyActive && runtimeState.frenzyBallValue > 0;
-    const actualBet = isFrenzy ? runtimeState.frenzyBallValue : (betAmount || gameState.currentBet || 1);
+    const actualBet = betAmount || gameState.currentBet || 1;
 
-    // During frenzy or free balls, skip coin check
-    if (!isFrenzy && !isFree) {
-        // Check if player has enough coins to place this bet
-        if (gameState.coins < actualBet) {
-            // Not enough coins - show feedback with throttling (once every 10s)
-            const now = Date.now();
-            if (now - (runtimeState.lastToastTime || 0) > 10000) {
-                if (typeof showToast === 'function') {
-                    showToast('Not enough coins!', 'error');
-                }
-                runtimeState.lastToastTime = now;
+    // Check if player has enough coins to place this bet
+    if (gameState.coins < actualBet) {
+        // Not enough coins - show feedback with throttling (once every 10s)
+        const now = Date.now();
+        if (now - (runtimeState.lastToastTime || 0) > 10000) {
+            if (typeof showToast === 'function') {
+                showToast('Not enough coins!', 'error');
             }
-            return null;
+            runtimeState.lastToastTime = now;
         }
-
-        // Deduct bet amount
-        gameState.coins -= actualBet;
-        gameState.totalCoinsBet += actualBet;
+        return null;
     }
+
+    // Deduct bet amount
+    gameState.coins -= actualBet;
+    gameState.totalCoinsBet += actualBet;
 
     // Visual Dropper Animation - Trigger only if spawned near center (manual or auto)
     const nozzle = document.querySelector('.dropper-nozzle');
@@ -464,36 +465,35 @@ function cleanupBalls() {
 
 // ── Auto-drop system ──
 let dropTimers = [];
-let dropperGeneration = 0; // Prevents stale timer callbacks from running
 
 function startAutoDroppers() {
     stopAutoDroppers();
     if (!gameState.settings.autoDropEnabled && !(typeof runtimeState !== 'undefined' && runtimeState.frenzyActive)) return;
 
-    const gen = ++dropperGeneration; // Capture current generation
     const dropperCount = getDropperCount();
     const interval = getDropInterval();
     const ballsPerDrop = getBallCount();
 
     for (let d = 0; d < dropperCount; d++) {
-        const timerId = setInterval(() => {
-            // If generation changed, this timer is stale — kill it
-            if (gen !== dropperGeneration) {
-                clearInterval(timerId);
-                return;
-            }
-            for (let b = 0; b < ballsPerDrop; b++) {
-                const dropperX = getDropperX(d, dropperCount);
-                setTimeout(() => spawnBall(dropperX, 15, false, gameState.currentBet), b * 80);
-            }
-            flashDropper(d);
-        }, interval);
+        const offset = d * (interval / dropperCount); // Stagger droppers
+
+        const timerId = setTimeout(() => {
+            const innerTimer = setInterval(() => {
+                for (let b = 0; b < ballsPerDrop; b++) {
+                    const dropperX = getDropperX(d, dropperCount);
+                    // Use current bet for auto-dropped balls
+                    setTimeout(() => spawnBall(dropperX, 15, false, gameState.currentBet), b * 80);
+                }
+                // Flash dropper indicator
+                flashDropper(d);
+            }, getDropInterval());
+            dropTimers.push(innerTimer);
+        }, offset);
         dropTimers.push(timerId);
     }
 }
 
 function stopAutoDroppers() {
-    dropperGeneration++; // Invalidate any pending callbacks
     for (const t of dropTimers) {
         clearTimeout(t);
         clearInterval(t);
@@ -540,12 +540,6 @@ function updatePhysics(delta) {
         // Apply event-specific forces
         if (typeof applyEdgeSingularity === 'function') applyEdgeSingularity(ball);
 
-        // Gem Rain: extra edge gravity
-        if (ball.isRainBall) {
-            const side = ball.position.x < boardWidth / 2 ? -1 : 1;
-            Matter.Body.applyForce(ball, ball.position, { x: 0.0003 * side, y: 0 });
-        }
-
         // Store trail points for active balls
         if (!ball.trailPoints) ball.trailPoints = [];
         ball.trailPoints.push({ x: ball.position.x, y: ball.position.y, t: Date.now() });
@@ -559,31 +553,15 @@ function updatePhysics(delta) {
     }
 }
 
-// ── Gem Upgrades: Ball Rain ──
-function triggerBallRain() {
-    const count = 200; // Reduced from 1000 to prevent physics meltdown
-    const batchSize = 10;
-    const interval = 80; // ms between batches
-
-    // Temporarily raise ball cap
-    runtimeState.ballCapOverride = CONFIG.MAX_BALLS_ON_BOARD + 300;
-
+// ── Ball Storm (shop): 50 balls at a bet you can afford ──
+function triggerBallStorm() {
+    const count = 50;
+    const bet = getAffordableBetForBalls(count);
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
-            const x = 20 + Math.random() * (boardWidth - 40);
-            // Rain balls are FREE (isFree=true)
-            const ball = spawnBall(x, 15, false, gameState.currentBet, true);
-
-            if (ball) {
-                const side = x < boardWidth / 2 ? -1 : 1;
-                Matter.Body.applyForce(ball, ball.position, { x: 0.002 * side, y: 0 });
-                ball.isRainBall = true;
-            }
-        }, Math.floor(i / batchSize) * interval);
+            if (runtimeState.activeBalls >= CONFIG.MAX_BALLS_ON_BOARD) return;
+            const x = boardWidth / 2 + (Math.random() - 0.5) * 0.1;
+            spawnBall(x, 15, false, bet);
+        }, i * 80);
     }
-
-    // Reset cap after all balls have been spawned
-    setTimeout(() => {
-        runtimeState.ballCapOverride = 0;
-    }, Math.ceil(count / batchSize) * interval + 1000);
 }
