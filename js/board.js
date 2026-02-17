@@ -382,8 +382,16 @@ function spawnBall(x, y, forceGolden, betAmount) {
     gameState.totalCoinsBet += actualBet;
 
     // Visual Dropper Animation - Trigger only if spawned near center (manual or auto)
+    // Visual Dropper: Move to spawn X and fire
     const nozzle = document.querySelector('.dropper-nozzle');
-    if (nozzle && (!x || Math.abs(x - boardWidth / 2) < 20)) {
+    if (nozzle) {
+        // Move nozzle to ball X (clamped to board width)
+        const spawnX = x || boardWidth / 2;
+        // nozzle is absolute in .plinko-board. 
+        // We used left: 50% in CSS, now we override it
+        nozzle.style.left = spawnX + 'px';
+
+        // Trigger animation
         nozzle.classList.remove('active');
         void nozzle.offsetWidth; // trigger reflow
         nozzle.classList.add('active');
