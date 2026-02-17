@@ -689,12 +689,10 @@ body::after {
   position: relative;
 }
 
-/* ─── Pixel Art Dropper (Robust) ─── */
+/* ─── Minimal Dropper Indicator ─── */
 .drop-zone {
-  /* Ensure header stack is highest */
   position: relative;
   z-index: 50;
-  /* Other styles inherited: flex, gap, etc. */
 }
 
 .dropper-nozzle {
@@ -702,61 +700,50 @@ body::after {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 32px;
-  height: 44px;
-  /* Taller to hang down */
+  width: 24px;
+  height: 28px;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: left 0.08s linear;
-  /* Slightly faster tracking */
+  transition: left 0.1s ease-out;
 }
 
-/* Gray Pipe Body */
+/* Simple line stem */
 .dropper-pipe {
-  width: 24px;
-  height: 32px;
-  background-color: #444;
-  border: 4px solid #222;
-  /* Thick pixel border */
-  border-bottom: none;
-  box-shadow: inset 4px 0 0 rgba(255, 255, 255, 0.1);
+  width: 4px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
 }
 
-/* Golden Tip */
+/* Subtle dot tip */
 .dropper-tip {
-  width: 32px;
+  width: 12px;
   height: 12px;
-  background-color: var(--gold);
-  border: 4px solid #222;
-  /* Thick pixel border */
-  border-top: none;
-  margin-top: -4px;
-  /* Connect seamlessly */
-  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.2);
-  position: relative;
-  z-index: 2;
-  /* Tip above pipe */
+  background: var(--gold);
+  border-radius: 50%;
+  margin-top: -2px;
+  box-shadow: 0 0 8px rgba(255, 200, 0, 0.5);
 }
 
-/* Firing Animation - Quick pixel jolt */
-.dropper-nozzle.active {
-  animation: pixelSnap 0.15s steps(2, end);
+/* Gentle pulse on fire */
+.dropper-nozzle.active .dropper-tip {
+  animation: gentlePulse 0.2s ease-out;
 }
 
-@keyframes pixelSnap {
+@keyframes gentlePulse {
   0% {
-    transform: translateX(-50%) translateY(0);
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(255, 200, 0, 0.5);
   }
-
   50% {
-    transform: translateX(-50%) translateY(-6px);
+    transform: scale(1.3);
+    box-shadow: 0 0 16px rgba(255, 200, 0, 0.8);
   }
-
-  /* Kick up */
   100% {
-    transform: translateX(-50%) translateY(0);
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(255, 200, 0, 0.5);
   }
 }
 
