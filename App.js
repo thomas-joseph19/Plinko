@@ -55,6 +55,10 @@ export default function App() {
             console.log('Native received message:', data.type);
 
             if (data.type === 'PURCHASE') {
+                if (!Purchases) {
+                    console.warn('Purchases not available in Expo Go.');
+                    return;
+                }
                 try {
                     const { customerInfo, productIdentifier } = await Purchases.purchaseProduct(data.productId);
                     webViewRef.current.postMessage(JSON.stringify({
@@ -76,6 +80,10 @@ export default function App() {
             }
 
             if (data.type === 'RESTORE') {
+                if (!Purchases) {
+                    console.warn('Purchases not available in Expo Go.');
+                    return;
+                }
                 const customerInfo = await Purchases.restorePurchases();
                 webViewRef.current.postMessage(JSON.stringify({
                     type: 'RESTORE_RESULT',
