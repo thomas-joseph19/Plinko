@@ -409,11 +409,61 @@
         <div class="settings-group">
           <div class="settings-label">Information</div>
           <div class="legal-links">
-            <a href="public/privacy.html" class="legal-link" target="_blank">Privacy Policy</a>
-            <a href="public/terms.html" class="legal-link" target="_blank">Terms of Service</a>
+            <button type="button" class="legal-btn" id="privacyBtn">Privacy Policy</button>
+            <button type="button" class="legal-btn" id="termsBtn">Terms of Service</button>
           </div>
-          <p class="settings-hint">Version 1.2.0 · Made with 💜 by Antigravity</p>
+          <p class="settings-hint">Version 1.2.0</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="legal-overlay" id="privacyOverlay" aria-hidden="true">
+    <div class="legal-modal">
+      <div class="legal-header">
+        <h2 class="legal-title">Privacy Policy</h2>
+        <button type="button" class="legal-close" id="privacyClose">✕</button>
+      </div>
+      <div class="legal-body">
+        <p>Last updated: February 17, 2026</p>
+        <p>PLINKO∞ ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy explains how we
+          collect, use, and share information about you when you play our game.</p>
+        <h3>Information We Collect</h3>
+        <p>We do not collect any personal information. All game data is stored locally on your device via browser local
+          storage.</p>
+        <h3>Third-Party Services</h3>
+        <p>Our game may include links to third-party services (like RevenueCat for purchases or Google AdSense for ads).
+          We are not responsible for the privacy practices of these third-party services.</p>
+        <h3>Contact Us</h3>
+        <p>If you have any questions about this Privacy Policy, please contact us at: <a
+            href="mailto:plinkosupport@proton.me" style="color: #60a5fa;">plinkosupport@proton.me</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Service Modal -->
+  <div class="legal-overlay" id="termsOverlay" aria-hidden="true">
+    <div class="legal-modal">
+      <div class="legal-header">
+        <h2 class="legal-title">Terms of Service</h2>
+        <button type="button" class="legal-close" id="termsClose">✕</button>
+      </div>
+      <div class="legal-body">
+        <p>Last updated: February 17, 2026</p>
+        <p>By using PLINKO∞, you agree to these Terms of Service. Please read them carefully.</p>
+        <h3>Game Use</h3>
+        <p>PLINKO∞ is for entertainment purposes only. The "coins" or "gems" used in the game have no real-world value
+          and cannot be exchanged for currency.</p>
+        <h3>In-App Purchases</h3>
+        <p>We may offer virtual goods or currency for purchase via real money. All sales are final and non-refundable.
+          Your purchases are handled by Apple/Google via the RevenueCat SDK.</p>
+        <h3>Intellectual Property</h3>
+        <p>All content included in the game (art, code, logic) is the property of the developers and is protected by
+          copyright laws.</p>
+        <h3>Support</h3>
+        <p>For support or inquiries, email us at: <a href="mailto:plinkosupport@proton.me"
+            style="color: #60a5fa;">plinkosupport@proton.me</a></p>
       </div>
     </div>
   </div>

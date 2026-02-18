@@ -29,10 +29,24 @@ export default function App() {
     const webViewRef = useRef(null);
 
     useEffect(() => {
-        if (Platform.OS !== 'web') {
-            const apiKey = Platform.OS === 'ios' ? RC_API_KEYS.apple : RC_API_KEYS.google;
-            Purchases.configure({ apiKey });
-        }
+        const configurePurchases = async () => {
+            if (Platform.OS !== 'web') {
+                try {
+                    // In Expo Go, native modules like Purchases are not available unless using a development build.
+                    // We check if Purchases is defined and has the configure method.
+                    if (Purchases && typeof Purchases.configure === 'function') {
+                        const apiKey = Platform.OS === 'ios' ? RC_API_KEYS.apple : RC_API_KEYS.google;
+                        await Purchases.configure({ apiKey });
+                        console.log('Purchases configured successfully');
+                    } else {
+                        console.warn('Purchases module is not available in این environment (possibly Expo Go).');
+                    }
+                } catch (e) {
+                    console.error('Error configuring Purchases:', e);
+                }
+            }
+        };
+        configurePurchases();
     }, []);
 
     const handleMessage = async (event) => {

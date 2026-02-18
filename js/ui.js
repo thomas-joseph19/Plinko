@@ -125,38 +125,44 @@ function initSettings() {
         });
     }
 
+    // ── Legal Overlay Logic (New Pop-ups) ──
+    const privacyBtn = document.getElementById('privacyBtn');
+    const termsBtn = document.getElementById('termsBtn');
+    const privacyOverlay = document.getElementById('privacyOverlay');
+    const termsOverlay = document.getElementById('termsOverlay');
+    const privacyClose = document.getElementById('privacyClose');
+    const termsClose = document.getElementById('termsClose');
+
+    function openPrivacy() {
+        if (privacyOverlay) privacyOverlay.classList.add('active');
+    }
+    function closePrivacy() {
+        if (privacyOverlay) privacyOverlay.classList.remove('active');
+    }
+    function openTerms() {
+        if (termsOverlay) termsOverlay.classList.add('active');
+    }
+    function closeTerms() {
+        if (termsOverlay) termsOverlay.classList.remove('active');
+    }
+
+    if (privacyBtn) privacyBtn.addEventListener('click', openPrivacy);
+    if (termsBtn) termsBtn.addEventListener('click', openTerms);
+    if (privacyClose) privacyClose.addEventListener('click', closePrivacy);
+    if (termsClose) termsClose.addEventListener('click', closeTerms);
+
+    // Close on click outside
+    if (privacyOverlay) privacyOverlay.addEventListener('click', (e) => { if (e.target === privacyOverlay) closePrivacy(); });
+    if (termsOverlay) termsOverlay.addEventListener('click', (e) => { if (e.target === termsOverlay) closeTerms(); });
+
+    // Handle Escape key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeSettings();
-        if (e.key === 'Escape' && legalOverlay && legalOverlay.classList.contains('open')) closeLegal();
+        if (e.key === 'Escape') {
+            closePrivacy();
+            closeTerms();
+            if (overlay && overlay.classList.contains('open')) closeSettings();
+        }
     });
-
-    // ── Legal Overlay Logic ──
-    const legalOverlay = document.getElementById('legalOverlay');
-    const legalClose = document.getElementById('legalClose');
-    const legalFrame = document.getElementById('legalFrame');
-    const legalTitle = document.getElementById('legalTitle');
-    const privacyLink = document.getElementById('privacyLink');
-    const termsLink = document.getElementById('termsLink');
-
-    function openLegal(url, title) {
-        if (!legalOverlay || !legalFrame) return;
-        legalTitle.textContent = title;
-        legalFrame.src = url;
-        legalOverlay.classList.add('open');
-        legalOverlay.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeLegal() {
-        if (!legalOverlay || !legalFrame) return;
-        legalOverlay.classList.remove('open');
-        legalOverlay.setAttribute('aria-hidden', 'true');
-        legalFrame.src = ''; // Clear for next time
-    }
-
-    if (privacyLink) privacyLink.addEventListener('click', () => openLegal('public/privacy.html', 'Privacy Policy'));
-    if (termsLink) termsLink.addEventListener('click', () => openLegal('public/terms.html', 'Terms of Service'));
-    if (legalClose) legalClose.addEventListener('click', closeLegal);
-    if (legalOverlay) legalOverlay.addEventListener('click', (e) => { if (e.target === legalOverlay) closeLegal(); });
 
     // Background Switcher
     const bgBtns = document.querySelectorAll('[data-bg-set]');
