@@ -8,7 +8,7 @@ const ASSETS = [
     './index.html',
     './style.css',
     './manifest.json',
-    './icons/icon.svg',
+    './icons/Logo.png',
     './js/config.js',
     './js/state.js',
     './js/upgrades.js',
