@@ -34,9 +34,9 @@ const CONFIG = {
   SLOT_MULTIPLIERS: {
     // Custom 12-bin layout for 10 rows
     // Pegs end at 11 -> 12 bins
-    // ~1.1x EV with drastic spread: rare big wins vs frequent small losses
+    // ~1.0005x EV: slightly positive for the player
     10: [
-      8, 4, 2, 1.5, 0.7, 0.5, 0.5, 0.7, 1.5, 2, 4, 8
+      7.2, 3.6, 1.8, 1.4, 0.6, 0.5, 0.5, 0.6, 1.4, 1.8, 3.6, 7.2
     ],
   },
 
