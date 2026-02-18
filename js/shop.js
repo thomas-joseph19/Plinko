@@ -34,7 +34,7 @@ function renderShopView() {
                 <div class="shop-item-icon">🚫</div>
                 <div class="shop-item-name">No Ads</div>
                 <div class="shop-item-desc">Remove ads & support dev</div>
-                <div class="shop-item-price">$2.99</div>
+                <div class="shop-item-price">$9.99</div>
             `;
             noAdsBtn.addEventListener('click', () => window.Monetization.purchaseNoAds());
             specialGrid.appendChild(noAdsBtn);
@@ -141,7 +141,7 @@ function renderShopView() {
     const GEM_PACKS = [
         { amount: 10, price: '2.99' },
         { amount: 50, price: '12.99' },
-        { amount: 100, price: '25.99' }
+        { amount: 100, price: '24.99' }
     ];
 
     GEM_PACKS.forEach(pack => {
