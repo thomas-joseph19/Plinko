@@ -56,8 +56,8 @@ function rebuildBoard() {
     // For 12 bins, the last row needs 13 pegs (bins = spaces between consecutive pegs).
     // Each row has one more peg than the previous, creating a proper staggered triangle.
     // Row 0: 4 pegs, Row 1: 5, ... Row 9: 13 pegs.
-    const numSlots = 12;
-    const lastRowPegCount = numSlots + 1;  // 13
+    const numSlots = 14;
+    const lastRowPegCount = numSlots + 1;  // 15
     const firstRowPegCount = lastRowPegCount - (numRows - 1); // 4
 
     // Uniform horizontal spacing based on the widest (last) row
@@ -289,9 +289,10 @@ function handleSlotHit(slotIndex, ballBody) {
     // Daily challenges: earn_coins, land_edge, land_center, land_high
     if (typeof recordDailyProgress === 'function') {
         recordDailyProgress('earn_coins', winnings);
-        const numSlots = (multipliers && multipliers.length) || 12;
+        const numSlots = (multipliers && multipliers.length) || 14;
         if (slotIndex === 0 || slotIndex === numSlots - 1) recordDailyProgress('land_edge', 1);
-        if (slotIndex === 5 || slotIndex === 6) recordDailyProgress('land_center', 1);
+        // Center slots for 14 bins are indexes 4 through 9 (the < 1.0 bins)
+        if (slotIndex >= 4 && slotIndex <= 9) recordDailyProgress('land_center', 1);
         const baseMult = multipliers[slotIndex] || 1;
         if (baseMult >= 10) recordDailyProgress('land_high', 1);
     }

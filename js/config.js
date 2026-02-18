@@ -32,11 +32,11 @@ const CONFIG = {
   // ── Economy ──
   BASE_BET: 1,                // Each "1x" pays 1 coin
   SLOT_MULTIPLIERS: {
-    // Custom 12-bin layout for 10 rows
-    // Pegs end at 11 -> 12 bins
-    // ~1.0005x EV: slightly positive for the player
+    // Custom 14-bin layout for 10 rows
+    // Pegs end at 13 -> 14 bins
+    // EV: ~1.01x
     10: [
-      7.2, 3.6, 1.8, 1.4, 0.6, 0.5, 0.5, 0.6, 1.4, 1.8, 3.6, 7.2
+      8, 4, 3, 1.5, 0.75, 0.5, 0.2, 0.2, 0.5, 0.75, 1.5, 3, 4, 8
     ],
   },
 

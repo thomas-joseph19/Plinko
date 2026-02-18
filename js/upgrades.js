@@ -44,12 +44,12 @@ const UPGRADES = {
     // ── Board Upgrades ──
     slotBoost: {
         name: '💰 Slot Boost',
-        desc: 'All slots pay +2% per level',
+        desc: 'All slots pay +1% per level',
         category: 'board',
         maxLevel: 100,
-        baseCost: 5000,
+        baseCost: 100000,
         costScale: 2.0,
-        effect: (lvl) => `×${Math.pow(1.02, lvl).toFixed(2)} payout`,
+        effect: (lvl) => `×${Math.pow(1.01, lvl).toFixed(2)} payout`,
     },
 
     // ── Passive Upgrades ──

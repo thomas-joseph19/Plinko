@@ -5,19 +5,15 @@ import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
 import Purchases from 'react-native-purchases';
 
+import bundledHtml from './assets/game_bundled.js';
+
 // ─── CONFIGURATION ───
-// Production: Load from GitHub Pages (works offline from cache after first load)
-// Development: Load from local Vite dev server
-const PRODUCTION_URL = 'https://thomas-joseph19.github.io/Plinko/game.html';
-
-const debuggerHost = Constants.expoConfig?.hostUri;
-const localIp = debuggerHost ? debuggerHost.split(':')[0] : 'localhost';
-const devUrl = `http://${localIp}:5173/game.html`;
-
-// Use Dev URL if running locally, otherwise use production URL
-const webViewSource = __DEV__
-    ? { uri: devUrl }
-    : { uri: PRODUCTION_URL };
+const webViewSource = Platform.OS === 'web'
+    ? { uri: '/game.html' }
+    : {
+        html: bundledHtml,
+        baseUrl: 'https://thomas-joseph19.github.io/Plinko/'
+    };
 
 // RevenueCat Config
 const RC_API_KEYS = {
@@ -29,6 +25,10 @@ export default function App() {
     const webViewRef = useRef(null);
 
     useEffect(() => {
+        console.log('App starting. Bundled HTML length:', bundledHtml?.length);
+        if (bundledHtml) {
+            console.log('Bundled HTML starts with:', bundledHtml.substring(0, 100));
+        }
         const configurePurchases = async () => {
             if (Platform.OS !== 'web') {
                 try {
@@ -109,36 +109,41 @@ export default function App() {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
             <StatusBar style="light" />
-            <View style={styles.container}>
-                <WebView
-                    ref={webViewRef}
-                    source={webViewSource}
-                    style={styles.webview}
-                    onMessage={handleMessage}
-                    allowsBackForwardNavigationGestures
-                    domStorageEnabled
-                    javaScriptEnabled
-                    allowsInlineMediaPlayback
-                    mediaPlaybackRequiresUserAction={false}
-                    scrollEnabled={false}
-                    bounces={false}
-                    originWhitelist={['*']}
-                />
-            </View>
-        </SafeAreaView>
+            <WebView
+                ref={webViewRef}
+                source={webViewSource}
+                style={styles.webview}
+                onMessage={handleMessage}
+                onLoadEnd={() => console.log('WebView loaded successfully')}
+                onError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn('WebView error: ', nativeEvent);
+                }}
+                onHttpError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn('WebView HTTP error: ', nativeEvent);
+                }}
+                allowsBackForwardNavigationGestures
+                domStorageEnabled
+                javaScriptEnabled
+                allowsInlineMediaPlayback
+                mediaPlaybackRequiresUserAction={false}
+                scrollEnabled={false}
+                bounces={false}
+                originWhitelist={['*']}
+                javaScriptCanOpenWindowsAutomatically={true}
+            />
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#08060f',
-    },
     container: {
         flex: 1,
         backgroundColor: '#08060f',
+        paddingTop: Platform.OS === 'ios' ? 50 : 0, // Fallback for safe area
     },
     webview: {
         flex: 1,

@@ -4,8 +4,9 @@
   "description": "Premium Idle Plinko Game — standalone, no overlap with other projects",
   "private": true,
   "scripts": {
-    "start": "vite --host",
+    "start": "npx expo start",
     "dev": "vite --host",
+    "bundle": "node build-html.js",
     "expo": "npx expo start",
     "build": "vite build",
     "preview": "vite preview",
