@@ -38,8 +38,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c87f2f2e-d3a6-420b-afdf-ff8c79904813"
+        "projectId": "a916a738-e3a1-49ad-9c21-f8bb6feb7bf6"
       }
-    }
+    },
+    "owner": "jerrythemouse"
   }
 }
