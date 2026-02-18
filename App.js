@@ -6,17 +6,18 @@ import Constants from 'expo-constants';
 import Purchases from 'react-native-purchases';
 
 // ─── CONFIGURATION ───
-// Offline Mode: We bundle the game into a single JS string to avoid external hosting
-import bundledGameHtml from './dist/game_bundled.js';
+// Production: Load from GitHub Pages (works offline from cache after first load)
+// Development: Load from local Vite dev server
+const PRODUCTION_URL = 'https://thomas-joseph19.github.io/Plinko/game.html';
 
 const debuggerHost = Constants.expoConfig?.hostUri;
 const localIp = debuggerHost ? debuggerHost.split(':')[0] : 'localhost';
 const devUrl = `http://${localIp}:5173/game.html`;
 
-// Use Dev URL if running locally (npm run dev), otherwise use Bundled HTML (Offline Mode)
+// Use Dev URL if running locally, otherwise use production URL
 const webViewSource = __DEV__
     ? { uri: devUrl }
-    : { html: bundledGameHtml, baseUrl: '' };
+    : { uri: PRODUCTION_URL };
 
 // RevenueCat Config
 const RC_API_KEYS = {
@@ -42,7 +43,6 @@ export default function App() {
             if (data.type === 'PURCHASE') {
                 try {
                     const { customerInfo, productIdentifier } = await Purchases.purchaseProduct(data.productId);
-                    // Check if entitlement is active or just return success for gems
                     webViewRef.current.postMessage(JSON.stringify({
                         type: 'PURCHASE_SUCCESS',
                         productId: productIdentifier,

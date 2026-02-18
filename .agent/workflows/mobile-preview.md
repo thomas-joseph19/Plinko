@@ -5,11 +5,11 @@ description: how to run the mobile preview
 
 // turbo-all
 
-#### Run the Dev Server (Shows Phone Frame)
+#### Run the Dev Server
 1. Run `npm run dev`
-2. Open `http://localhost:5173` in your browser
-3. You will see the game running **inside a realistic iPhone 15 frame** with controls
-4. Click **"Full Screen"** to view the game without the phone frame
+2. Open `http://localhost:5173` in your browser (or on your phone via the network URL)
+3. You will see the game running **directly** — identical to the deployed network version
+4. To view the old phone-frame preview wrapper, go to `http://localhost:5173/index.html`
 
 #### Run on a Real Phone via Expo Go
 **Prerequisites:** You need both Vite AND Expo running simultaneously (two terminals).
